@@ -35,7 +35,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 ### 1A. Rust DB layer
 - [x] 1.1 Add `rusqlite` (feature `bundled-sqlcipher-vendored-openssl`). Open `life.db` in the app data dir with `PRAGMA key` first, then WAL, foreign keys, `synchronous=NORMAL`, `busy_timeout` and `temp_store=MEMORY`. Confirm FTS5 is available. [NFR-3, NFR-4, NFR-5, SEC-1, SEC-3]
 - [x] 1.2 `KeyStore` trait plus a `keyring` implementation, and a `0600` key-file fallback with a warning flag. First-run key generation. [SEC-2]
-- [ ] 1.3 "Can't open database" error screen for when the key is missing but a DB exists. [SEC-2]
+- [x] 1.3 "Can't open database" error screen for when the key is missing but a DB exists. [SEC-2]
 - [x] 1.4 Implement the `db_query`, `db_execute` and `db_transaction` commands, mapping JSON params ↔ SQLite types. [NFR-3]
 - [x] 1.5 Implement `db_backup` (Online Backup API, device key) and `db_info`. [EXP-4, EXP-7]
 - [x] 1.6 `cargo test`: transaction rolls back on error; backup produces a DB that opens; the DB is unreadable without the key; a file with a different key is rejected.
@@ -48,19 +48,21 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 - [x] 1.11 `0002_seed`: 8 default categories with **fixed UUIDs** (design §4.5), plus default settings including `day_start_hour = 4`. [CAT-1, SET-2, SET-4, FC-5]
 
 ### 1C. Domain & repositories
-- [ ] 1.12 Domain types and Zod schemas for every entity (design §5.1). [FC-1]
+- [x] 1.12 Domain types and Zod schemas for every entity (design §5.1). [FC-1]
 - [x] 1.13 ID helpers: `newId()` (UUID v7) and `naturalId(kind, ...parts)` (UUID v5 under the app namespace) for habit entries and link tables. [FC-1, FC-5]
 - [x] 1.14 Clock helpers: `nowUtc()`, `logicalToday(dayStartHour)`, `logicalDateOf(timestamp, dayStartHour)`. Nothing else reads the system date. [NFR-11, SET-4]
-- [ ] 1.15 Repository interfaces (design §5.2).
-- [ ] 1.16 SQLite repositories for V1.0 entities, with row↔domain mappers, `updated_at` handling, and a soft-delete filter on every read:
-  - [ ] Category, Tag (incl. `getOrCreate`, `setTags` with natural IDs, rename, merge) [CAT-2..4, TAG-1..4, FC-5]
-  - [ ] Habit (incl. type lock, `activeOn`, reorder, archive, cascading soft delete) [HAB-1..10, MON-8]
-  - [ ] HabitEntry (`forRange`, `set` = upsert on natural ID that also revives a soft-deleted row, `clear` = soft delete) [ENT-1..4, FC-5]
-  - [ ] Journal [JRN-1..7]
-  - [ ] Settings [SET-2..4]
-- [ ] 1.17 `createRepositories(driver)` and a `RepositoryProvider` React context. [FC-3]
-- [ ] 1.18 Repository test suite on the in-memory NodeDriver: CRUD, soft delete hides rows, set → clear → set reuses the same entry ID, the same (habit, date) gives the same ID on two separate DBs, cascade, triggers keep search in sync, tag merge. [NFR-10, FC-5]
-- [ ] 1.19 `tests/fixtures/seed.ts`: synthetic data generator (5 years × 30 habits, 3,000 journal entries, goals, events). [NFR-1]
+- [x] 1.15 Repository interfaces (design §5.2).
+- [x] 1.16 SQLite repositories for V1.0 entities, with row↔domain mappers, `updated_at` handling, and a soft-delete filter on every read:
+  - [x] Category, Tag (incl. `getOrCreate`, `setTags` with natural IDs, rename, merge) [CAT-2..4, TAG-1..4, FC-5]
+  - [x] Habit (incl. type lock, `activeOn`, reorder, archive, cascading soft delete) [HAB-1..10, MON-8]
+  - [x] HabitEntry (`forRange`, `set` = upsert on natural ID that also revives a soft-deleted row, `clear` = soft delete) [ENT-1..4, FC-5]
+  - [x] Journal [JRN-1..7]
+  - [x] Settings [SET-2..4]
+- [x] 1.17 `createRepositories(driver)` and a `RepositoryProvider` React context. [FC-3]
+- [x] 1.18 Repository test suite on the in-memory NodeDriver: CRUD, soft delete hides rows, set → clear → set reuses the same entry ID, the same (habit, date) gives the same ID on two separate DBs, cascade, triggers keep search in sync, tag merge. [NFR-10, FC-5]
+- [x] 1.19 `tests/fixtures/seed.ts`: synthetic data generator (5 years × 30 habits, 3,000 journal entries, goals, events). [NFR-1]
+
+> Status: code complete. The encrypted DB opens and migrates in the Tauri app on Linux (verified 2026-11-08). The Debug page (dev builds only) covers the create/list check below.
 
 **✅ Done when:** all migrations apply on a fresh DB in both the Node tests and the Tauri app, the repository tests pass, and a dev-only debug page in the Tauri app can create and list a habit and an entry.
 

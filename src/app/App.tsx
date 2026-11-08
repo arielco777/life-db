@@ -1,5 +1,6 @@
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
-import { FEATURE_V1_1 } from './features';
+import { FEATURE_V1_1, SHOW_DEBUG } from './features';
+import { DebugPage } from '@/features/debug/DebugPage';
 import { Placeholder } from '@/features/Placeholder';
 
 interface NavItem {
@@ -36,6 +37,14 @@ export function App() {
             <span className="nav-label">{n.label}</span>
           </NavLink>
         ))}
+        {SHOW_DEBUG && (
+          <NavLink to="/debug" className="nav-link nav-debug">
+            <span className="nav-icon" aria-hidden>
+              ⚑
+            </span>
+            <span className="nav-label">Debug</span>
+          </NavLink>
+        )}
       </nav>
       <main className="page">
         <Routes>
@@ -53,6 +62,7 @@ export function App() {
               <Route path="/search" element={<Placeholder title="Search" phase="Phase 14" />} />
             </>
           )}
+          {SHOW_DEBUG && <Route path="/debug" element={<DebugPage />} />}
           <Route path="*" element={<Navigate to="/day" replace />} />
         </Routes>
       </main>
