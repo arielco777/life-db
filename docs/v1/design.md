@@ -465,7 +465,7 @@ Stats are computed in TS from the entries for a range, fetched in **one indexed 
 
 ### 6.1 Daily view (`/day/:date`)
 
-Data loaded with parallel queries: habits active on the date, entries for the date, events overlapping the date, goals that have linked habits (active status), and journal entries for the date. Week and month target progress needs entries for the enclosing period, so the daily view fetches entries for `[startOfMonth(min(weekStart)), date]`.
+Data loaded with parallel queries (`useDay`): habits active on the date, entries, events overlapping the date (V1.1), goals that have linked habits (V1.1), and journal entries for the date. Week and month targets need the enclosing period, so entries are fetched for `dayWindow(date)`: the union of the date's week and month. Moving between days of the same month reuses that one cached query, and saving a value patches it in place.
 
 ```text
 ┌──────────────────────────────────────────────┐
@@ -498,7 +498,8 @@ Data loaded with parallel queries: habits active on the date, entries for the da
 - **Per-type inputs** (`<HabitInput habit value onChange />` dispatches to): `BooleanToggle`, `NumberInput` (stepper and free entry), `DurationInput` (accepts `45`, `0:45`, `1h30`), `RatingPicker` (segmented buttons, number keys).
 - **Input behavior:** `BooleanToggle` click toggles *done ↔ not logged*. An explicit *not done* (0, ✗) is set from the entry's `⋯` menu, which also holds the note (ENT-3) and *Clear entry* (ENT-2). Text inputs commit once on Enter or blur, never per keystroke. Escape reverts, and invalid text is flagged and never saved (ENT-4). Rating scales wider than 11 values use a whole-number field instead of buttons.
 - **Saving:** `useSetEntry()` does an optimistic TanStack Query update, then calls `entryRepo.set`. On error it rolls back and shows a toast (ENT-5, NFR-1).
-- **Keyboard** (DAY-3): one focus order through all inputs. A global key handler ignores keys when focus is in a text field.
+- **Keyboard** (DAY-3): one focus order through all inputs. A window key handler maps ←/→ to the previous/next day and `t` to today. It ignores keys typed in text fields, selects and dialogs, keys a widget already handled (`defaultPrevented`, e.g. arrows in a rating) and keys pressed with modifiers.
+- **Row status** (DAY-5, HAB-5): under each habit name, "Not scheduled" on off days (still loggable), day targets as met / below / over, week and month targets as progress so far ("3 / 4 this week", "1h 30m / 10h this month", "avg 6.5 this week · target ≥ 7"), and ●●○ dots for N-per-week habits without a target.
 
 ### 6.2 Monthly view (`/month/:yyyy-mm`)
 
