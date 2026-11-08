@@ -10,6 +10,19 @@ export const valuesByDate = (entries: readonly Pick<HabitEntry, 'date' | 'value'
   new Map(entries.map((e) => [e.date, e.value]));
 
 /** The calendar period (day / week / month) a target is measured over, containing `date`. */
+/** Splits entries into one ValuesByDate per habit (daily view, monthly grid). */
+export function valuesByHabit(
+  entries: readonly Pick<HabitEntry, 'habitId' | 'date' | 'value'>[],
+): Map<string, Map<ISODate, number>> {
+  const out = new Map<string, Map<ISODate, number>>();
+  for (const e of entries) {
+    let m = out.get(e.habitId);
+    if (!m) out.set(e.habitId, (m = new Map()));
+    m.set(e.date, e.value);
+  }
+  return out;
+}
+
 export function periodRange(period: HabitTarget['period'], date: ISODate, weekStart: WeekStart): DateRange {
   switch (period) {
     case 'day':

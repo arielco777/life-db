@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { dayWindow } from './rowStatus';
-import { valuesByDate, type ValuesByDate } from '@/domain/services/targets';
-import type { Habit, HabitEntry, ISODate, JournalEntry, UUID } from '@/domain/types';
+import { valuesByHabit, type ValuesByDate } from '@/domain/services/targets';
+import type { Habit, ISODate, JournalEntry, UUID } from '@/domain/types';
 import { useEntries } from '@/features/habits/entryHooks';
 import { useActiveHabits } from '@/features/habits/hooks';
 import { useJournalForDate } from '@/features/journal/hooks';
@@ -29,19 +29,11 @@ export function useDay(date: ISODate): DayData {
   const entries = useEntries(range);
   const journal = useJournalForDate(date);
 
-  const valuesByHabit = useMemo(() => {
-    const byHabit = new Map<UUID, HabitEntry[]>();
-    for (const e of entries.data ?? []) {
-      const list = byHabit.get(e.habitId);
-      if (list) list.push(e);
-      else byHabit.set(e.habitId, [e]);
-    }
-    return new Map([...byHabit].map(([id, list]) => [id, valuesByDate(list)]));
-  }, [entries.data]);
+  const byHabit = useMemo(() => valuesByHabit(entries.data ?? []), [entries.data]);
 
   return {
     habits: habits.data ?? [],
-    valuesByHabit,
+    valuesByHabit: byHabit,
     journal: journal.data ?? [],
     window: range,
     isPending: habits.isPending || entries.isPending,
