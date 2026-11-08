@@ -52,6 +52,9 @@ textarea {
 input:where(:not([type='checkbox'], [type='radio'])),
 select {
   height: var(--control-h);
+  /* No vertical padding: single-line fields centre their text, and padding plus a fixed
+     height would clip it (WebKitGTK selects in particular). */
+  padding-block: 0;
 }
 
 button {
@@ -537,7 +540,7 @@ button.danger {
   width: 5.5em;
   text-align: right;
   font-variant-numeric: tabular-nums;
-  padding: var(--space-1) var(--space-2);
+  padding: 0 var(--space-2);
 }
 .value-input input.duration {
   width: 6.5em;
@@ -722,11 +725,10 @@ a.button.secondary {
   padding: 0;
   margin-bottom: var(--space-1);
 }
-/* A fieldset's <legend> is laid out specially and ignores the flex gap; floating it turns it
-   into an ordinary flex item, so legends and labels sit the same distance above their controls. */
+/* A fieldset's <legend> sits outside the fieldset's flex content box in every engine, so the
+   flex gap never applies to it. Labels get margin + gap (4 + 4); legends get the same 8px as margin. */
 .field > legend {
-  float: left;
-  width: 100%;
+  margin-bottom: var(--space-2);
 }
 .field .row {
   margin: 0;
