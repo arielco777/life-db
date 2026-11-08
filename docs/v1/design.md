@@ -531,7 +531,10 @@ MONTHLY GOALS
 
 - List with drag-to-reorder, filter by category and archived status, and an "Archive" section.
 - Form: name, type (locked once entries exist), unit / rating scale, target, frequency, category, priority, dates, tags, linked goals.
-- Detail page: stats for the selected period, a chart, and recent entries (ANL-1/3).
+- Detail page: summary, archive/delete, and the last 7 days with live inputs (V1.0). Stats for the selected period and a chart arrive with analytics (ANL-1/3, V1.1).
+- **End date is an explicit choice:** *Ends: (•) Never ( ) On a date*. The date field appears only for "On a date" and is then required, and switching back to Never clears it. The habit page states the window ("From Aug 14, 2026 · no end date", "… · ends in 53 days"). Finished habits get an **Ended** badge and list rows show "Ends/Ended Dec 31", so a habit that leaves the daily view on schedule is never mistaken for an archived or missing one.
+- Reordering uses `@dnd-kit` (pointer, touch and keyboard: focus the ⠿ handle, Space, arrows, Space). It is disabled while a category filter is active, since a partial list can't define a full order.
+- A rating habit's scale is locked once it has entries, like its type (HAB-2), so existing values can't fall outside the scale.
 
 ### 6.4 Goals (`/goals`, `/goals/:id`)
 

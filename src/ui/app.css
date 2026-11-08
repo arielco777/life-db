@@ -47,6 +47,15 @@ textarea {
   border-radius: var(--radius);
   padding: var(--space-2) var(--space-3);
 }
+/* Native date/select widgets size themselves differently per platform; pin them to one height. */
+/* :where() keeps this at element-level specificity so component rules can override it. */
+input:where(:not([type='checkbox'], [type='radio'])),
+select {
+  height: var(--control-h);
+  /* No vertical padding: single-line fields centre their text, and padding plus a fixed
+     height would clip it (WebKitGTK selects in particular). */
+  padding-block: 0;
+}
 
 button {
   background: var(--accent);
@@ -395,6 +404,7 @@ button.danger {
 
 /* ───────── tag input ───────── */
 .tag-input {
+  min-height: var(--control-h);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -437,6 +447,7 @@ button.danger {
   min-width: 8em;
 }
 .tag-input-field input {
+  height: auto;
   width: 100%;
   border: 0;
   background: transparent;
@@ -525,10 +536,11 @@ button.danger {
   position: relative;
 }
 .value-input input.num {
+  height: 28px; /* matches the step buttons and checkboxes in compact rows */
   width: 5.5em;
   text-align: right;
   font-variant-numeric: tabular-nums;
-  padding: var(--space-1) var(--space-2);
+  padding: 0 var(--space-2);
 }
 .value-input input.duration {
   width: 6.5em;
@@ -645,5 +657,247 @@ button.check-not-done {
   width: 100%;
 }
 .popover .row {
+  margin: 0;
+}
+
+/* ───────── page & form building blocks ───────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.page-header .page-title {
+  margin: 0;
+}
+a.button {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+  text-decoration: none;
+}
+a.button.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+.badge {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font: 12px/1.8 var(--font-body);
+  color: var(--ink-muted);
+  vertical-align: middle;
+}
+.stack-xs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.card.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.card.empty p {
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.field > label,
+.field > legend {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0;
+  margin-bottom: var(--space-1);
+}
+/* A fieldset's <legend> sits outside the fieldset's flex content box in every engine, so the
+   flex gap never applies to it. Labels get margin + gap (4 + 4); legends get the same 8px as margin. */
+.field > legend {
+  margin-bottom: var(--space-2);
+}
+.field .row {
+  margin: 0;
+}
+.field-msg {
+  margin: 0;
+  font-size: 13px;
+}
+input.short {
+  width: 6em;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+/* Controls fill their column so the gaps between columns look even. */
+.form-grid .field > :is(input, select, .segmented) {
+  width: 100%;
+}
+.form-actions {
+  margin-top: var(--space-2);
+}
+.check-row {
+  margin: 0;
+  cursor: pointer;
+}
+fieldset:disabled .type-option {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.type-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-2);
+}
+.type-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  cursor: pointer;
+}
+.type-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.type-option.on {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.type-option:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  align-self: flex-start;
+}
+.segmented label {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--control-h) - 2px); /* minus the top and bottom border */
+  padding: 0 var(--space-3);
+  cursor: pointer;
+  background: var(--paper-raised);
+}
+.segmented label + label {
+  border-left: 1px solid var(--border);
+}
+.segmented label.on {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.segmented label:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.weekday-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+.weekday-picker button {
+  min-width: 48px;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+.weekday-picker button.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* ───────── habits list & detail ───────── */
+.habit-row {
+  background: var(--paper-raised);
+}
+.habit-row.dragging {
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.15);
+}
+.drag-handle {
+  cursor: grab;
+  touch-action: none;
+  font-size: 18px;
+}
+.habit-name {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+.habit-name:hover {
+  text-decoration: underline;
+}
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+.facts dt {
+  color: var(--ink-muted);
+}
+.facts dd {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.description {
+  white-space: pre-wrap;
+  margin: 0;
+}
+.stack h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.danger-zone {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-4);
+}
+.end-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+.end-options .row {
   margin: 0;
 }

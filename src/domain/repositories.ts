@@ -91,7 +91,10 @@ export interface HabitRepository {
   get(id: UUID): Promise<Habit | null>;
   hasEntries(id: UUID): Promise<boolean>;
   create(input: NewHabit): Promise<Habit>;
-  /** Throws `type_locked` when changing the type of a habit that has entries (HAB-2). */
+  /**
+   * Throws `type_locked` when changing the type, or a rating habit's scale, of a habit that
+   * has entries (HAB-2): existing values would no longer fit.
+   */
   update(id: UUID, patch: HabitPatch): Promise<Habit>;
   archive(id: UUID, archived: boolean): Promise<void>;
   /** Soft-deletes the habit and its entries, tags and goal links (HAB-9). */

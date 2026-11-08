@@ -185,6 +185,21 @@ describe('habits', () => {
     );
   });
 
+  it('locks the rating scale once entries exist, but allows saving it unchanged', async () => {
+    const { repos } = await setup();
+    const h = await repos.habits.create({ name: 'Mood', type: 'rating', startDate: '2026-08-01' });
+    expect((await repos.habits.update(h.id, { ratingScale: { min: 1, max: 5 } })).ratingScale).toEqual({
+      min: 1,
+      max: 5,
+    });
+    await repos.entries.set(h.id, '2026-08-02', 4);
+    await expect(repos.habits.update(h.id, { ratingScale: { min: 1, max: 10 } })).rejects.toSatisfy((e) =>
+      isDomainError(e, 'type_locked'),
+    );
+    const same = await repos.habits.update(h.id, { name: 'Mood', ratingScale: { min: 1, max: 5 } });
+    expect(same.ratingScale).toEqual({ min: 1, max: 5 });
+  });
+
   it('update with null clears optional fields', async () => {
     const { repos } = await setup();
     const h = await repos.habits.create({
