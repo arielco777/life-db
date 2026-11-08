@@ -26,7 +26,7 @@ V1 ships in two releases, so the core notebook reaches users sooner and real use
 | **V1.0** — the notebook | Habits (HAB), entries (ENT), categories (CAT), tags (TAG), journal (JRN), daily view (DAY), monthly view (MON), backup & restore (EXP), encryption (SEC), settings (SET), distribution (DIST), all NFRs and FC |
 | **V1.1** — the rest of V1 | Goals (GOAL), life events (EVT), analytics (ANL), search (SRCH), plus the parts of other areas that depend on them: the goals and events sections of the daily view (DAY-1), month goals (MON-7), event markers (MON-6), and goals/events in tag views (TAG-5) |
 
-The V1.0 database schema already contains every V1.1 table, so V1.1 is a plain app update with no data migration. The monthly summary column (MON-4) ships in V1.0. The analytics screens ship in V1.1.
+The V1.0 database schema already contains every V1.1 table, so V1.1 is a plain app update with no data migration. The monthly summary row (MON-4) ships in V1.0. The analytics screens ship in V1.1.
 
 ### Out of scope (V1)
 
@@ -216,7 +216,7 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 ### 4.9 Monthly view (MON)
 
-**MON-1 Grid.** For a selected month, the system SHALL show a grid: rows = habits active during the month, columns = days 1…N. Each cell shows that habit's value on that day:
+**MON-1 Grid.** For a selected month, the system SHALL show a grid laid out like a paper habit tracker: rows = days 1…N (with the weekday), columns = habits active during the month, in user order. Each cell shows that habit's value on that day:
 - boolean → ✓ or empty
 - number → value
 - duration → compact (`45m`, `1h30`)
@@ -224,13 +224,13 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 **MON-2 Navigation.** Previous/next month, jump to current month, month picker. Switching months SHALL feel instant (see NFR-1).
 
-**MON-3 Inline edit.** Clicking a cell edits it in place: a boolean toggles, other types open a small input. Arrow keys move between cells.
+**MON-3 Inline edit.** Clicking a cell edits it in place: a boolean toggles, other types open a small input. Arrow keys move between cells (↑/↓ change the day, ←/→ the habit).
 
-**MON-4 Summary column.** Each row ends with a summary for the month: boolean → `done/scheduled days` and %, number → average (and total if a unit is set), duration → total and average per day, rating → average.
+**MON-4 Summary row.** Each habit column ends with a summary for the month, in a footer row under the last day: boolean → `done/scheduled days` and %, number → average (and total if a unit is set), duration → total and average per day, rating → average.
 
-**MON-5 Day link.** Clicking a day header opens the daily view for that date.
+**MON-5 Day link.** Clicking a day's row header (its number) opens the daily view for that date.
 
-**MON-6 Visual cues.** Today's column, weekends, unscheduled days and days with life events are visually distinguished. Cells that meet the target are styled.
+**MON-6 Visual cues.** Today's row, weekends, unscheduled cells and days with life events (a marker next to the day number) are visually distinguished. Cells that meet the target are styled. Logged cells are tinted with a light version of the habit's category color (the accent color when it has none), like the colored columns of a paper tracker.
 
 **MON-7 Month goals and notes.** Below the grid, show that month's goals (GOAL-6) with their status and progress.
 
@@ -341,7 +341,7 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 **NFR-7 Accessibility.** All controls are keyboard reachable, with visible focus, labels for assistive technology, and WCAG AA contrast in both themes.
 
-**NFR-8 Responsiveness.** Layouts SHALL adapt down to 360 px width (to prepare for mobile, FC-4). On narrow widths the monthly grid scrolls horizontally with a sticky habit-name column.
+**NFR-8 Responsiveness.** Layouts SHALL adapt down to 360 px width (to prepare for mobile, FC-4). The monthly grid keeps its day column and habit header row sticky; when the habits don't fit the width, it scrolls horizontally.
 
 **NFR-9 Platforms.** V1 ships for Windows, macOS and Linux desktop.
 
