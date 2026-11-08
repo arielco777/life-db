@@ -7,3 +7,4 @@ src-tauri/gen/schemas
 *.db
 *.db-wal
 *.db-shm
+coverage

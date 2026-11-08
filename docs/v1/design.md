@@ -452,11 +452,11 @@ All repositories are built once in `createRepositories(driver: SqlDriver)` and h
 | `dates.ts` | Calendar math on `YYYY-MM-DD` strings in UTC (add/diff days, week and month boundaries by week start), so DST can never shift a date | NFR-11 |
 | `schedule.ts` | `isScheduled(habit, date)`, `scheduledDays(habit, range)` and `expectedCompletions()` from frequency + start/end dates. "N times per week" habits: any active day counts; a full week expects N, a partial week (month edges, habit start/end) expects `round(N × activeDays / 7)` | HAB-5 |
 | `targets.ts` | `evaluateTarget(habit, values, asOf, weekStart)` → `met` / `not_met` / `in_progress` / `no_data` plus actual and progress, for the day, week or month containing `asOf`. Roll-up: boolean = done days, number/duration = sum, rating = average | HAB-4, DAY-5 |
-| `stats.ts` | Per-type stats: completion %, streaks, avg/min/max/total | ANL-1/2, MON-4 |
+| `stats.ts` | `computeStats(habit, values, range, { weekStart, today })`: boolean → done / expected / completion + current and longest streak (days, or weeks for N/week); number → total/avg/min/max; duration → total, avg per logged day and per calendar day; rating → avg/min/max. Days after `today` are ignored, and an unlogged today (or unfinished week) doesn't break a streak. `previousPeriod()` for comparisons (August → July) | ANL-1/2, MON-4 |
 | `progress.ts` | Goal progress for each progress mode | GOAL-4 |
 | `clock.ts` | `nowUtc()`, `logicalToday(dayStartHour)`, `logicalDateOf(ts, dayStartHour)`. The only place the system clock is read. A `useToday()` hook re-renders when the logical day rolls over | SET-4, NFR-11 |
 | `ids.ts` | `newId()` (v7), `naturalId(kind, ...parts)` (v5, app namespace), default-category ID constants | FC-1, FC-5 |
-| `format.ts` | Value display (`1h 30m`, `8/10`, `2.5 L`) and duration parsing (`1:30`, `90`, `1h30`) | HAB-2 |
+| `format.ts` | Value display (`1h 30m`, `8/10`, `2.5 L`; compact `1h30` for grid cells), locale-aware numbers and percentages, and duration parsing (`45`, `0:45`, `1h30`, `1.5h`, `2 hours`) | HAB-2, MON-1 |
 | `tags.ts` | Name normalization | TAG-3 |
 
 Stats are computed in TS from the entries for a range, fetched in **one indexed query per view**. Five years × 30 habits is about 55k rows in total, and a month is under 1k rows, so in-memory aggregation is cheap and easy to test. A SQL `GROUP BY` path can be added later if profiling shows it's needed. Nothing derived is persisted (ANL-5).
