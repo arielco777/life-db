@@ -41,16 +41,16 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 - [x] 1.6 `cargo test`: transaction rolls back on error; backup produces a DB that opens; the DB is unreadable without the key; a file with a different key is rejected.
 
 ### 1B. TypeScript driver & migrations
-- [ ] 1.7 Write the `SqlDriver` interface, `TauriDriver` (invoke), and `tests/nodeDriver.ts` (better-sqlite3). [NFR-10]
-- [ ] 1.8 Migration runner: bundle `migrations/*.sql`, take a backup before migrating, run each migration in a transaction, refuse a newer DB version. [NFR-3]
-- [ ] 1.9 `0001_init.sql`: every table, index and CHECK in design §4.3, including the V1.1 tables. [FC-1, FC-2, ENT-1, CAT-4, TAG-3]
-- [ ] 1.10 FTS5 `search_index` plus triggers for journal_entries, habits, goals, goal_milestones and life_events, respecting `deleted_at`. [SRCH-1]
-- [ ] 1.11 `0002_seed`: 8 default categories with **fixed UUIDs** (design §4.5), plus default settings including `day_start_hour = 4`. [CAT-1, SET-2, SET-4, FC-5]
+- [x] 1.7 Write the `SqlDriver` interface, `TauriDriver` (invoke), and `tests/nodeDriver.ts` (better-sqlite3). [NFR-10]
+- [x] 1.8 Migration runner: bundle `migrations/*.sql`, take a backup before migrating, run each migration in a transaction, refuse a newer DB version. [NFR-3]
+- [x] 1.9 `0001_init.sql`: every table, index and CHECK in design §4.3, including the V1.1 tables. [FC-1, FC-2, ENT-1, CAT-4, TAG-3]
+- [x] 1.10 FTS5 `search_index` plus triggers for journal_entries, habits, goals, goal_milestones and life_events, respecting `deleted_at`. [SRCH-1]
+- [x] 1.11 `0002_seed`: 8 default categories with **fixed UUIDs** (design §4.5), plus default settings including `day_start_hour = 4`. [CAT-1, SET-2, SET-4, FC-5]
 
 ### 1C. Domain & repositories
 - [ ] 1.12 Domain types and Zod schemas for every entity (design §5.1). [FC-1]
-- [ ] 1.13 ID helpers: `newId()` (UUID v7) and `naturalId(kind, ...parts)` (UUID v5 under the app namespace) for habit entries and link tables. [FC-1, FC-5]
-- [ ] 1.14 Clock helpers: `nowUtc()`, `logicalToday(dayStartHour)`, `logicalDateOf(timestamp, dayStartHour)`. Nothing else reads the system date. [NFR-11, SET-4]
+- [x] 1.13 ID helpers: `newId()` (UUID v7) and `naturalId(kind, ...parts)` (UUID v5 under the app namespace) for habit entries and link tables. [FC-1, FC-5]
+- [x] 1.14 Clock helpers: `nowUtc()`, `logicalToday(dayStartHour)`, `logicalDateOf(timestamp, dayStartHour)`. Nothing else reads the system date. [NFR-11, SET-4]
 - [ ] 1.15 Repository interfaces (design §5.2).
 - [ ] 1.16 SQLite repositories for V1.0 entities, with row↔domain mappers, `updated_at` handling, and a soft-delete filter on every read:
   - [ ] Category, Tag (incl. `getOrCreate`, `setTags` with natural IDs, rename, merge) [CAT-2..4, TAG-1..4, FC-5]
