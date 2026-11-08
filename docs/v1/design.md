@@ -496,6 +496,7 @@ Data loaded with parallel queries: habits active on the date, entries for the da
 
 - **One habits section** (DAY-1): every habit type shares one list in user order, and each row renders its own input. Keep the row component layout-agnostic, because a separate measurements presentation may come in a later UI redesign.
 - **Per-type inputs** (`<HabitInput habit value onChange />` dispatches to): `BooleanToggle`, `NumberInput` (stepper and free entry), `DurationInput` (accepts `45`, `0:45`, `1h30`), `RatingPicker` (segmented buttons, number keys).
+- **Input behavior:** `BooleanToggle` click toggles *done ↔ not logged*. An explicit *not done* (0, ✗) is set from the entry's `⋯` menu, which also holds the note (ENT-3) and *Clear entry* (ENT-2). Text inputs commit once on Enter or blur, never per keystroke. Escape reverts, and invalid text is flagged and never saved (ENT-4). Rating scales wider than 11 values use a whole-number field instead of buttons.
 - **Saving:** `useSetEntry()` does an optimistic TanStack Query update, then calls `entryRepo.set`. On error it rolls back and shows a toast (ENT-5, NFR-1).
 - **Keyboard** (DAY-3): one focus order through all inputs. A global key handler ignores keys when focus is in a text field.
 

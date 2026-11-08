@@ -510,3 +510,140 @@ button.danger {
   gap: var(--space-2);
   margin-top: var(--space-4);
 }
+
+/* ───────── habit value inputs (HAB-2) ───────── */
+.entry-field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  position: relative;
+}
+.value-input {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  position: relative;
+}
+.value-input input.num {
+  width: 5.5em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  padding: var(--space-1) var(--space-2);
+}
+.value-input input.duration {
+  width: 6.5em;
+}
+.value-input input[aria-invalid] {
+  border-color: var(--error);
+}
+.value-input .unit {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+button.step {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  line-height: 1;
+}
+.field-error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--error);
+  white-space: nowrap;
+}
+
+button.check {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 6px;
+  border: 2px solid var(--ink-muted);
+  background: transparent;
+  color: var(--accent-ink);
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background 120ms ease,
+    transform 120ms ease;
+}
+button.check-done {
+  background: var(--accent);
+  border-color: var(--accent);
+  animation: check-pop 180ms ease;
+}
+button.check-not-done {
+  color: var(--margin);
+  border-color: var(--margin);
+}
+@keyframes check-pop {
+  50% {
+    transform: scale(1.15);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button.check-done {
+    animation: none;
+  }
+}
+
+.rating {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.rating button {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--space-1);
+  background: transparent;
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.rating button:hover:not(:disabled) {
+  color: var(--ink);
+}
+.rating button.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.entry-menu {
+  position: relative;
+}
+.entry-menu button.has-note {
+  color: var(--accent);
+}
+.popover {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  z-index: 15;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--paper-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.14);
+}
+.popover textarea {
+  resize: vertical;
+  width: 100%;
+}
+.popover .row {
+  margin: 0;
+}

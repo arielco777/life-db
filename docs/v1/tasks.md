@@ -97,10 +97,10 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 - [ ] 4.1a Shared `<CategoryFilter>`: active categories, then an "Archived" group with only the archived categories the listed records use. Reused by 7.1, 11.3, 13.5 and 14.3. [CAT-5]
 - [ ] 4.2 Habit form: all fields, with a type-specific section (unit / rating scale), target, frequency, tags, and type locked when entries exist. [HAB-1..7]
 - [ ] 4.3 Archive/unarchive and delete with confirmation. [HAB-8, HAB-9]
-- [ ] 4.4 `<HabitInput>` dispatcher plus `BooleanToggle`, `NumberInput`, `DurationInput` and `RatingPicker`, with validation. [HAB-2, ENT-4]
-- [ ] 4.5 `useSetEntry` / `useClearEntry` hooks: optimistic update, rollback, error toast. [ENT-2, ENT-5, NFR-1]
-- [ ] 4.6 Entry note support (popover). [ENT-3]
-- [ ] 4.7 Component tests for each input type.
+- [x] 4.4 `<HabitInput>` dispatcher plus `BooleanToggle`, `NumberInput`, `DurationInput` and `RatingPicker`, with validation. [HAB-2, ENT-4]
+- [x] 4.5 `useSetEntry` / `useClearEntry` hooks: optimistic update, rollback, error toast. [ENT-2, ENT-5, NFR-1]
+- [x] 4.6 Entry note support (popover). [ENT-3]
+- [x] 4.7 Component tests for each input type.
 
 **✅ Done when:** habits of all four types can be created, edited, archived and deleted, and the inputs work on their own.
 
