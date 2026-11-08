@@ -15,7 +15,7 @@ import { dayLong, monthTitle, weekdayShort } from './labels';
 import { summaryLines } from './summary';
 import { eachDay, monthRange, weekdayOf } from '@/domain/services/dates';
 import { formatDuration, formatValue, parseDuration } from '@/domain/services/format';
-import { isActiveOn, isScheduled } from '@/domain/services/schedule';
+import { isActiveOn, isRestDay, isScheduled, restDaysLogged } from '@/domain/services/schedule';
 import { computeStats } from '@/domain/services/stats';
 import { evaluateTarget, type TargetStatus, type ValuesByDate } from '@/domain/services/targets';
 import type { Habit, ISODate, ISOMonth } from '@/domain/types';
@@ -212,6 +212,7 @@ export function MonthGrid({ ym, habits, valuesByHabit, today }: GridProps) {
                         active={isActiveOn(h, d)}
                         future={d > today}
                         scheduled={isScheduled(h, d)}
+                        rest={isRestDay(h, d)}
                         dayTarget={
                           value !== undefined && h.target?.period === 'day'
                             ? evaluateTarget(h, values, d, week_start)?.status
@@ -237,7 +238,12 @@ export function MonthGrid({ ym, habits, valuesByHabit, today }: GridProps) {
                   weekStart: week_start,
                   today,
                 });
-                const lines = summaryLines(h, s);
+                const lines = summaryLines(
+                  h,
+                  s,
+                  undefined,
+                  restDaysLogged(h, valuesByHabit.get(h.id) ?? EMPTY, range),
+                );
                 return (
                   <td key={h.id} className="summary-cell" aria-label={`${h.name}: ${lines.label}`}>
                     <span className="summary-main">{lines.main}</span>
@@ -264,6 +270,8 @@ interface CellProps {
   /** After the logical today: can't be logged yet. */
   future: boolean;
   scheduled: boolean;
+  /** A rest day (HAB-5): shouldn't be done. Still loggable, but flagged when done. */
+  rest: boolean;
   dayTarget?: TargetStatus;
   color?: string;
   /** The grid's single tab stop (roving tabindex). */
@@ -294,7 +302,8 @@ const MonthCell = memo(function MonthCell(p: CellProps) {
     'cell',
     tinted && 'logged',
     isBool && value === 1 && 'done',
-    !p.active ? 'inactive' : !p.scheduled && 'unscheduled',
+    !p.active ? 'inactive' : p.rest ? 'rest' : !p.scheduled && 'unscheduled',
+    p.rest && tinted && 'rest-broken',
     p.future && 'future',
     p.dayTarget === 'met' && 'target-met',
     p.dayTarget === 'not_met' && 'target-missed',
@@ -308,7 +317,7 @@ const MonthCell = memo(function MonthCell(p: CellProps) {
   const locked = p.future || !p.active;
   const label = `${habit.name}, ${dayLong(date)}: ${
     p.future ? 'not yet' : !p.active ? 'outside the habit’s dates' : spoken(habit, value)
-  }${p.scheduled || locked ? '' : ', not scheduled'}`;
+  }${locked || p.scheduled ? '' : !p.rest ? ', not scheduled' : tinted ? ', on a rest day' : ', rest day'}`;
 
   const toggle = () => actions.commit(habit, date, value === 1 ? undefined : 1);
 
@@ -340,7 +349,9 @@ const MonthCell = memo(function MonthCell(p: CellProps) {
 
   const text =
     value === undefined
-      ? ''
+      ? p.rest && p.active
+        ? '–'
+        : ''
       : isBool
         ? value === 1
           ? '✓'

@@ -171,6 +171,23 @@ describe('Habit form (tasks 4.2)', () => {
     expect(await screen.findByRole('heading', { name: 'Water' })).toBeInTheDocument();
   });
 
+  it('a weekday habit can make its other days rest days (HAB-5)', async () => {
+    const app = await open('/habits/new');
+    const { user } = app;
+    await user.type(await screen.findByLabelText('Name'), 'Exercise');
+    expect(screen.queryByRole('radiogroup', { name: 'Other days' })).not.toBeInTheDocument();
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Schedule' }), 'On specific days');
+    const other = screen.getByRole('radiogroup', { name: 'Other days' });
+    expect(within(other).getByRole('radio', { name: /Optional/ })).toBeChecked(); // default
+    await user.click(within(other).getByRole('radio', { name: /Rest days/ }));
+    await user.click(screen.getByRole('button', { name: 'Create habit' }));
+
+    await waitFor(() => expect(path()).toMatch(/^\/habits\/[0-9a-f-]+$/));
+    const [h] = await app.repos.habits.list();
+    expect(h!.frequency).toEqual({ type: 'weekdays', days: ['mon', 'wed', 'fri'], restOnOtherDays: true });
+    expect(await screen.findByText(/Mon, Wed, Fri · rest other days/)).toBeInTheDocument();
+  });
+
   it('edits: type and scale are locked once entries exist; emptied fields are cleared (HAB-2, HAB-7)', async () => {
     let id = '';
     const app = await open('/habits/x', async (repos) => {

@@ -101,6 +101,10 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 **HAB-5 Frequency.** A habit has a schedule: `daily` (default), `specific weekdays` (e.g. Mon/Wed/Fri), or `n times per week`.
 - WHEN a date is not scheduled for a weekday-based habit THEN the daily view SHALL show the habit as "not scheduled" (it can still be logged), and analytics SHALL leave that date out of completion rates.
+- A weekday-based habit SHALL say what its other days are: **optional** (default; the habit may still be done) or **rest days** (the habit shouldn't be done, e.g. recovery days between workouts).
+- WHEN a date is a rest day THEN the daily view SHALL show "Rest day" instead of "not scheduled", and the monthly grid SHALL mark the cell as a rest day.
+- WHEN the habit is done on a rest day anyway (any value except a checkbox's "not done") THEN the entry SHALL be saved, and the daily view, the grid cell and the month summary SHALL flag it. Rest days stay out of completion rates.
+- Rest days are part of the habit's schedule, so a later "what's left today" summary can leave those habits out.
 
 **HAB-6 Priority.** Each habit has a priority: `low` / `medium` / `high` (default `medium`). Priority is independent of category.
 

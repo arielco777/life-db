@@ -218,6 +218,7 @@ CREATE TABLE habits (
                    CHECK (frequency_type IN ('daily','weekdays','times_per_week')),
   frequency_days   INTEGER,                    -- weekdays bitmask: bit0=Mon … bit6=Sun
   frequency_count  INTEGER,                    -- times_per_week
+  frequency_rest   INTEGER NOT NULL DEFAULT 0, -- weekdays: 1 = other days are rest days (HAB-5); migration 0003
   category_id      TEXT REFERENCES categories(id),
   priority         TEXT NOT NULL DEFAULT 'medium' CHECK (priority IN ('low','medium','high')),
   start_date       TEXT NOT NULL,
@@ -401,7 +402,7 @@ export interface Habit {
   id: UUID; name: string; description?: string; type: HabitType;
   unit?: string; ratingScale?: { min: number; max: number };
   target?: { value: number; op: 'at_least' | 'at_most'; period: 'day' | 'week' | 'month' };
-  frequency: { type: 'daily' } | { type: 'weekdays'; days: Weekday[] } | { type: 'times_per_week'; count: number };
+  frequency: { type: 'daily' } | { type: 'weekdays'; days: Weekday[]; restOnOtherDays?: boolean } | { type: 'times_per_week'; count: number };
   categoryId?: UUID; priority: Priority; startDate: ISODate; endDate?: ISODate;
   archivedAt?: Timestamp; sortOrder: number; tagIds: UUID[];
   createdAt: Timestamp; updatedAt: Timestamp;
@@ -532,7 +533,8 @@ MONTHLY GOALS
 - **Tint** (MON-6): logged cells get a light tint of the habit's category color (the accent color for habits without a category), mixed with `color-mix()` so it stays light in both themes. Checkboxes fill the cell; number, duration and rating cells show the value on the tint. An explicit "not done" (0) stays untinted with a faint ✗.
 - **Cell editing** (MON-3): the table follows the ARIA grid pattern. It is a single Tab stop (Tab enters and leaves it), and ↑/↓ move between days, ←/→ between habits, Home/End to the first/last habit, PgUp/PgDn by a week. A checkbox cell toggles on click, Space or Enter; `1`/`0` set done / not done. Other cells open a small in-cell editor on click, Enter or a typed digit (the digit starts the text). Enter saves and moves down a day, so a column can be filled like a notebook; Tab saves and moves right, Escape cancels, and clicking away saves. A rating cell takes a digit directly (`0` = 10), and Enter opens the 1–N picker. Delete clears a cell. Invalid text is flagged and never saved.
 - **Read-only cells** (ENT-2): days after the logical today, and days outside the habit's start/end dates, can be focused but not edited (`aria-disabled`, labelled "not yet" / "outside the habit's dates"). The daily view for a future date shows the habits with disabled inputs and a note.
-- Each cell has an accessible label: "Exercise, Monday, August 3: done", plus ", not scheduled" on off days (NFR-7).
+- **Rest days** (HAB-5): for a weekday habit whose other days are rest days, an empty rest-day cell shows a faint "–" instead of the off-day hatching. Doing the habit anyway is saved and gets a small "!" in the corner of the cell (`rest-broken`), and the summary row adds "⚠ N" for the month. `isRestDay` and `restDaysLogged` in `schedule.ts` are the single source for this.
+- Each cell has an accessible label: "Exercise, Monday, August 3: done", plus ", not scheduled" on off days, ", rest day" on rest days, or ", on a rest day" when a rest day was logged (NFR-7).
 - Cells are memoized on primitive props (value, scheduled, target status, colour, tab stop, editing), and grid actions come from a stable context, so editing one cell re-renders only that cell and the summary row.
 - **Summary row** (MON-4): a sticky footer row under day N with each habit's month summary from `stats.ts`.
 - The day number links to `/day/:date` (MON-5). Rows are classed for today and weekend, cells for unscheduled and target-met, and days with life events show a marker next to the number (MON-6).

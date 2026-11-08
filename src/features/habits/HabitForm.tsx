@@ -17,6 +17,8 @@ export interface HabitDraft {
   ratingMax: string;
   frequency: 'daily' | 'weekdays' | 'times_per_week';
   days: Weekday[];
+  /** Weekday habits: the other days are rest days (HAB-5) rather than optional. */
+  rest: boolean;
   count: string;
   hasTarget: boolean;
   targetOp: HabitTarget['op'];
@@ -42,6 +44,7 @@ export function draftFrom(h: Habit | undefined, today: ISODate): HabitDraft {
     ratingMax: String(h?.ratingScale?.max ?? 10),
     frequency: f?.type ?? 'daily',
     days: f?.type === 'weekdays' ? f.days : ['mon', 'wed', 'fri'],
+    rest: f?.type === 'weekdays' && !!f.restOnOtherDays,
     count: String(f?.type === 'times_per_week' ? f.count : 3),
     hasTarget: !!h?.target,
     targetOp: h?.target?.op ?? 'at_least',
@@ -90,7 +93,7 @@ export function toInput(
   let frequency: NewHabit['frequency'] = { type: 'daily' };
   if (d.frequency === 'weekdays') {
     if (d.days.length === 0) errors.days = 'Pick at least one day';
-    frequency = { type: 'weekdays', days: d.days };
+    frequency = { type: 'weekdays', days: d.days, ...(d.rest ? { restOnOtherDays: true } : {}) };
   } else if (d.frequency === 'times_per_week') {
     const count = intIn(d.count, 1, 7);
     if (count === null) errors.count = 'Between 1 and 7 times';
@@ -306,6 +309,24 @@ export function HabitForm({ initial, locked, submitLabel, busy, onSubmit, onCanc
           </div>
         )}
         {(errors.days || errors.count) && <p className="field-msg error">{errors.days ?? errors.count}</p>}
+        {d.frequency === 'weekdays' && (
+          <div className="other-days" role="radiogroup" aria-label="Other days">
+            <span className="small muted">Other days:</span>
+            <label className="check-row row">
+              <input
+                type="radio"
+                name={`${ids}-rest`}
+                checked={!d.rest}
+                onChange={() => set('rest', false)}
+              />
+              <span>Optional – can still be done</span>
+            </label>
+            <label className="check-row row">
+              <input type="radio" name={`${ids}-rest`} checked={d.rest} onChange={() => set('rest', true)} />
+              <span>Rest days – shouldn’t be done</span>
+            </label>
+          </div>
+        )}
       </fieldset>
 
       <fieldset className="field">

@@ -160,6 +160,26 @@ describe('Daily view: habits (tasks 5.3, 5.4, DAY-1, DAY-5, HAB-5)', () => {
     );
   });
 
+  it('rest days say so, and doing the habit anyway is saved but flagged (HAB-5)', async () => {
+    const app = await open(`/day/${THU}`, (repos) =>
+      repos.habits.create({
+        name: 'Gym',
+        type: 'boolean',
+        startDate: start,
+        frequency: { type: 'weekdays', days: ['mon', 'wed', 'fri'], restOnOtherDays: true },
+      }),
+    );
+    const box = await screen.findByRole('checkbox', { name: 'Gym, August 13' });
+    expect(screen.getByText('Rest day')).toBeInTheDocument();
+    expect(screen.queryByText('Not scheduled')).not.toBeInTheDocument();
+    await waitFor(() => expect(box).toBeEnabled());
+    await app.user.click(box);
+    expect(await screen.findByText('⚠ Done on a rest day')).toBeInTheDocument();
+    await waitFor(async () =>
+      expect((await app.repos.entries.forRange({ from: THU, to: THU }))[0]?.value).toBe(1),
+    );
+  });
+
   it('target feedback updates as soon as a value is logged', async () => {
     const app = await open(`/day/${THU}`, async (repos) => {
       await repos.habits.create({

@@ -4,7 +4,10 @@ import {
   expectedCompletions,
   expectedForWeek,
   isActiveOn,
+  isDoneValue,
+  isRestDay,
   isScheduled,
+  restDaysLogged,
   scheduledDays,
   weeksOf,
 } from './schedule';
@@ -17,6 +20,36 @@ const habit = (frequency: HabitFrequency, startDate = '2026-01-01', endDate?: st
 const AUG = { from: '2026-08-01', to: '2026-08-31' }; // Aug 1 2026 is a Saturday
 
 describe('schedule (HAB-5)', () => {
+  it('rest days are the off days of a weekday habit that rests on them', () => {
+    const optional = habit({ type: 'weekdays', days: ['mon', 'wed', 'fri'] });
+    const resting = habit(
+      { type: 'weekdays', days: ['mon', 'wed', 'fri'], restOnOtherDays: true },
+      '2026-08-05',
+    );
+    expect(isRestDay(optional, '2026-08-15')).toBe(false); // Sat, but optional
+    expect(isRestDay(resting, '2026-08-15')).toBe(true); // Sat
+    expect(isRestDay(resting, '2026-08-14')).toBe(false); // Fri is scheduled
+    expect(isRestDay(resting, '2026-08-04')).toBe(false); // before the start date
+    expect(isRestDay(habit({ type: 'daily' }), '2026-08-15')).toBe(false);
+    expect(isScheduled(resting, '2026-08-15')).toBe(false);
+  });
+
+  it('counts rest days on which the habit was done anyway', () => {
+    const h = {
+      ...habit({ type: 'weekdays', days: ['mon', 'wed', 'fri'], restOnOtherDays: true }),
+      type: 'boolean' as const,
+    };
+    const values = new Map([
+      ['2026-08-14', 1], // Fri: scheduled
+      ['2026-08-15', 1], // Sat: rest day, done
+      ['2026-08-16', 0], // Sun: rest day, marked not done → fine
+      ['2026-09-05', 1], // Sat, outside the range
+    ]);
+    expect(restDaysLogged(h, values, AUG)).toBe(1);
+    expect(isDoneValue(h, 0)).toBe(false);
+    expect(isDoneValue({ type: 'number' }, 0)).toBe(true);
+  });
+
   it('respects start and end dates', () => {
     const h = habit({ type: 'daily' }, '2026-08-10', '2026-08-20');
     expect(isActiveOn(h, '2026-08-09')).toBe(false);

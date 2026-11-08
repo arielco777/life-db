@@ -252,7 +252,13 @@ function DayHabitRow({
       <span className="grow stack-xs">
         <span className="habit-label">{habit.name}</span>
         <span className="small muted day-habit-meta">
-          {!status.scheduled && <span>Not scheduled</span>}
+          {status.restBroken ? (
+            <span className="rest-flag">⚠ Done on a rest day</span>
+          ) : status.rest ? (
+            <span>Rest day</span>
+          ) : (
+            !status.scheduled && <span>Not scheduled</span>
+          )}
           {status.week && (
             <span className="week-dots" aria-label={`${status.week.done} of ${status.week.need} this week`}>
               <span aria-hidden>

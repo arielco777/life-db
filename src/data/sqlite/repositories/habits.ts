@@ -22,6 +22,7 @@ interface HabitRow {
   frequency_type: HabitFrequency['type'];
   frequency_days: number | null;
   frequency_count: number | null;
+  frequency_rest: number;
   category_id: string | null;
   priority: Habit['priority'];
   start_date: string;
@@ -39,7 +40,11 @@ export const maskToWeekdays = (mask: number): Weekday[] => WEEKDAYS.filter((_, i
 function toFrequency(r: HabitRow): HabitFrequency {
   switch (r.frequency_type) {
     case 'weekdays':
-      return { type: 'weekdays', days: maskToWeekdays(r.frequency_days ?? 0) };
+      return {
+        type: 'weekdays',
+        days: maskToWeekdays(r.frequency_days ?? 0),
+        ...(r.frequency_rest ? { restOnOtherDays: true } : {}),
+      };
     case 'times_per_week':
       return { type: 'times_per_week', count: r.frequency_count ?? 1 };
     default:
@@ -102,6 +107,7 @@ const COLUMNS = [
   'frequency_type',
   'frequency_days',
   'frequency_count',
+  'frequency_rest',
   'category_id',
   'priority',
   'start_date',
@@ -121,6 +127,7 @@ const columnValues = (h: ValidHabit): SqlParam[] => [
   h.frequency.type,
   h.frequency.type === 'weekdays' ? weekdaysToMask(h.frequency.days) : null,
   h.frequency.type === 'times_per_week' ? h.frequency.count : null,
+  h.frequency.type === 'weekdays' && h.frequency.restOnOtherDays ? 1 : 0,
   n(h.categoryId),
   h.priority,
   h.startDate,

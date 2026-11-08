@@ -157,6 +157,25 @@ describe('habits', () => {
     });
   });
 
+  it('stores whether a weekday habit rests on its other days (HAB-5)', async () => {
+    const { repos } = await setup();
+    const h = await repos.habits.create({
+      name: 'Exercise',
+      type: 'boolean',
+      frequency: { type: 'weekdays', days: ['mon', 'wed', 'fri'], restOnOtherDays: true },
+    });
+    expect((await repos.habits.get(h.id))!.frequency).toEqual({
+      type: 'weekdays',
+      days: ['mon', 'wed', 'fri'],
+      restOnOtherDays: true,
+    });
+    await repos.habits.update(h.id, { frequency: { type: 'weekdays', days: ['mon', 'wed', 'fri'] } });
+    expect((await repos.habits.get(h.id))!.frequency).toEqual({
+      type: 'weekdays',
+      days: ['mon', 'wed', 'fri'],
+    });
+  });
+
   it('validates input (HAB-1)', async () => {
     const { repos } = await setup();
     const bad = [

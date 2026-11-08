@@ -233,4 +233,35 @@ describe('Days that can’t be logged (ENT-2)', () => {
     await app.user.click(cell(10, 0));
     expect(cell(10, 0)).toHaveTextContent('✓');
   });
+
+  it('rest days show a dash; doing the habit anyway is saved and flagged (HAB-5)', async () => {
+    const app = await renderWithApp(
+      async ({ repos }) => {
+        await repos.habits.create({
+          name: 'Gym',
+          type: 'boolean',
+          startDate: S,
+          frequency: { type: 'weekdays', days: ['mon', 'wed', 'fri'], restOnOtherDays: true },
+        });
+        return (
+          <Routes>
+            <Route path="/month/:ym?" element={<MonthRoute />} />
+          </Routes>
+        );
+      },
+      { route: `/month/${AUG}` },
+    );
+    await screen.findByRole('grid');
+    // Aug 1 2026 is a Saturday (rest), Aug 3 a Monday (scheduled).
+    expect(cell(1, 0)).toHaveTextContent('–');
+    expect(cell(1, 0)).toHaveAccessibleName('Gym, Saturday, August 1: not logged, rest day');
+    expect(cell(3, 0)).toHaveTextContent('');
+    await app.user.click(cell(1, 0));
+    expect(cell(1, 0)).toHaveTextContent('✓');
+    expect(cell(1, 0)).toHaveClass('rest-broken');
+    expect(cell(1, 0)).toHaveAccessibleName('Gym, Saturday, August 1: done, on a rest day');
+    const footer = screen.getByRole('grid').querySelectorAll('tfoot td')[0]!;
+    await waitFor(() => expect(footer).toHaveTextContent('⚠ 1'));
+    expect(footer).toHaveAccessibleName(/done on 1 rest day$/);
+  });
 });

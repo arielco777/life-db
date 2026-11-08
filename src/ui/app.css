@@ -892,14 +892,19 @@ fieldset:disabled .type-option {
   border-top: 1px solid var(--border);
   padding-top: var(--space-4);
 }
-.end-options {
+.end-options,
+.other-days {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1) var(--space-3);
 }
-.end-options .row {
+.end-options .row,
+.other-days .row {
   margin: 0;
+}
+.other-days {
+  margin-top: var(--space-2);
 }
 
 /* ───────── daily view (DAY-1) ───────── */
@@ -962,6 +967,10 @@ a.icon-btn {
   flex-wrap: nowrap;
 }
 .habit-label {
+  font-weight: 600;
+}
+.rest-flag {
+  color: var(--warning);
   font-weight: 600;
 }
 .day-habit.unscheduled .habit-label {
@@ -1181,6 +1190,20 @@ a.icon-btn {
 }
 .month-grid td.inactive {
   background-color: var(--paper);
+}
+/* Rest days (HAB-5): a dash says "not meant to happen"; doing it anyway gets a corner flag. */
+.month-grid td.rest:not(.logged) {
+  color: var(--border);
+}
+.month-grid td.rest-broken::after {
+  content: '!';
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--warning);
 }
 
 .month-grid tfoot th,

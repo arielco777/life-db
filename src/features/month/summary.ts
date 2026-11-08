@@ -11,6 +11,24 @@ export function summaryLines(
   habit: Pick<Habit, 'unit'>,
   s: HabitStats,
   locale?: string,
+  /** Rest days the habit was done anyway (HAB-5): flagged as "⚠ N" on the second line. */
+  restLogged = 0,
+): { main: string; sub?: string; label: string } {
+  const lines = baseLines(habit, s, locale);
+  if (!restLogged) return lines;
+  const flag = `⚠ ${restLogged}`;
+  const days = `${restLogged} rest day${restLogged === 1 ? '' : 's'}`;
+  return {
+    main: lines.main,
+    sub: lines.sub ? `${lines.sub} ${flag}` : flag,
+    label: `${lines.label}; done on ${days}`,
+  };
+}
+
+function baseLines(
+  habit: Pick<Habit, 'unit'>,
+  s: HabitStats,
+  locale?: string,
 ): { main: string; sub?: string; label: string } {
   switch (s.type) {
     case 'boolean': {
