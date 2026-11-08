@@ -70,8 +70,8 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 2 — Domain services
 
-- [ ] 2.1 `schedule.ts`: `isScheduled`, `scheduledDays` (daily / weekdays / times-per-week, start/end dates). [HAB-5]
-- [ ] 2.2 `targets.ts`: evaluate targets per day, week (respecting week start) and month. [HAB-4, DAY-5]
+- [x] 2.1 `schedule.ts`: `isScheduled`, `scheduledDays` (daily / weekdays / times-per-week, start/end dates). [HAB-5]
+- [x] 2.2 `targets.ts`: evaluate targets per day, week (respecting week start) and month. [HAB-4, DAY-5]
 - [ ] 2.3 `stats.ts`: completion %, current and longest streak, avg/min/max/total, per-logged-day vs per-calendar-day averages. [MON-4, ANL-1, ANL-5]
 - [ ] 2.4 `format.ts`: value display plus duration parsing (`45`, `0:45`, `1h30`). [HAB-2]
 - [ ] 2.5 Unit tests for each, including leap years, month boundaries, Sunday/Monday week starts, and `logicalToday` around the day-start hour (e.g. 01:30 with a 4 a.m. start → yesterday). [NFR-11, SET-4]
