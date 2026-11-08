@@ -47,6 +47,12 @@ textarea {
   border-radius: var(--radius);
   padding: var(--space-2) var(--space-3);
 }
+/* Native date/select widgets size themselves differently per platform; pin them to one height. */
+/* :where() keeps this at element-level specificity so component rules can override it. */
+input:where(:not([type='checkbox'], [type='radio'])),
+select {
+  height: var(--control-h);
+}
 
 button {
   background: var(--accent);
@@ -395,6 +401,7 @@ button.danger {
 
 /* ───────── tag input ───────── */
 .tag-input {
+  min-height: var(--control-h);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -437,6 +444,7 @@ button.danger {
   min-width: 8em;
 }
 .tag-input-field input {
+  height: auto;
   width: 100%;
   border: 0;
   background: transparent;
@@ -525,6 +533,7 @@ button.danger {
   position: relative;
 }
 .value-input input.num {
+  height: 28px; /* matches the step buttons and checkboxes in compact rows */
   width: 5.5em;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -713,6 +722,12 @@ a.button.secondary {
   padding: 0;
   margin-bottom: var(--space-1);
 }
+/* A fieldset's <legend> is laid out specially and ignores the flex gap; floating it turns it
+   into an ordinary flex item, so legends and labels sit the same distance above their controls. */
+.field > legend {
+  float: left;
+  width: 100%;
+}
 .field .row {
   margin: 0;
 }
@@ -727,6 +742,10 @@ input.short {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-4);
+}
+/* Controls fill their column so the gaps between columns look even. */
+.form-grid .field > :is(input, select, .segmented) {
+  width: 100%;
 }
 .form-actions {
   margin-top: var(--space-2);
@@ -778,7 +797,12 @@ fieldset:disabled .type-option {
 }
 .segmented label {
   position: relative;
-  padding: var(--space-1) var(--space-3);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--control-h) - 2px); /* minus the top and bottom border */
+  padding: 0 var(--space-3);
   cursor: pointer;
   background: var(--paper-raised);
 }

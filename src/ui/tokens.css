@@ -23,6 +23,8 @@
   --space-4: 16px;
   --space-6: 24px;
   --nav-width: 200px;
+  /* One height for text fields, selects and segmented controls, so rows of controls line up. */
+  --control-h: 40px;
 
   color-scheme: light;
 }
