@@ -203,10 +203,18 @@ export function createHabitRepository(ctx: RepoContext): HabitRepository {
     async update(id, patch) {
       const current = await get(id);
       if (!current) throw new DomainError('not_found', 'Habit not found');
-      if (patch.type && patch.type !== current.type && (await hasEntries(id)))
+      const typeChanges = !!patch.type && patch.type !== current.type;
+      const scaleChanges =
+        current.type === 'rating' &&
+        patch.ratingScale !== undefined &&
+        (patch.ratingScale?.min !== current.ratingScale?.min ||
+          patch.ratingScale?.max !== current.ratingScale?.max);
+      if ((typeChanges || scaleChanges) && (await hasEntries(id)))
         throw new DomainError(
           'type_locked',
-          'The type of a habit with entries cannot be changed. Archive it and create a new one.',
+          typeChanges
+            ? 'The type of a habit with entries cannot be changed. Archive it and create a new one.'
+            : 'The rating scale of a habit with entries cannot be changed. Archive it and create a new one.',
         );
       const merged = { ...asInput(current) } as Record<string, unknown>;
       for (const [k, v] of Object.entries(patch)) if (v !== undefined) merged[k] = v === null ? undefined : v;
