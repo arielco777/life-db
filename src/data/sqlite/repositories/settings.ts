@@ -13,6 +13,7 @@ const validators: { [K in keyof Settings]: (v: unknown) => boolean } = {
   'backup.keep_count': (v) => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 100,
   'updates.enabled': (v) => typeof v === 'boolean',
   'onboarding.completed': (v) => typeof v === 'boolean',
+  'day.group_by_category': (v) => typeof v === 'boolean',
 };
 
 /** Key/value settings stored as JSON; missing or invalid keys fall back to DEFAULT_SETTINGS. */

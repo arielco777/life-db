@@ -106,6 +106,8 @@ export interface Settings {
   'backup.keep_count': number;
   'updates.enabled': boolean;
   'onboarding.completed': boolean;
+  /** Daily view: group habits by category (DAY-4). */
+  'day.group_by_category': boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -118,4 +120,5 @@ export const DEFAULT_SETTINGS: Settings = {
   'backup.keep_count': 7,
   'updates.enabled': true,
   'onboarding.completed': false,
+  'day.group_by_category': false,
 };

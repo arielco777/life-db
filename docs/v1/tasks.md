@@ -112,9 +112,9 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 - [x] 5.2 `useDay(date)` hook: parallel queries for habits, entries (enclosing period) and journal entries.
 - [x] 5.3 Sections: one habits section (all types together), then journal. Leave slots for the V1.1 events banner and goals section. [DAY-1]
 - [x] 5.4 Target / week-progress indicators. "Not scheduled" state. [DAY-5, HAB-5]
-- [ ] 5.5 Optional group-by-category toggle. [DAY-4]
+- [x] 5.5 Optional group-by-category toggle. [DAY-4]
 - [x] 5.6 Keyboard: focus order, space toggles, number keys for ratings, ←/→ change the day, `t` for today. [DAY-3, NFR-7]
-- [ ] 5.7 Inline quick journal entry, wired up properly in Phase 7. [DAY-1]
+- [x] 5.7 Inline quick journal entry, wired up properly in Phase 7. [DAY-1]
 
 **✅ Done when:** a timed run with 10 habits plus one journal line, keyboard only, takes < 60 s (DAY-2), and the daily view loads in < 150 ms on seeded data (NFR-1).
 
