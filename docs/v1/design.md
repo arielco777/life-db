@@ -449,8 +449,9 @@ All repositories are built once in `createRepositories(driver: SqlDriver)` and h
 
 | Module | Responsibility | Req |
 | --- | --- | --- |
-| `schedule.ts` | `isScheduled(habit, date)`, `scheduledDays(habit, range)` from frequency + start/end dates | HAB-5 |
-| `targets.ts` | `evaluateTarget(habit, entries, date)` → met / not met / progress for the day, week or month | HAB-4, DAY-5 |
+| `dates.ts` | Calendar math on `YYYY-MM-DD` strings in UTC (add/diff days, week and month boundaries by week start), so DST can never shift a date | NFR-11 |
+| `schedule.ts` | `isScheduled(habit, date)`, `scheduledDays(habit, range)` and `expectedCompletions()` from frequency + start/end dates. "N times per week" habits: any active day counts; a full week expects N, a partial week (month edges, habit start/end) expects `round(N × activeDays / 7)` | HAB-5 |
+| `targets.ts` | `evaluateTarget(habit, values, asOf, weekStart)` → `met` / `not_met` / `in_progress` / `no_data` plus actual and progress, for the day, week or month containing `asOf`. Roll-up: boolean = done days, number/duration = sum, rating = average | HAB-4, DAY-5 |
 | `stats.ts` | Per-type stats: completion %, streaks, avg/min/max/total | ANL-1/2, MON-4 |
 | `progress.ts` | Goal progress for each progress mode | GOAL-4 |
 | `clock.ts` | `nowUtc()`, `logicalToday(dayStartHour)`, `logicalDateOf(ts, dayStartHour)`. The only place the system clock is read. A `useToday()` hook re-renders when the logical day rolls over | SET-4, NFR-11 |
