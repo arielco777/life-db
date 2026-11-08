@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml -p life_db_core"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.107.1",
