@@ -15,10 +15,12 @@ interface HabitEntryFieldProps {
    * month) so many fields share one query; defaults to just this day.
    */
   range?: DateRange;
+  /** Read-only, e.g. for a future date (ENT-2). */
+  disabled?: boolean;
 }
 
 /** One habit's value on one date, saved instantly (ENT-5), with the note/clear menu. */
-export function HabitEntryField({ habit, date, label, range }: HabitEntryFieldProps) {
+export function HabitEntryField({ habit, date, label, range, disabled }: HabitEntryFieldProps) {
   const { data } = useEntries(range ?? { from: date, to: date });
   const entry = useMemo(
     () => data?.find((e) => e.habitId === habit.id && e.date === date),
@@ -34,9 +36,16 @@ export function HabitEntryField({ habit, date, label, range }: HabitEntryFieldPr
 
   return (
     <span className="entry-field">
-      <HabitInput habit={habit} value={entry?.value} onChange={onChange} label={label} disabled={!data} />
+      <HabitInput
+        habit={habit}
+        value={entry?.value}
+        onChange={onChange}
+        label={label}
+        disabled={disabled || !data}
+      />
       <EntryMenu
         label={label}
+        disabled={disabled}
         isBoolean={habit.type === 'boolean'}
         entry={entry}
         onSaveNote={(note) => entry && setEntry.mutate({ habit, date, value: entry.value, note })}

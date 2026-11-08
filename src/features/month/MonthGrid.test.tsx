@@ -3,6 +3,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { MonthRoute } from './MonthPage';
 import { renderWithApp } from '../../../tests/render';
+import { logicalToday } from '@/domain/services/clock';
+import { addDays, addMonths, monthOf } from '@/domain/services/dates';
 
 const AUG = '2026-08';
 const S = '2026-01-01';
@@ -155,5 +157,80 @@ describe('Monthly grid editing (tasks 6.4, MON-3)', () => {
     await app.user.click(cell(1, 0));
     await app.user.click(cell(2, 0));
     await waitFor(() => expect(summary()[0]).toHaveTextContent('2/31'));
+  });
+});
+
+describe('Days that can’t be logged (ENT-2)', () => {
+  it('future days are read-only: no toggle, no editor, no digits', async () => {
+    const next = addMonths(monthOf(logicalToday(4)), 1);
+    let id = '';
+    const app = await renderWithApp(
+      async ({ repos }) => {
+        id = (await repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: S })).id;
+        await repos.habits.create({ name: 'Sleep', type: 'number', startDate: S });
+        return (
+          <Routes>
+            <Route path="/month/:ym?" element={<MonthRoute />} />
+          </Routes>
+        );
+      },
+      { route: `/month/${next}` },
+    );
+    await screen.findByRole('grid');
+    expect(cell(1, 0)).toHaveAttribute('aria-disabled', 'true');
+    expect(cell(1, 0)).toHaveAccessibleName(expect.stringMatching(/: not yet$/));
+    await app.user.click(cell(1, 0));
+    expect(cell(1, 0)).toHaveTextContent('');
+    expect(cell(1, 0)).toHaveFocus(); // still reachable for navigation
+    await app.user.keyboard(' 1');
+    await app.user.click(cell(1, 1));
+    expect(within(cell(1, 1)).queryByRole('textbox')).not.toBeInTheDocument();
+    await app.user.keyboard('7');
+    expect(within(cell(1, 1)).queryByRole('textbox')).not.toBeInTheDocument();
+    expect(await app.repos.entries.forRange({ from: `${next}-01`, to: `${next}-31` })).toEqual([]);
+    expect(id).not.toBe('');
+  });
+
+  it('today is editable, tomorrow is not', async () => {
+    const today = logicalToday(4);
+    const app = await renderWithApp(
+      async ({ repos }) => {
+        await repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: S });
+        return (
+          <Routes>
+            <Route path="/month/:ym?" element={<MonthRoute />} />
+          </Routes>
+        );
+      },
+      { route: `/month/${monthOf(today)}` },
+    );
+    await screen.findByRole('grid');
+    const day = Number(today.slice(8));
+    expect(cell(day, 0)).not.toHaveAttribute('aria-disabled');
+    if (monthOf(addDays(today, 1)) === monthOf(today))
+      expect(cell(day + 1, 0)).toHaveAttribute('aria-disabled', 'true');
+    await app.user.click(cell(day, 0));
+    expect(cell(day, 0)).toHaveTextContent('✓');
+  });
+
+  it('days before a habit started are read-only', async () => {
+    const app = await renderWithApp(
+      async ({ repos }) => {
+        await repos.habits.create({ name: 'Late', type: 'boolean', startDate: '2026-08-10' });
+        return (
+          <Routes>
+            <Route path="/month/:ym?" element={<MonthRoute />} />
+          </Routes>
+        );
+      },
+      { route: `/month/${AUG}` },
+    );
+    await screen.findByRole('grid');
+    expect(cell(9, 0)).toHaveAttribute('aria-disabled', 'true');
+    expect(cell(9, 0)).toHaveAccessibleName(expect.stringMatching(/outside the habit’s dates$/));
+    await app.user.click(cell(9, 0));
+    expect(cell(9, 0)).toHaveTextContent('');
+    await app.user.click(cell(10, 0));
+    expect(cell(10, 0)).toHaveTextContent('✓');
   });
 });

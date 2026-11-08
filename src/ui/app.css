@@ -1072,7 +1072,7 @@ a.icon-btn {
 /* Angled habit names: the header cell is tall and narrow; the label is rotated -60°
    from its bottom-left corner so long names lean into the space above the next columns. */
 .month-grid th.habit-col {
-  height: 120px;
+  height: 140px;
   width: 52px;
   min-width: 52px;
   max-width: 52px;
@@ -1088,7 +1088,9 @@ a.icon-btn {
 }
 .month-grid .angled span {
   display: inline-block;
-  max-width: 130px;
+  /* Sized to the text, not to the 52px column; ~150px leaning at 60° fits the 140px header. */
+  width: max-content;
+  max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: bottom;
@@ -1104,13 +1106,19 @@ a.icon-btn {
   font-weight: 400;
   min-width: 64px;
 }
+.month-grid tbody th,
+.month-grid tbody td {
+  box-sizing: border-box;
+  height: 32px;
+  vertical-align: middle;
+  line-height: 1;
+}
 .month-grid .day-cell a {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-2);
   padding: 0 var(--space-2);
-  height: 30px;
-  line-height: 30px;
+  height: 100%;
   color: var(--ink);
   text-decoration: none;
 }
@@ -1127,7 +1135,7 @@ a.icon-btn {
   font-size: 12px;
 }
 .month-grid tr.weekend .day-cell,
-.month-grid tr.weekend td {
+.month-grid tr.weekend td:not(.logged) {
   background-color: color-mix(in srgb, var(--paper) 70%, var(--paper-raised));
 }
 .month-grid tr.today .day-cell {
@@ -1143,7 +1151,6 @@ a.icon-btn {
 
 .month-grid td.cell {
   width: 52px;
-  height: 30px;
   text-align: center;
   white-space: nowrap;
 }
@@ -1242,4 +1249,8 @@ a.icon-btn {
   top: calc(100% + 2px);
   left: 50%;
   transform: translateX(-50%);
+}
+.month-grid td.inactive,
+.month-grid td.future {
+  cursor: default;
 }

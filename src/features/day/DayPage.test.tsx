@@ -5,6 +5,7 @@ import { DayRoute } from './DayPage';
 import { renderWithApp } from '../../../tests/render';
 import type { setup } from '../../../tests/helpers';
 import { logicalToday } from '@/domain/services/clock';
+import { addDays } from '@/domain/services/dates';
 
 type Repos = Awaited<ReturnType<typeof setup>>['repos'];
 const THU = '2026-08-13';
@@ -97,6 +98,26 @@ describe('Daily view: routing and navigation (tasks 5.1, DAY-3)', () => {
 });
 
 describe('Daily view: habits (tasks 5.3, 5.4, DAY-1, DAY-5, HAB-5)', () => {
+  it('a future day is read-only, with a note saying why (ENT-2)', async () => {
+    const tomorrow = addDays(logicalToday(4), 1);
+    await open(`/day/${tomorrow}`, (repos) =>
+      repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: start }),
+    );
+    const box = await screen.findByRole('checkbox', { name: /^Exercise, / });
+    expect(screen.getByRole('note')).toHaveTextContent('hasn’t happened yet');
+    expect(box).toBeDisabled();
+    expect(screen.getByRole('button', { name: /note and options/ })).toBeDisabled();
+  });
+
+  it('today is not read-only', async () => {
+    await open(`/day/${logicalToday(4)}`, (repos) =>
+      repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: start }),
+    );
+    const box = await screen.findByRole('checkbox', { name: /^Exercise, / });
+    await waitFor(() => expect(box).toBeEnabled());
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+  });
+
   it('lists the habits active that day in user order, all types in one section', async () => {
     await open(`/day/${THU}`, async (repos) => {
       await repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: start });

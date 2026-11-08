@@ -117,7 +117,7 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 **ENT-1 One value per habit per day.** There is at most one entry per (habit, date). Logging again overwrites the existing value, and the entry keeps the same ID even after it's cleared and logged again (FC-5).
 
-**ENT-2 Log / edit / clear.** The user can set, change or clear the value for any habit on any date, including past dates.
+**ENT-2 Log / edit / clear.** The user can set, change or clear the value for any habit on any date up to the logical today (SET-4), with no limit on how far back. Future dates, and dates outside the habit's start/end dates, are shown but can't be logged.
 - Clearing a value SHALL remove the entry. ("No entry" means not logged. It is different from logging 0 or "not done".)
 
 **ENT-3 Optional note.** An entry MAY carry a short text note.

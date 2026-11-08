@@ -210,6 +210,7 @@ export function MonthGrid({ ym, habits, valuesByHabit, today }: GridProps) {
                         col={col}
                         value={value}
                         active={isActiveOn(h, d)}
+                        future={d > today}
                         scheduled={isScheduled(h, d)}
                         dayTarget={
                           value !== undefined && h.target?.period === 'day'
@@ -260,6 +261,8 @@ interface CellProps {
   value: number | undefined;
   /** Between the habit's start and end dates. */
   active: boolean;
+  /** After the logical today: can't be logged yet. */
+  future: boolean;
   scheduled: boolean;
   dayTarget?: TargetStatus;
   color?: string;
@@ -292,6 +295,7 @@ const MonthCell = memo(function MonthCell(p: CellProps) {
     tinted && 'logged',
     isBool && value === 1 && 'done',
     !p.active ? 'inactive' : !p.scheduled && 'unscheduled',
+    p.future && 'future',
     p.dayTarget === 'met' && 'target-met',
     p.dayTarget === 'not_met' && 'target-missed',
     p.editing !== undefined && 'editing',
@@ -299,12 +303,17 @@ const MonthCell = memo(function MonthCell(p: CellProps) {
     .filter(Boolean)
     .join(' ');
 
-  const label = `${habit.name}, ${dayLong(date)}: ${spoken(habit, value)}${p.scheduled || !p.active ? '' : ', not scheduled'}`;
+  // Future days and days outside the habit's start/end dates can't be logged (ENT-2):
+  // stats ignore them, and nobody can have done tomorrow's workout yet.
+  const locked = p.future || !p.active;
+  const label = `${habit.name}, ${dayLong(date)}: ${
+    p.future ? 'not yet' : !p.active ? 'outside the habit’s dates' : spoken(habit, value)
+  }${p.scheduled || locked ? '' : ', not scheduled'}`;
 
   const toggle = () => actions.commit(habit, date, value === 1 ? undefined : 1);
 
   const onKeyDown = (e: KeyboardEvent) => {
-    if (p.editing !== undefined || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (locked || p.editing !== undefined || e.altKey || e.ctrlKey || e.metaKey) return;
     const k = e.key;
     if (k === 'Delete' || k === 'Backspace') {
       if (value !== undefined) actions.commit(habit, date, undefined);
@@ -344,11 +353,13 @@ const MonthCell = memo(function MonthCell(p: CellProps) {
       data-pos={`${p.row}:${p.col}`}
       tabIndex={p.tabStop ? 0 : -1}
       aria-label={label}
+      aria-disabled={locked || undefined}
       className={cls}
       style={tinted ? ({ '--cat': p.color ?? 'var(--accent)' } as CSSProperties) : undefined}
       onClick={() => {
         if (p.editing !== undefined) return;
         actions.focus(pos);
+        if (locked) return;
         if (isBool) toggle();
         else actions.startEdit(pos);
       }}

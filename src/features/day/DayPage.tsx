@@ -139,8 +139,11 @@ function HabitsSection({ date, day }: { date: ISODate; day: ReturnType<typeof us
   const setSetting = useSetSetting();
   const { data: categories = [] } = useCategories();
   const grouped = settings['day.group_by_category'];
+  const today = useToday();
   if (day.error) return <p className="error">Couldn't load this day.</p>;
 
+  // Habits can't be logged ahead of time (ENT-2): nobody has done tomorrow's workout yet.
+  const future = date > today;
   const row = (h: Habit) => (
     <DayHabitRow
       key={h.id}
@@ -148,6 +151,7 @@ function HabitsSection({ date, day }: { date: ISODate; day: ReturnType<typeof us
       date={date}
       values={day.valuesByHabit.get(h.id) ?? EMPTY}
       range={day.window}
+      readOnly={future}
     />
   );
 
@@ -168,6 +172,11 @@ function HabitsSection({ date, day }: { date: ISODate; day: ReturnType<typeof us
           </label>
         )}
       </div>
+      {future && day.habits.length > 0 && (
+        <p className="small muted" role="note">
+          This day hasn’t happened yet, so habits can’t be logged for it.
+        </p>
+      )}
       {day.isPending ? (
         <p className="muted">Loading…</p>
       ) : day.habits.length === 0 ? (
@@ -219,11 +228,13 @@ function DayHabitRow({
   date,
   values,
   range,
+  readOnly,
 }: {
   habit: Habit;
   date: ISODate;
   values: ValuesByDate;
   range: { from: ISODate; to: ISODate };
+  readOnly?: boolean;
 }) {
   const { week_start } = useSettings();
   const { data: categories = [] } = useCategories();
@@ -256,7 +267,13 @@ function DayHabitRow({
           )}
         </span>
       </span>
-      <HabitEntryField habit={habit} date={date} range={range} label={`${habit.name}, ${shortDate(date)}`} />
+      <HabitEntryField
+        habit={habit}
+        date={date}
+        range={range}
+        disabled={readOnly}
+        label={`${habit.name}, ${shortDate(date)}`}
+      />
     </li>
   );
 }
