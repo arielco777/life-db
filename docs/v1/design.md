@@ -505,27 +505,33 @@ Data loaded with parallel queries (`useDay`): habits active on the date, entries
 
 Data: `habitRepo.activeOn(month)`, `entryRepo.forRange(monthStart, monthEnd)`, `lifeEventRepo.overlapping(month)`, `goalRepo.forMonth(month)`. The grid is built as a `Map<habitId, Map<date, HabitEntry>>`.
 
+Laid out like a paper habit tracker: days run down the left, habits across the top with their names written at an angle.
+
 ```text
-                    AUGUST 2026                 ‹ ›  [This month]
-            1  2  3  4  5  6  7  8 … 31 │ Summary
-Exercise    ✓  ✓     ✓  ✓        ✓      │ 18/31 58%
-Reading     ✓     ✓  ✓                  │ 12h43m · 24m/d
-Meditate    ✓  ✓                        │  9/31 29%
-Sleep       7  6  8  7  …               │ avg 6.8 h
-Coffee      2  3  4  2                  │ avg 2.7 cups
-Mood        8  6  7  9                  │ avg 7.2/10
-            ✈              ✈            │  ← event markers
-─────────────────────────────────────────
+  AUGUST 2026                            ‹ ›  [This month]
+                 Exer/  Read/  Sleep/  Coffee/  Mood/
+                cise   ing           (cups)
+  Sat  1          ✓      ✓      7.2      2       8
+  Sun  2          ✓             6.5      3       6
+  Mon  3 ✈               ✓      8.0      1       7
+  …
+  Mon 31          ✓      ✓      7.0      2       8
+ ─────────────────────────────────────────────────────
+  Summary       18/31  12h43   avg 6.8  avg 2.3  avg 7.2
+                 58%   24m/d
 MONTHLY GOALS
 ☐ Read 3 books        1/3
 ☐ Learn a new recipe
 ☑ Finish project
 ```
 
-- Rendered as a CSS grid or `<table>` with a sticky first column and header, scrolling horizontally on narrow widths (NFR-8). At most 31 × ~30 cells, so no virtualization is needed.
-- **Cell editing** (MON-3): a boolean click toggles. For other types, Enter or a click opens a popover input, and typing a digit starts editing straight away. Arrow keys / Tab navigate. Escape cancels.
+- Rendered as a `<table>`: one row per day, one column per habit. The day column (number, weekday, event marker) and the header row of habit names are sticky. When the habits don't fit the width, the table scrolls horizontally (NFR-8). Most people track fewer than ~15 habits, so a phone in portrait shows the columns and the month scrolls down naturally. At most 31 × ~30 cells, so no virtualization is needed.
+- **Column headers:** habit names are written at an angle (about 60°, like the paper tracker) so narrow columns can hold long names. The full name is in a `title` tooltip and the accessible label. The number habit's unit appears under the name.
+- **Tint** (MON-6): logged cells get a light tint of the habit's category color (the accent color for habits without a category), mixed with `color-mix()` so it stays light in both themes. Checkboxes fill the cell; number, duration and rating cells show the value on the tint. An explicit "not done" (0) stays untinted with a faint ✗.
+- **Cell editing** (MON-3): a boolean click toggles. For other types, Enter or a click opens a popover input, and typing a digit starts editing straight away. ↑/↓ move between days, ←/→ and Tab between habits. Escape cancels.
 - Cells are memoized per (habitId, date) so editing one cell doesn't re-render the whole grid.
-- The day header links to `/day/:date` (MON-5). Columns are classed for today, weekend, unscheduled and has-event (MON-6).
+- **Summary row** (MON-4): a sticky footer row under day N with each habit's month summary from `stats.ts`.
+- The day number links to `/day/:date` (MON-5). Rows are classed for today and weekend, cells for unscheduled and target-met, and days with life events show a marker next to the number (MON-6).
 - Neighbouring months are prefetched to make navigation instant (MON-2).
 
 ### 6.3 Habits management (`/habits`, `/habits/:id`)
