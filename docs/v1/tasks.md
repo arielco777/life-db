@@ -84,8 +84,8 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 - [x] 3.1 Settings → Categories: list, create, rename, recolor, archive, reorder. [CAT-2, CAT-4]
 - [x] 3.2 `<CategorySelect>` component (hides archived categories for new records). [CAT-2, CAT-3]
-- [ ] 3.3 `<TagInput>`: autocomplete, inline creation, normalization. [TAG-2, TAG-3]
-- [ ] 3.4 Tags management page: rename, merge (with confirmation), delete. A tag view lists every habit and journal entry carrying the tag (goals and events are added in V1.1). [TAG-4, TAG-5]
+- [x] 3.3 `<TagInput>`: autocomplete, inline creation, normalization. [TAG-2, TAG-3]
+- [x] 3.4 Tags management page: rename, merge (with confirmation), delete. A tag view lists every habit and journal entry carrying the tag (goals and events are added in V1.1). [TAG-4, TAG-5]
 
 **✅ Done when:** categories and tags can be fully managed, and the TagInput is reusable by later phases.
 

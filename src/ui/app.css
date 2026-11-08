@@ -392,3 +392,121 @@ button.danger {
     bottom: 72px; /* above the bottom tab bar */
   }
 }
+
+/* ───────── tag input ───────── */
+.tag-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--paper-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-1) var(--space-2);
+  cursor: text;
+}
+.tag-input:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.chips {
+  display: contents;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 0 0 var(--space-2);
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+.chip::before {
+  content: '#';
+  color: var(--ink-muted);
+}
+.chip button.ghost {
+  padding: 0 var(--space-2);
+  line-height: 1.6;
+}
+.tag-input-field {
+  position: relative;
+  flex: 1;
+  min-width: 8em;
+}
+.tag-input-field input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: var(--space-1);
+}
+.tag-input-field input:focus-visible {
+  outline: none; /* the wrapper shows focus */
+}
+.suggestions {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: var(--space-1) 0;
+  list-style: none;
+  background: var(--paper-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.12);
+  z-index: 10;
+  max-height: 240px;
+  overflow: auto;
+}
+.suggestions li {
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.suggestions li.active {
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+}
+.tag-link {
+  color: var(--ink);
+  text-decoration: none;
+}
+.tag-link:hover {
+  text-decoration: underline;
+}
+
+/* ───────── dialog ───────── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: rgb(0 0 0 / 0.35);
+  z-index: 30;
+}
+.dialog {
+  width: min(440px, 100%);
+  background: var(--paper-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-6);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.25);
+}
+.dialog h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 20px;
+}
+.dialog-body p {
+  margin: var(--space-3) 0 0;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}

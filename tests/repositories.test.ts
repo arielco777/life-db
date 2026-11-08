@@ -94,6 +94,19 @@ describe('tags', () => {
     expect(await repos.tags.taggedWith(money.id)).toHaveLength(2);
   });
 
+  it('usageCounts counts live links only', async () => {
+    const { repos } = await setup();
+    const a = await repos.tags.getOrCreate('a');
+    const b = await repos.tags.getOrCreate('b');
+    await repos.tags.getOrCreate('unused');
+    const h = await repos.habits.create({ name: 'Run', type: 'boolean', tagIds: [a.id, b.id] });
+    const j = await repos.journal.create({ entryDate: '2026-08-14', tagIds: [a.id] });
+    await repos.journal.remove(j.id);
+    await repos.journal.create({ entryDate: '2026-08-15', tagIds: [a.id] });
+    await repos.tags.setTags('habit', h.id, [a.id]);
+    expect(Object.fromEntries(await repos.tags.usageCounts())).toEqual({ [a.id]: 2 });
+  });
+
   it('remove hides the tag from every record', async () => {
     const { repos } = await setup();
     const t = await repos.tags.getOrCreate('temp');
