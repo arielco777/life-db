@@ -1,4 +1,11 @@
-import { describeFrequency, describeTarget, orderedWeekdays } from './describe';
+import {
+  describeFrequency,
+  describeRun,
+  describeTarget,
+  orderedWeekdays,
+  runNote,
+  runState,
+} from './describe';
 import { draftFrom, toInput } from './HabitForm';
 
 describe('describeFrequency / describeTarget', () => {
@@ -31,6 +38,41 @@ describe('describeFrequency / describeTarget', () => {
   });
 });
 
+describe('run window (start / end dates)', () => {
+  const T = '2026-08-14';
+  it('runState', () => {
+    expect(runState({ startDate: '2026-08-01' }, T)).toBe('running');
+    expect(runState({ startDate: '2026-08-01', endDate: T }, T)).toBe('running');
+    expect(runState({ startDate: '2026-08-01', endDate: '2026-08-13' }, T)).toBe('ended');
+    expect(runState({ startDate: '2026-08-20' }, T)).toBe('upcoming');
+  });
+  it('describeRun', () => {
+    expect(describeRun({ startDate: '2026-08-01' }, T, 'en-US')).toBe('From Aug 1, 2026 · no end date');
+    expect(describeRun({ startDate: '2026-08-01', endDate: '2026-10-06' }, T, 'en-US')).toBe(
+      'Aug 1, 2026 – Oct 6, 2026 · ends in 53 days',
+    );
+    expect(describeRun({ startDate: '2026-08-01', endDate: T }, T, 'en-US')).toMatch(/ends today$/);
+    expect(describeRun({ startDate: '2026-08-01', endDate: '2026-08-15' }, T, 'en-US')).toMatch(
+      /ends in 1 day$/,
+    );
+    expect(describeRun({ startDate: '2026-07-01', endDate: '2026-07-31' }, T, 'en-US')).toBe(
+      'Jul 1, 2026 – Jul 31, 2026 · ended',
+    );
+    expect(describeRun({ startDate: '2026-08-19' }, T, 'en-US')).toBe(
+      'Starts Aug 19, 2026 (in 5 days) · no end date',
+    );
+    expect(describeRun({ startDate: '2026-08-19', endDate: '2026-09-01' }, T, 'en-US')).toMatch(
+      /starts in 5 days$/,
+    );
+  });
+  it('runNote for list rows', () => {
+    expect(runNote({ startDate: '2026-08-01' }, T, 'en-US')).toBeNull();
+    expect(runNote({ startDate: '2026-08-01', endDate: '2026-12-31' }, T, 'en-US')).toBe('Ends Dec 31');
+    expect(runNote({ startDate: '2026-07-01', endDate: '2026-07-31' }, T, 'en-US')).toBe('Ended Jul 31');
+    expect(runNote({ startDate: '2026-09-01' }, T, 'en-US')).toBe('Starts Sep 1');
+  });
+});
+
 describe('HabitForm toInput (HAB-1…6)', () => {
   const base = () => ({ ...draftFrom(undefined, '2026-08-14'), name: 'Read' });
 
@@ -57,6 +99,7 @@ describe('HabitForm toInput (HAB-1…6)', () => {
       ratingMax: '1',
       frequency: 'weekdays',
       days: [],
+      hasEnd: true,
       endDate: '2026-08-01',
     });
     expect(r.errors).toEqual({
@@ -66,6 +109,15 @@ describe('HabitForm toInput (HAB-1…6)', () => {
       endDate: expect.any(String),
     });
     expect(toInput({ ...base(), frequency: 'times_per_week', count: '8' }).errors?.count).toBeDefined();
+  });
+
+  it('end date: "Never" saves none even if a date was typed; "On a date" requires one', () => {
+    expect(toInput({ ...base(), hasEnd: false, endDate: '2026-12-31' }).input?.endDate).toBeUndefined();
+    expect(toInput({ ...base(), hasEnd: true, endDate: '' }).errors?.endDate).toBe(
+      'Pick an end date, or choose Never',
+    );
+    expect(toInput({ ...base(), hasEnd: true, endDate: '2026-12-31' }).input?.endDate).toBe('2026-12-31');
+    expect(draftFrom(undefined, '2026-08-14').hasEnd).toBe(false);
   });
 
   it('parses targets per type', () => {
@@ -97,6 +149,7 @@ describe('HabitForm toInput (HAB-1…6)', () => {
     };
     const draft = draftFrom(habit, '2026-08-14');
     expect(draft.targetValue).toBe('30m');
+    expect(draft.hasEnd).toBe(true);
     expect(toInput(draft).input).toMatchObject({
       frequency: habit.frequency,
       target: habit.target,

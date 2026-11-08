@@ -25,6 +25,8 @@ export interface HabitDraft {
   categoryId?: UUID;
   priority: Priority;
   startDate: ISODate;
+  /** "Never" vs "On a date": explicit, so an empty date box never silently means "no end". */
+  hasEnd: boolean;
   endDate: string;
   tagIds: UUID[];
 }
@@ -52,6 +54,7 @@ export function draftFrom(h: Habit | undefined, today: ISODate): HabitDraft {
     categoryId: h?.categoryId,
     priority: h?.priority ?? 'medium',
     startDate: h?.startDate ?? today,
+    hasEnd: !!h?.endDate,
     endDate: h?.endDate ?? '',
     tagIds: h?.tagIds ?? [],
   };
@@ -73,7 +76,8 @@ export function toInput(
   const errors: Errors = {};
   if (!d.name.trim()) errors.name = 'Give the habit a name';
   if (!d.startDate) errors.startDate = 'Pick a start date';
-  if (d.endDate && d.endDate < d.startDate) errors.endDate = 'The end date is before the start date';
+  if (d.hasEnd && !d.endDate) errors.endDate = 'Pick an end date, or choose Never';
+  else if (d.hasEnd && d.endDate < d.startDate) errors.endDate = 'The end date is before the start date';
 
   let ratingScale: NewHabit['ratingScale'];
   if (d.type === 'rating') {
@@ -126,7 +130,7 @@ export function toInput(
       categoryId: d.categoryId,
       priority: d.priority,
       startDate: d.startDate,
-      endDate: d.endDate || undefined,
+      endDate: d.hasEnd ? d.endDate : undefined,
       tagIds: d.tagIds,
     },
   };
@@ -373,16 +377,40 @@ export function HabitForm({ initial, locked, submitLabel, busy, onSubmit, onCanc
             onChange={(e) => set('startDate', e.target.value)}
           />
         </Field>
-        <Field label="Ends" id={`${ids}-end`} hint="Optional" error={errors.endDate}>
-          <input
-            id={`${ids}-end`}
-            type="date"
-            value={d.endDate}
-            min={d.startDate}
-            aria-invalid={!!errors.endDate}
-            onChange={(e) => set('endDate', e.target.value)}
-          />
-        </Field>
+        <fieldset className="field">
+          <legend>Ends</legend>
+          <div className="end-options">
+            <label className="check-row row">
+              <input
+                type="radio"
+                name={`${ids}-ends`}
+                checked={!d.hasEnd}
+                onChange={() => set('hasEnd', false)}
+              />
+              <span>Never</span>
+            </label>
+            <label className="check-row row">
+              <input
+                type="radio"
+                name={`${ids}-ends`}
+                checked={d.hasEnd}
+                onChange={() => set('hasEnd', true)}
+              />
+              <span>On a date</span>
+            </label>
+            {d.hasEnd && (
+              <input
+                type="date"
+                aria-label="End date"
+                value={d.endDate}
+                min={d.startDate}
+                aria-invalid={!!errors.endDate}
+                onChange={(e) => set('endDate', e.target.value)}
+              />
+            )}
+          </div>
+          {errors.endDate && <p className="field-msg error">{errors.endDate}</p>}
+        </fieldset>
       </div>
 
       <Field label="Tags" id={`${ids}-tags`}>

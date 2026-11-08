@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react';
 import { Link, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import { describeFrequency, describeTarget, TYPE_LABELS } from './describe';
+import { describeFrequency, describeRun, describeTarget, runState, TYPE_LABELS } from './describe';
 import { HabitEntryField } from './HabitEntryField';
 import { draftFrom, HabitForm } from './HabitForm';
 import { HabitsPage } from './HabitsPage';
@@ -145,7 +145,11 @@ function HabitDetail({ habit }: { habit: Habit }) {
       <header className="page-header">
         <h1 className="page-title">
           {habit.name}
-          {habit.archivedAt && <span className="badge">Archived</span>}
+          {habit.archivedAt ? (
+            <span className="badge">Archived</span>
+          ) : (
+            runState(habit, today) === 'ended' && <span className="badge">Ended</span>
+          )}
         </h1>
         <Link to="edit" className="button secondary">
           Edit
@@ -181,11 +185,8 @@ function HabitDetail({ habit }: { habit: Habit }) {
         </dd>
         <dt>Priority</dt>
         <dd>{habit.priority[0]!.toUpperCase() + habit.priority.slice(1)}</dd>
-        <dt>Dates</dt>
-        <dd>
-          From {habit.startDate}
-          {habit.endDate && ` to ${habit.endDate}`}
-        </dd>
+        <dt>Runs</dt>
+        <dd>{describeRun(habit, today)}</dd>
         {tagNames.length > 0 && (
           <>
             <dt>Tags</dt>

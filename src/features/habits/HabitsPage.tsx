@@ -17,7 +17,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { describeFrequency, describeTarget, TYPE_LABELS } from './describe';
+import { describeFrequency, describeTarget, runNote, TYPE_LABELS } from './describe';
 import { useHabitActions, useHabits } from './hooks';
 import type { Category, Habit } from '@/domain/types';
 import {
@@ -26,7 +26,7 @@ import {
   type CategoryFilterValue,
 } from '@/features/categories/CategoryFilter';
 import { useCategories } from '@/features/categories/hooks';
-import { useSettings } from '@/features/settings/hooks';
+import { useSettings, useToday } from '@/features/settings/hooks';
 
 /** /habits (tasks 4.1): user-ordered list with drag reorder (HAB-10), category filter (CAT-5), archive (HAB-8). */
 export function HabitsPage() {
@@ -142,10 +142,12 @@ function HabitRow({
   sortable: boolean;
 }) {
   const { week_start } = useSettings();
+  const today = useToday();
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
     useSortable({ id: h.id, disabled: !sortable });
   const style: CSSProperties = { transform: CSS.Transform.toString(transform), transition };
   const target = describeTarget(h);
+  const run = runNote(h, today);
 
   return (
     <li ref={setNodeRef} style={style} className={`list-row habit-row${isDragging ? ' dragging' : ''}`}>
@@ -175,6 +177,7 @@ function HabitRow({
           {TYPE_LABELS[h.type].label} · {describeFrequency(h.frequency, week_start)}
           {target && ` · ${target}`}
           {category && ` · ${category.name}`}
+          {run && ` · ${run}`}
         </span>
       </span>
     </li>

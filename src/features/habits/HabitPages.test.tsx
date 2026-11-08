@@ -6,6 +6,7 @@ import { renderWithApp } from '../../../tests/render';
 import type { setup } from '../../../tests/helpers';
 import { DEFAULT_CATEGORY_IDS } from '@/domain/ids';
 import { logicalToday } from '@/domain/services/clock';
+import { addDays } from '@/domain/services/dates';
 
 type Repos = Awaited<ReturnType<typeof setup>>['repos'];
 
@@ -203,6 +204,61 @@ describe('Habit form (tasks 4.2)', () => {
     expect(h).toMatchObject({ name: 'Mood today', type: 'rating', ratingScale: { min: 1, max: 5 } });
     expect(h?.target).toBeUndefined();
     expect(h?.description).toBeUndefined();
+  });
+});
+
+describe('End date: explicit Never / On a date', () => {
+  it('a new habit defaults to Never; choosing a date shows it on the page and list', async () => {
+    const app = await open('/habits/new');
+    const { user } = app;
+    await user.type(await screen.findByLabelText('Name'), '30-day challenge');
+    expect(screen.getByRole('radio', { name: 'Never' })).toBeChecked();
+    expect(screen.queryByLabelText('End date')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: 'On a date' }));
+    await user.click(screen.getByRole('button', { name: 'Create habit' }));
+    expect(screen.getByText('Pick an end date, or choose Never')).toBeInTheDocument();
+
+    const end = addDays(logicalToday(4), 29);
+    await user.type(screen.getByLabelText('End date'), end);
+    await user.click(screen.getByRole('button', { name: 'Create habit' }));
+    expect(await screen.findByText(/· ends in 29 days$/)).toBeInTheDocument();
+    expect((await app.repos.habits.list())[0]?.endDate).toBe(end);
+
+    await user.click(screen.getByRole('link', { name: '← Habits' }));
+    const list = await screen.findByRole('list', { name: 'Habits' });
+    expect(within(list).getByText(/· Ends /)).toBeInTheDocument();
+  });
+
+  it('switching back to Never removes the end date', async () => {
+    let id = '';
+    const app = await open('/habits', async (repos) => {
+      id = (await repos.habits.create({ name: 'Sprint', type: 'boolean', endDate: '2099-01-01' })).id;
+    });
+    await app.user.click(await screen.findByRole('link', { name: 'Sprint' }));
+    await app.user.click(await screen.findByRole('link', { name: 'Edit' }));
+    expect(await screen.findByRole('radio', { name: 'On a date' })).toBeChecked();
+    expect(screen.getByLabelText('End date')).toHaveValue('2099-01-01');
+    await app.user.click(screen.getByRole('radio', { name: 'Never' }));
+    await app.user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(await screen.findByText(/no end date$/)).toBeInTheDocument();
+    expect((await app.repos.habits.get(id))?.endDate).toBeUndefined();
+  });
+
+  it('a finished habit is marked Ended on its page and in the list', async () => {
+    const app = await open('/habits', async (repos) => {
+      await repos.habits.create({
+        name: 'Lent',
+        type: 'boolean',
+        startDate: '2026-02-18',
+        endDate: '2026-04-02',
+      });
+    });
+    const list = await screen.findByRole('list', { name: 'Habits' });
+    expect(within(list).getByText(/· Ended Apr 2$/)).toBeInTheDocument();
+    await app.user.click(within(list).getByRole('link', { name: 'Lent' }));
+    expect(await screen.findByText('Ended')).toBeInTheDocument();
+    expect(screen.getByText('Feb 18, 2026 – Apr 2, 2026 · ended')).toBeInTheDocument();
   });
 });
 
