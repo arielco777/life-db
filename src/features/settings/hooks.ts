@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRepositories } from '@/app/RepositoryProvider';
 import { logicalToday } from '@/domain/services/clock';
 import { DEFAULT_SETTINGS, type ISODate, type Settings } from '@/domain/types';
+import { useToast } from '@/ui/Toast';
 
 export const settingsKeys = { all: ['settings'] as const };
 
@@ -15,4 +16,30 @@ export function useSettings(): Settings {
 /** The logical today (SET-4), computed at render time. */
 export function useToday(): ISODate {
   return logicalToday(useSettings().day_start_hour);
+}
+
+/** One setting change, with the value type tied to its key. */
+export type SettingChange = { [K in keyof Settings]: { key: K; value: Settings[K] } }[keyof Settings];
+
+/** Changes one setting; applied optimistically, rolled back with a toast on failure. */
+export function useSetSetting() {
+  const { settings } = useRepositories();
+  const qc = useQueryClient();
+  const toast = useToast();
+  return useMutation({
+    mutationFn: ({ key, value }: SettingChange) =>
+      // The union keeps key and value paired for callers; the repository validates again.
+      (settings.set as (k: keyof Settings, v: unknown) => Promise<void>)(key, value),
+    onMutate: async ({ key, value }) => {
+      await qc.cancelQueries({ queryKey: settingsKeys.all });
+      const previous = qc.getQueryData<Settings>(settingsKeys.all);
+      qc.setQueryData<Settings>(settingsKeys.all, { ...(previous ?? DEFAULT_SETTINGS), [key]: value });
+      return { previous };
+    },
+    onError: (e, _vars, ctx) => {
+      qc.setQueryData(settingsKeys.all, ctx?.previous);
+      toast.error(e);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: settingsKeys.all }),
+  });
 }

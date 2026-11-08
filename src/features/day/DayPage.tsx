@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, type CSSProperties } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { groupByCategory } from './grouping';
 import { rowStatus } from './rowStatus';
 import { useDay } from './useDay';
 import { isISODate } from '@/domain/services/clock';
@@ -8,7 +9,8 @@ import type { ValuesByDate } from '@/domain/services/targets';
 import type { Habit, ISODate } from '@/domain/types';
 import { useCategories } from '@/features/categories/hooks';
 import { HabitEntryField } from '@/features/habits/HabitEntryField';
-import { useSettings, useToday } from '@/features/settings/hooks';
+import { QuickJournal } from '@/features/journal/QuickJournal';
+import { useSetSetting, useSettings, useToday } from '@/features/settings/hooks';
 
 const longDate = (d: ISODate) =>
   new Date(`${d}T00:00:00Z`).toLocaleDateString(undefined, {
@@ -115,9 +117,7 @@ function DayPage({ date }: { date: ISODate }) {
         <h2 id="day-journal" className="section-title">
           Journal
         </h2>
-        {day.journal.length === 0 ? (
-          <p className="muted">Nothing written for this day yet.</p>
-        ) : (
+        {day.journal.length > 0 && (
           <ul className="plain list" aria-label="Journal entries">
             {day.journal.map((j) => (
               <li key={j.id} className="list-row">
@@ -128,18 +128,46 @@ function DayPage({ date }: { date: ISODate }) {
             ))}
           </ul>
         )}
+        <QuickJournal date={date} label={`New journal entry for ${shortDate(date)}`} />
       </section>
     </section>
   );
 }
 
 function HabitsSection({ date, day }: { date: ISODate; day: ReturnType<typeof useDay> }) {
+  const settings = useSettings();
+  const setSetting = useSetSetting();
+  const { data: categories = [] } = useCategories();
+  const grouped = settings['day.group_by_category'];
   if (day.error) return <p className="error">Couldn't load this day.</p>;
+
+  const row = (h: Habit) => (
+    <DayHabitRow
+      key={h.id}
+      habit={h}
+      date={date}
+      values={day.valuesByHabit.get(h.id) ?? EMPTY}
+      range={day.window}
+    />
+  );
+
   return (
     <section className="day-section" aria-labelledby="day-habits">
-      <h2 id="day-habits" className="section-title">
-        Habits
-      </h2>
+      <div className="section-head">
+        <h2 id="day-habits" className="section-title">
+          Habits
+        </h2>
+        {day.habits.length > 0 && (
+          <label className="row check-row small">
+            <input
+              type="checkbox"
+              checked={grouped}
+              onChange={(e) => setSetting.mutate({ key: 'day.group_by_category', value: e.target.checked })}
+            />
+            <span>Group by category</span>
+          </label>
+        )}
+      </div>
       {day.isPending ? (
         <p className="muted">Loading…</p>
       ) : day.habits.length === 0 ? (
@@ -149,17 +177,28 @@ function HabitsSection({ date, day }: { date: ISODate; day: ReturnType<typeof us
             Add a habit
           </Link>
         </div>
+      ) : grouped ? (
+        groupByCategory(day.habits, categories).map((g) => {
+          const name = g.category?.name ?? 'No category';
+          return (
+            <div key={g.category?.id ?? 'none'} className="habit-group">
+              <h3 className="group-title">
+                <span
+                  className="dot"
+                  style={{ '--dot': g.category?.color ?? 'var(--border)' } as CSSProperties}
+                  aria-hidden
+                />
+                {name}
+              </h3>
+              <ul className="plain list day-habits" aria-label={`${name} habits`}>
+                {g.habits.map(row)}
+              </ul>
+            </div>
+          );
+        })
       ) : (
         <ul className="plain list day-habits" aria-label="Habits">
-          {day.habits.map((h) => (
-            <DayHabitRow
-              key={h.id}
-              habit={h}
-              date={date}
-              values={day.valuesByHabit.get(h.id) ?? EMPTY}
-              range={day.window}
-            />
-          ))}
+          {day.habits.map(row)}
         </ul>
       )}
     </section>

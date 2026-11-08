@@ -1,6 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRepositories } from '@/app/RepositoryProvider';
+import type { NewJournalEntry } from '@/domain/repositories';
 import type { ISODate } from '@/domain/types';
+import { tagKeys } from '@/features/tags/hooks';
+import { useToast } from '@/ui/Toast';
 
 export const journalKeys = {
   all: ['journal'] as const,
@@ -11,4 +14,19 @@ export const journalKeys = {
 export function useJournalForDate(date: ISODate) {
   const { journal } = useRepositories();
   return useQuery({ queryKey: journalKeys.forDate(date), queryFn: () => journal.forDate(date) });
+}
+
+export function useCreateJournalEntry() {
+  const { journal } = useRepositories();
+  const qc = useQueryClient();
+  const toast = useToast();
+  return useMutation({
+    mutationFn: (input: NewJournalEntry) => journal.create(input),
+    onError: (e) => toast.error(e),
+    onSettled: () =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: journalKeys.all }),
+        qc.invalidateQueries({ queryKey: tagKeys.all }),
+      ]),
+  });
 }

@@ -996,3 +996,31 @@ a.icon-btn {
     margin-left: 20px; /* under the name, past the category dot */
   }
 }
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.section-head .row {
+  margin: 0;
+}
+.habit-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  font: 600 14px/1.4 var(--font-body);
+}
+.quick-journal textarea {
+  width: 100%;
+  resize: vertical;
+}
+.quick-journal .row {
+  margin: 0;
+}
