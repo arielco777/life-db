@@ -9,10 +9,17 @@ import { ToastProvider } from '@/ui/Toast';
 
 /**
  * Renders UI against real repositories over an in-memory SQLite database (design §9),
- * with the same providers as the app. Component test files need `@vitest-environment jsdom`.
+ * with the same providers as the app. Pass a function to seed data before the first render.
+ * Component test files need `@vitest-environment jsdom`.
  */
-export async function renderWithApp(ui: ReactElement, { route = '/' }: { route?: string } = {}) {
+type Ctx = Awaited<ReturnType<typeof setup>>;
+
+export async function renderWithApp(
+  ui: ReactElement | ((ctx: Ctx) => ReactElement | Promise<ReactElement>),
+  { route = '/' }: { route?: string } = {},
+) {
   const ctx = await setup();
+  const element = typeof ui === 'function' ? await ui(ctx) : ui;
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } },
   });
@@ -21,7 +28,7 @@ export async function renderWithApp(ui: ReactElement, { route = '/' }: { route?:
     <RepositoryProvider repos={ctx.repos}>
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
-          <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+          <MemoryRouter initialEntries={[route]}>{element}</MemoryRouter>
         </ToastProvider>
       </QueryClientProvider>
     </RepositoryProvider>,
