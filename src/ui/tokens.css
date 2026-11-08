@@ -1,0 +1,60 @@
+/* Design tokens (design §7). Light = warm paper; dark = ink. */
+:root {
+  --paper: #f7f1e3;
+  --paper-raised: #fffaf0;
+  --ink: #2b2a27;
+  --ink-muted: #6f6a60;
+  --rule: #b0c4d6;
+  --margin: #c76b5c;
+  --accent: #3f5f54;
+  --accent-ink: #ffffff;
+  --border: #e2d8c3;
+  --error: #a33a2c;
+  --focus: #2f6fb0;
+
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'DejaVu Sans Mono', monospace;
+
+  --radius: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --nav-width: 200px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #1d1f1e;
+    --paper-raised: #262927;
+    --ink: #ece6d8;
+    --ink-muted: #a39d90;
+    --rule: #3a4a58;
+    --margin: #b86455;
+    --accent: #8fbfae;
+    --accent-ink: #14201c;
+    --border: #3a3d3b;
+    --error: #e6806f;
+    --focus: #7fb2e6;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --paper: #1d1f1e;
+  --paper-raised: #262927;
+  --ink: #ece6d8;
+  --ink-muted: #a39d90;
+  --rule: #3a4a58;
+  --margin: #b86455;
+  --accent: #8fbfae;
+  --accent-ink: #14201c;
+  --border: #3a3d3b;
+  --error: #e6806f;
+  --focus: #7fb2e6;
+  color-scheme: dark;
+}

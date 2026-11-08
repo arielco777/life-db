@@ -19,12 +19,12 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 0 — Project scaffold
 
-- [ ] 0.1 Create a Tauri 2 + React + TypeScript (strict) + Vite app in the repo root. Add `git init` and a `.gitignore`. [NFR-9]
-- [ ] 0.2 Add ESLint + Prettier, plus a `no-restricted-imports` rule blocking `src/features/**` and `src/ui/**` from importing `src/data/**`. [FC-3]
-- [ ] 0.3 Add Vitest + React Testing Library. Add `npm run test`, `lint`, `typecheck`, `tauri dev`, `tauri build`.
-- [ ] 0.4 Create the folder layout from design §8 (`domain/`, `data/`, `platform/`, `features/`, `ui/`, `tests/`).
-- [ ] 0.5 Add React Router with placeholder routes and the app shell (sidebar, plus a bottom tab bar below 768 px). V1.1 routes stay hidden behind a feature flag. [NFR-8]
-- [ ] 0.6 Add design tokens (`tokens.css`) with light/dark themes. Follow the system theme. [NFR-6, NFR-7]
+- [x] 0.1 Create a Tauri 2 + React + TypeScript (strict) + Vite app in the repo root. Add `git init` and a `.gitignore`. [NFR-9]
+- [x] 0.2 Add ESLint + Prettier, plus a `no-restricted-imports` rule blocking `src/features/**` and `src/ui/**` from importing `src/data/**`. [FC-3]
+- [x] 0.3 Add Vitest + React Testing Library. Add `npm run test`, `lint`, `typecheck`, `tauri dev`, `tauri build`.
+- [x] 0.4 Create the folder layout from design §8 (`domain/`, `data/`, `platform/`, `features/`, `ui/`, `tests/`).
+- [x] 0.5 Add React Router with placeholder routes and the app shell (sidebar, plus a bottom tab bar below 768 px). V1.1 routes stay hidden behind a feature flag. [NFR-8]
+- [x] 0.6 Add design tokens (`tokens.css`) with light/dark themes. Follow the system theme. [NFR-6, NFR-7]
 
 **✅ Done when:** `tauri dev` opens a window with navigation between empty pages, and lint, typecheck and test all pass.
 
