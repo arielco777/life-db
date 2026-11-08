@@ -93,7 +93,8 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 4 — Habits management & entry inputs
 
-- [ ] 4.1 Habits list: drag reorder, category filter, archived section. [HAB-8, HAB-10]
+- [ ] 4.1 Habits list: drag reorder, category filter, archived section. [HAB-8, HAB-10, CAT-5]
+- [ ] 4.1a Shared `<CategoryFilter>`: active categories, then an "Archived" group with only the archived categories the listed records use. Reused by 7.1, 11.3, 13.5 and 14.3. [CAT-5]
 - [ ] 4.2 Habit form: all fields, with a type-specific section (unit / rating scale), target, frequency, tags, and type locked when entries exist. [HAB-1..7]
 - [ ] 4.3 Archive/unarchive and delete with confirmation. [HAB-8, HAB-9]
 - [ ] 4.4 `<HabitInput>` dispatcher plus `BooleanToggle`, `NumberInput`, `DurationInput` and `RatingPicker`, with validation. [HAB-2, ENT-4]
@@ -135,7 +136,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 7 — Journal
 
-- [ ] 7.1 Journal feed: grouped by date, keyset pagination, filters for date range, category and tag. [JRN-5]
+- [ ] 7.1 Journal feed: grouped by date, keyset pagination, filters for date range, category and tag. [JRN-5, CAT-5]
 - [ ] 7.2 Editor: textarea + Markdown preview, title, entry-date picker (defaults to the viewed date, or `logicalToday()`), category, tags. [JRN-1, JRN-3, JRN-6, SET-4]
 - [ ] 7.3 Autosave (800 ms debounce, on blur, and on window close). [JRN-4]
 - [ ] 7.4 Multiple entries per day in the daily view. Wire up quick entry. [JRN-2, DAY-1]
@@ -195,7 +196,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 - [ ] 11.1 Goal repository (+ milestones, goal_habits and goal_months with natural IDs) and tests. [GOAL-1..7, FC-5]
 - [ ] 11.2 `progress.ts`: milestones, manual and numeric modes, with unit tests. [GOAL-4]
-- [ ] 11.3 Goals list grouped by status, with progress bars and a category filter. [GOAL-1, GOAL-2]
+- [ ] 11.3 Goals list grouped by status, with progress bars and a category filter. [GOAL-1, GOAL-2, CAT-5]
 - [ ] 11.4 Goal form and detail page: fields, status (sets `completed_at`), progress mode controls. [GOAL-1, GOAL-2, GOAL-4]
 - [ ] 11.5 Milestones: inline add, toggle, edit, drag reorder, delete. [GOAL-3, GOAL-7]
 - [ ] 11.6 Link/unlink habits, with linked habit month stats on the detail page. [GOAL-5]
@@ -224,7 +225,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 - [ ] 13.2 Per-habit stat cards with previous-period comparison. [ANL-1, ANL-2]
 - [ ] 13.3 Choose a chart library (design §11 Q4). Per-habit chart, aggregated by week for year ranges. [ANL-3]
 - [ ] 13.4 Habit detail page reuses the stat cards and chart. [ANL-1]
-- [ ] 13.5 Goals summary table with status and category filters. [ANL-4]
+- [ ] 13.5 Goals summary table with status and category filters. [ANL-4, CAT-5]
 
 **✅ Done when:** the overview's examples (Exercise 18/31 58% vs July, Sleep avg/min/max, Reading totals) display correctly from the seeded data.
 
@@ -234,7 +235,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 - [ ] 14.1 Turn user input into a safe FTS5 query (quoted tokens with prefix stars). [SRCH-3]
 - [ ] 14.2 Search repository: FTS `bm25` + snippet, merged with tag `LIKE` matches, and tests. [SRCH-1, SRCH-2]
-- [ ] 14.3 Filters by type, date range, category and tag. [SRCH-4]
+- [ ] 14.3 Filters by type, date range, category and tag. [SRCH-4, CAT-5]
 - [ ] 14.4 `Ctrl/Cmd+K` palette and a `/search` page with grouped, highlighted results that link to records. [SRCH-1, SRCH-2]
 - [ ] 14.5 150 ms debounce. Verify < 300 ms on seeded data. [SRCH-5, NFR-1]
 
@@ -259,7 +260,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 | Forward compat | FC-1..5 | V1.0 | 0, 1, 8, 11 |
 | Habits | HAB-1..10 | V1.0 | 1, 2, 4, 5 |
 | Entries | ENT-1..5 | V1.0 | 1, 4 |
-| Categories | CAT-1..4 | V1.0 | 1, 3 |
+| Categories | CAT-1..5 | V1.0 | 1, 3, 4, 7 (filters also in 11, 13, 14) |
 | Tags | TAG-1..5 | V1.0 (+ goals/events in V1.1) | 1, 3, 11, 12 |
 | Journal | JRN-1..7 | V1.0 | 1, 7 |
 | Daily view | DAY-1..5 | V1.0 (+ goals/events sections in V1.1) | 5, 7, 11, 12 |

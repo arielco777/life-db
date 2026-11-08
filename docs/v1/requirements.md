@@ -183,6 +183,8 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 **CAT-4 Uniqueness.** Category names are unique (case-insensitive) among non-deleted categories.
 
+**CAT-5 Archived categories in filters and display.** Wherever records can be filtered by category (habits, journal, goals, analytics, search), the filter SHALL offer every active category, plus each archived category that at least one record in that list still uses. Archived options are listed separately from the active ones, under an "Archived" group. A record whose category is archived still shows it; pickers label it "(archived)" (CAT-2).
+
 ### 4.7 Tags (TAG)
 
 **TAG-1 Shared tags.** Tags are shared across habits, goals, journal entries and life events.
