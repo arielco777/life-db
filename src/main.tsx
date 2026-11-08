@@ -6,6 +6,7 @@ import { App } from './app/App';
 import { boot, type BootResult } from './app/boot';
 import { BootScreen } from './app/BootScreen';
 import { RepositoryProvider } from './app/RepositoryProvider';
+import { ToastProvider } from './ui/Toast';
 import './ui/tokens.css';
 import './ui/app.css';
 
@@ -23,9 +24,11 @@ function Root() {
   return (
     <RepositoryProvider repos={result.repos}>
       <QueryClientProvider client={queryClient}>
-        <HashRouter>
-          <App />
-        </HashRouter>
+        <ToastProvider>
+          <HashRouter>
+            <App />
+          </HashRouter>
+        </ToastProvider>
       </QueryClientProvider>
     </RepositoryProvider>
   );

@@ -2,6 +2,7 @@ import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import { FEATURE_V1_1, SHOW_DEBUG } from './features';
 import { DebugPage } from '@/features/debug/DebugPage';
 import { Placeholder } from '@/features/Placeholder';
+import { SettingsPage } from '@/features/settings/SettingsPage';
 
 interface NavItem {
   to: string;
@@ -53,7 +54,7 @@ export function App() {
           <Route path="/month/:ym?" element={<Placeholder title="Month" phase="Phase 6" />} />
           <Route path="/habits/*" element={<Placeholder title="Habits" phase="Phase 4" />} />
           <Route path="/journal/*" element={<Placeholder title="Journal" phase="Phase 7" />} />
-          <Route path="/settings/*" element={<Placeholder title="Settings" phase="Phase 9" />} />
+          <Route path="/settings/*" element={<SettingsPage />} />
           {FEATURE_V1_1 && (
             <>
               <Route path="/goals/*" element={<Placeholder title="Goals" phase="Phase 11" />} />
