@@ -196,6 +196,12 @@ export function createTagRepository(ctx: RepoContext): TagRepository {
     async setTags(entityType, entityId, tagIds) {
       await db.transaction(setTagsStatements(ctx.now(), entityType, entityId, tagIds));
     },
+    async usageCounts() {
+      const rows = await db.query<{ tag_id: string; n: number }>(
+        'SELECT tag_id, count(*) AS n FROM entity_tags WHERE deleted_at IS NULL GROUP BY tag_id',
+      );
+      return new Map(rows.map((r) => [r.tag_id, r.n]));
+    },
     async taggedWith(tagId) {
       const rows = await db.query<{ entity_type: TaggableType; entity_id: string }>(
         'SELECT entity_type, entity_id FROM entity_tags WHERE tag_id = ? AND deleted_at IS NULL ORDER BY created_at',

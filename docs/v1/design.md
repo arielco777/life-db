@@ -437,7 +437,7 @@ interface GoalRepository { /* list(filter), get, create, update, remove, reorder
 interface JournalRepository { /* forDate, list(filter, page), get, create, update, remove */ }
 interface LifeEventRepository { /* overlapping(from, to), list, get, create, update, remove */ }
 interface CategoryRepository { /* list, create, update, archive, remove */ }
-interface TagRepository { /* list, search(prefix), getOrCreate(name), rename, merge, remove,
+interface TagRepository { /* list, search(prefix), getOrCreate(name), rename, merge, remove, usageCounts,
   setTags(entityType, entityId, tagIds) */ }
 interface SearchRepository { search(q: string, filters?: SearchFilters): Promise<SearchResult[]>; }
 interface SettingsRepository { get<K>(key: K): Promise<Settings[K]>; set<K>(key: K, v: Settings[K]): Promise<void>; }

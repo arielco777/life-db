@@ -52,6 +52,8 @@ export interface TagRepository {
   remove(id: UUID): Promise<void>;
   tagsOf(entityType: TaggableType, entityId: UUID): Promise<UUID[]>;
   setTags(entityType: TaggableType, entityId: UUID, tagIds: UUID[]): Promise<void>;
+  /** Number of live records carrying each tag; tags with none are absent (TAG-4, TAG-5). */
+  usageCounts(): Promise<Map<UUID, number>>;
   /** All records carrying the tag (TAG-5). */
   taggedWith(tagId: UUID): Promise<{ entityType: TaggableType; entityId: UUID }[]>;
 }
