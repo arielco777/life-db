@@ -33,12 +33,12 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 ## Phase 1 — Schema & data-access layer *(first milestone)*
 
 ### 1A. Rust DB layer
-- [ ] 1.1 Add `rusqlite` (feature `bundled-sqlcipher-vendored-openssl`). Open `life.db` in the app data dir with `PRAGMA key` first, then WAL, foreign keys, `synchronous=NORMAL`, `busy_timeout` and `temp_store=MEMORY`. Confirm FTS5 is available. [NFR-3, NFR-4, NFR-5, SEC-1, SEC-3]
-- [ ] 1.2 `KeyStore` trait plus a `keyring` implementation, and a `0600` key-file fallback with a warning flag. First-run key generation. [SEC-2]
+- [x] 1.1 Add `rusqlite` (feature `bundled-sqlcipher-vendored-openssl`). Open `life.db` in the app data dir with `PRAGMA key` first, then WAL, foreign keys, `synchronous=NORMAL`, `busy_timeout` and `temp_store=MEMORY`. Confirm FTS5 is available. [NFR-3, NFR-4, NFR-5, SEC-1, SEC-3]
+- [x] 1.2 `KeyStore` trait plus a `keyring` implementation, and a `0600` key-file fallback with a warning flag. First-run key generation. [SEC-2]
 - [ ] 1.3 "Can't open database" error screen for when the key is missing but a DB exists. [SEC-2]
-- [ ] 1.4 Implement the `db_query`, `db_execute` and `db_transaction` commands, mapping JSON params ↔ SQLite types. [NFR-3]
-- [ ] 1.5 Implement `db_backup` (Online Backup API, device key) and `db_info`. [EXP-4, EXP-7]
-- [ ] 1.6 `cargo test`: transaction rolls back on error; backup produces a DB that opens; the DB is unreadable without the key; a file with a different key is rejected.
+- [x] 1.4 Implement the `db_query`, `db_execute` and `db_transaction` commands, mapping JSON params ↔ SQLite types. [NFR-3]
+- [x] 1.5 Implement `db_backup` (Online Backup API, device key) and `db_info`. [EXP-4, EXP-7]
+- [x] 1.6 `cargo test`: transaction rolls back on error; backup produces a DB that opens; the DB is unreadable without the key; a file with a different key is rejected.
 
 ### 1B. TypeScript driver & migrations
 - [ ] 1.7 Write the `SqlDriver` interface, `TauriDriver` (invoke), and `tests/nodeDriver.ts` (better-sqlite3). [NFR-10]
