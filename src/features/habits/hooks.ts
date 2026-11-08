@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { entryKeys } from './entryHooks';
 import { useRepositories } from '@/app/RepositoryProvider';
-import type { HabitPatch, NewHabit } from '@/domain/repositories';
+import type { DateRange, HabitPatch, NewHabit } from '@/domain/repositories';
 import type { Habit, UUID } from '@/domain/types';
 import { tagKeys } from '@/features/tags/hooks';
 import { useToast } from '@/ui/Toast';
@@ -10,6 +10,7 @@ export const habitKeys = {
   all: ['habits'] as const,
   list: ['habits', 'list'] as const,
   detail: (id: UUID) => ['habits', 'detail', id] as const,
+  activeOn: (range: DateRange) => ['habits', 'activeOn', range.from, range.to] as const,
   hasEntries: (id: UUID) => ['habits', 'hasEntries', id] as const,
 };
 
@@ -17,6 +18,12 @@ export const habitKeys = {
 export function useHabits() {
   const { habits } = useRepositories();
   return useQuery({ queryKey: habitKeys.list, queryFn: () => habits.list({ includeArchived: true }) });
+}
+
+/** Habits relevant to a date range, in user order (DAY-1, MON-1, MON-8). */
+export function useActiveHabits(range: DateRange) {
+  const { habits } = useRepositories();
+  return useQuery({ queryKey: habitKeys.activeOn(range), queryFn: () => habits.activeOn(range) });
 }
 
 export function useHabit(id: UUID) {

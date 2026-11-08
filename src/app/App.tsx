@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import { FEATURE_V1_1, SHOW_DEBUG } from './features';
 import { DebugPage } from '@/features/debug/DebugPage';
+import { DayRoute } from '@/features/day/DayPage';
 import { HabitRoutes } from '@/features/habits/HabitPages';
 import { Placeholder } from '@/features/Placeholder';
 import { SettingsPage } from '@/features/settings/SettingsPage';
@@ -51,7 +52,7 @@ export function App() {
       <main className="page">
         <Routes>
           <Route path="/" element={<Navigate to="/day" replace />} />
-          <Route path="/day/:date?" element={<Placeholder title="Today" phase="Phase 5" />} />
+          <Route path="/day/:date?" element={<DayRoute />} />
           <Route path="/month/:ym?" element={<Placeholder title="Month" phase="Phase 6" />} />
           <Route path="/habits/*" element={<HabitRoutes />} />
           <Route path="/journal/*" element={<Placeholder title="Journal" phase="Phase 7" />} />

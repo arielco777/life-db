@@ -901,3 +901,98 @@ fieldset:disabled .type-option {
 .end-options .row {
   margin: 0;
 }
+
+/* ───────── daily view (DAY-1) ───────── */
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 760px;
+}
+.day-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.day-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.day-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.day-title .page-title {
+  margin: 0;
+  font-size: 24px;
+}
+a.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-h);
+  height: var(--control-h);
+  padding: 0;
+  font-size: 20px;
+  flex: none;
+}
+.day-tools {
+  margin: 0;
+}
+.day-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.section-title {
+  margin: 0;
+  font-size: 13px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.day-habit {
+  flex-wrap: nowrap;
+}
+.habit-label {
+  font-weight: 600;
+}
+.day-habit.unscheduled .habit-label {
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+.day-habit-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
+}
+.day-habit-meta:empty {
+  display: none;
+}
+.week-dots [aria-hidden] {
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+.target-met {
+  color: var(--accent);
+  font-weight: 600;
+}
+.target-not_met {
+  color: var(--error);
+}
+
+@media (max-width: 520px) {
+  .day-habit {
+    flex-wrap: wrap;
+  }
+  .day-habit .entry-field {
+    margin-left: 20px; /* under the name, past the category dot */
+  }
+}
