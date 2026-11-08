@@ -1,4 +1,6 @@
 dist
-src-tauri/target
+node_modules
+src-tauri
 docs
 *.md
+package-lock.json
