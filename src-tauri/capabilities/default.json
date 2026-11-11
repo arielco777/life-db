@@ -1,7 +1,15 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Main window. App db_* commands are allowed by default; no plugins yet. allow-destroy lets the window close after pending saves finish (JRN-4).",
-  "windows": ["main"],
-  "permissions": ["core:default", "core:window:allow-destroy"]
+  "description": "Main window. App db_* commands are allowed by default. allow-destroy lets the window close after pending saves finish (JRN-4). dialog:allow-save / allow-open pick a backup to write or restore (EXP-4, EXP-5); opener:allow-reveal-item-in-dir shows the data folder (EXP-7).",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "core:window:allow-destroy",
+    "dialog:allow-save",
+    "dialog:allow-open",
+    "opener:allow-reveal-item-in-dir"
+  ]
 }

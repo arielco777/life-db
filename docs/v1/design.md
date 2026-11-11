@@ -588,9 +588,11 @@ MONTHLY GOALS
 
 | Action | Implementation |
 | --- | --- |
-| Backup (EXP-4) | Save dialog → `db_backup(path)`. Default name `life-db-YYYY-MM-DD.lifedb`. The UI states that the file restores only on this device |
-| Restore (EXP-5) | Open dialog → `db_restore(path)`: Rust opens the file read-only with the device key, checks `schema_migrations` exists and that its max version ≤ the app's, backs up the current DB to `backups/pre-restore-<ts>.db`, swaps the files, reopens, and the frontend reloads. A file that won't open gives a clear "not a Life DB backup from this device" error |
-| Auto backup (EXP-6) | On app start, if the newest automatic backup is older than 24h, run `db_backup` to `backups/auto-YYYY-MM-DD.db` and prune down to `keep_count` |
+| Backup (EXP-4) | Save dialog → `db_backup(path)`. Default name `life-db-YYYY-MM-DD.lifedb`; a name typed without an extension gets `.lifedb` (GTK dialogs don't add it). The UI states that the file restores only on this device, then shows where it was saved with a *Show in folder* link |
+| Data location (EXP-7) | `db_info` → database path and size, plus *Open folder*, which opens the file manager with `life.db` selected |
+| Restore (EXP-5) | Open dialog → confirm → `db_restore(path, maxVersion)`. Rust copies the file to `life.db.restoring` (the user's file is never modified) and validates the copy: it opens with the device key, passes `PRAGMA quick_check`, has `schema_migrations`, and its max version is ≤ the app's. Then it backs up the current DB to `backups/pre-restore-<ms>.lifedb`, closes it, moves it to `life.db.old`, drops any `-wal`/`-shm`, moves the copy into place and reopens. If any step of the swap fails, the old file goes back and is reopened. The frontend then reloads to the daily view, and the usual migration runs if the backup is older. Errors are written for people: "isn't a Life DB backup from this device", "damaged", "made by a newer version" |
+| Auto backup (EXP-6) | After startup (in the background, if `backup.auto_enabled`): `db_auto_backup(today, keep_count)` writes `backups/auto-YYYY-MM-DD.lifedb` unless today's exists, then deletes the oldest `auto-*` files beyond `keep_count`. Pre-migration, pre-restore and manual backups are never pruned. `db_info` reports the newest one's date for Settings |
+| Security (SEC-2, SEC-4) | Settings → Security explains what's encrypted and where the key is. When the key-file fallback is in use (`db_info.keyFile`), it warns that the file plus the database is enough to read the data |
 
 **Deferred to V1.5:** JSON / CSV / Markdown export and import (EXP-1..3). Planned shapes, kept here so V1 doesn't block them:
 - JSON: `{ app: "life-db", format: 1, schemaVersion, exportedAt, categories: [], tags: [], habits: [], habitEntries: [], goals: [], milestones: [], goalHabits: [], goalMonths: [], journalEntries: [], lifeEvents: [], entityTags: [] }`
@@ -635,7 +637,7 @@ life-db/
 │  │  ├─ driver.ts          # SqlDriver interface
 │  │  ├─ tauriDriver.ts
 │  │  └─ sqlite/            # repositories, mappers, migrations/*.sql
-│  ├─ platform/             # PlatformService (dialogs, fs) – tauri impl
+│  ├─ platform/             # PlatformService (dialogs, reveal folder, backup, data info) – tauri impl; tests use tests/fakePlatform.ts
 │  ├─ features/             # day/, month/, habits/, goals/, journal/, events/,
 │  │                        # analytics/, search/, settings/  (components + hooks)
 │  ├─ ui/                   # shared components, tokens.css

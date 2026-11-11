@@ -14,6 +14,9 @@ pub enum Error {
     Io(#[from] std::io::Error),
     #[error("{0}")]
     Invalid(String),
+    /// A backup that can't be restored. The message is written for the user (EXP-5).
+    #[error("{0}")]
+    Restore(String),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
