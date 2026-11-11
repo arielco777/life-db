@@ -5,7 +5,9 @@ import { DayRoute } from '@/features/day/DayPage';
 import { HabitRoutes } from '@/features/habits/HabitPages';
 import { JournalRoutes } from '@/features/journal/JournalPages';
 import { MonthRoute } from '@/features/month/MonthPage';
+import { FirstRunGate } from '@/features/onboarding/FirstRun';
 import { Placeholder } from '@/features/Placeholder';
+import { useApplyTheme, useSettings } from '@/features/settings/hooks';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 
 interface NavItem {
@@ -30,10 +32,23 @@ const NAV: NavItem[] = [
 const visibleNav = NAV.filter((n) => FEATURE_V1_1 || !n.v11);
 
 export function App() {
+  useApplyTheme();
+  return (
+    <FirstRunGate>
+      <Shell />
+    </FirstRunGate>
+  );
+}
+
+function Shell() {
+  const name = useSettings()['profile.display_name'];
   return (
     <div className="shell">
       <nav className="nav" aria-label="Main">
-        <div className="nav-brand">Life DB</div>
+        <div className="nav-brand">
+          Life DB
+          {name && <span className="nav-name">{name}</span>}
+        </div>
         {visibleNav.map((n) => (
           <NavLink key={n.to} to={n.to} className="nav-link">
             <span className="nav-icon" aria-hidden>

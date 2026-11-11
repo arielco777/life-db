@@ -141,13 +141,13 @@ function HabitRow({
   category?: Category;
   sortable: boolean;
 }) {
-  const { week_start } = useSettings();
+  const { week_start, date_format } = useSettings();
   const today = useToday();
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
     useSortable({ id: h.id, disabled: !sortable });
   const style: CSSProperties = { transform: CSS.Transform.toString(transform), transition };
   const target = describeTarget(h);
-  const run = runNote(h, today);
+  const run = runNote(h, today, date_format);
 
   return (
     <li ref={setNodeRef} style={style} className={`list-row habit-row${isDragging ? ' dragging' : ''}`}>

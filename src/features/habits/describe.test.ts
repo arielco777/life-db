@@ -47,29 +47,23 @@ describe('run window (start / end dates)', () => {
     expect(runState({ startDate: '2026-08-20' }, T)).toBe('upcoming');
   });
   it('describeRun', () => {
-    expect(describeRun({ startDate: '2026-08-01' }, T, 'en-US')).toBe('From Aug 1, 2026 · no end date');
-    expect(describeRun({ startDate: '2026-08-01', endDate: '2026-10-06' }, T, 'en-US')).toBe(
+    expect(describeRun({ startDate: '2026-08-01' }, T)).toBe('From Aug 1, 2026 · no end date');
+    expect(describeRun({ startDate: '2026-08-01', endDate: '2026-10-06' }, T)).toBe(
       'Aug 1, 2026 – Oct 6, 2026 · ends in 53 days',
     );
-    expect(describeRun({ startDate: '2026-08-01', endDate: T }, T, 'en-US')).toMatch(/ends today$/);
-    expect(describeRun({ startDate: '2026-08-01', endDate: '2026-08-15' }, T, 'en-US')).toMatch(
-      /ends in 1 day$/,
-    );
-    expect(describeRun({ startDate: '2026-07-01', endDate: '2026-07-31' }, T, 'en-US')).toBe(
+    expect(describeRun({ startDate: '2026-08-01', endDate: T }, T)).toMatch(/ends today$/);
+    expect(describeRun({ startDate: '2026-08-01', endDate: '2026-08-15' }, T)).toMatch(/ends in 1 day$/);
+    expect(describeRun({ startDate: '2026-07-01', endDate: '2026-07-31' }, T)).toBe(
       'Jul 1, 2026 – Jul 31, 2026 · ended',
     );
-    expect(describeRun({ startDate: '2026-08-19' }, T, 'en-US')).toBe(
-      'Starts Aug 19, 2026 (in 5 days) · no end date',
-    );
-    expect(describeRun({ startDate: '2026-08-19', endDate: '2026-09-01' }, T, 'en-US')).toMatch(
-      /starts in 5 days$/,
-    );
+    expect(describeRun({ startDate: '2026-08-19' }, T)).toBe('Starts Aug 19, 2026 (in 5 days) · no end date');
+    expect(describeRun({ startDate: '2026-08-19', endDate: '2026-09-01' }, T)).toMatch(/starts in 5 days$/);
   });
   it('runNote for list rows', () => {
-    expect(runNote({ startDate: '2026-08-01' }, T, 'en-US')).toBeNull();
-    expect(runNote({ startDate: '2026-08-01', endDate: '2026-12-31' }, T, 'en-US')).toBe('Ends Dec 31');
-    expect(runNote({ startDate: '2026-07-01', endDate: '2026-07-31' }, T, 'en-US')).toBe('Ended Jul 31');
-    expect(runNote({ startDate: '2026-09-01' }, T, 'en-US')).toBe('Starts Sep 1');
+    expect(runNote({ startDate: '2026-08-01' }, T)).toBeNull();
+    expect(runNote({ startDate: '2026-08-01', endDate: '2026-12-31' }, T)).toBe('Ends Dec 31');
+    expect(runNote({ startDate: '2026-07-01', endDate: '2026-07-31' }, T)).toBe('Ended Jul 31');
+    expect(runNote({ startDate: '2026-09-01' }, T)).toBe('Starts Sep 1');
   });
 });
 

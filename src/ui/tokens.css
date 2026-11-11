@@ -5,10 +5,14 @@
   --ink: #2b2a27;
   --ink-muted: #6f6a60;
   --rule: #b0c4d6;
-  --margin: #c76b5c;
+  /* The notebook's red margin line; also today's date, so dark enough for text (4.5:1). */
+  --margin: #a4503f;
   --accent: #3f5f54;
   --accent-ink: #ffffff;
+  /* Card edges and grid rules: quiet on purpose. */
   --border: #e2d8c3;
+  /* Edges of inputs, selects and outline buttons: 3:1 against the page (WCAG 1.4.11). */
+  --control-border: #8c8371;
   --error: #a33a2c;
   --warning: #9a6200;
   --focus: #2f6fb0;
@@ -37,12 +41,12 @@
     --ink: #ece6d8;
     --ink-muted: #a39d90;
     --rule: #3a4a58;
-    --margin: #b86455;
+    --margin: #d98676;
     --accent: #8fbfae;
     --accent-ink: #14201c;
     --border: #3a3d3b;
+    --control-border: #727673;
     --error: #e6806f;
-    --warning: #e0a84a;
     --warning: #e0a84a;
     --focus: #7fb2e6;
     color-scheme: dark;
@@ -55,11 +59,13 @@
   --ink: #ece6d8;
   --ink-muted: #a39d90;
   --rule: #3a4a58;
-  --margin: #b86455;
+  --margin: #d98676;
   --accent: #8fbfae;
   --accent-ink: #14201c;
   --border: #3a3d3b;
+  --control-border: #727673;
   --error: #e6806f;
+  --warning: #e0a84a;
   --focus: #7fb2e6;
   color-scheme: dark;
 }

@@ -1,8 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useId, useState } from 'react';
 import { BACKUP_EXTENSION, backupFileName, formatBytes, withBackupExtension } from './backup';
-import { useSetSetting, useSettings, useToday } from './hooks';
-import { formatDate } from '@/features/habits/describe';
+import { useFormatDate, useSetSetting, useSettings, useToday } from './hooks';
 import { usePlatform } from '@/platform/PlatformProvider';
 import { ConfirmDialog } from '@/ui/ConfirmDialog';
 import { useToast } from '@/ui/Toast';
@@ -166,6 +165,7 @@ function AutoBackupSection({ lastAutoBackup }: { lastAutoBackup?: string | null 
   const ids = useId();
   const settings = useSettings();
   const set = useSetSetting();
+  const formatDate = useFormatDate();
   const enabled = settings['backup.auto_enabled'];
   const keep = settings['backup.keep_count'];
   const choices = KEEP_CHOICES.includes(keep) ? KEEP_CHOICES : [...KEEP_CHOICES, keep].sort((a, b) => a - b);

@@ -164,13 +164,13 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 9 — Settings, first run & polish
 
-- [ ] 9.1 First-run onboarding with suggested habits. [SET-1]
-- [ ] 9.2 Settings: profile name, week start, **day starts at** (midnight–6 a.m., default 4 a.m.), theme, date format. [SET-2, SET-3, SET-4]
-- [ ] 9.3 Empty states for every view. Completion animations. Toasts. [NFR-6]
-- [ ] 9.4 Accessibility pass: keyboard reachability, focus rings, labels, contrast check in both themes. [NFR-7]
-- [ ] 9.5 Responsive pass down to 360 px. [NFR-8]
-- [ ] 9.6 Performance pass against the NFR-1 budgets for V1.0 views with the seed fixture, including cold start < 2 s. [NFR-1]
-- [ ] 9.7 Confirm the only network request is the update check (CSP `connect-src` in `tauri.conf.json`). [NFR-2, NFR-5]
+- [x] 9.1 First-run onboarding with suggested habits. [SET-1]
+- [x] 9.2 Settings: profile name, week start, **day starts at** (midnight–6 a.m., default 4 a.m.), theme, date format. [SET-2, SET-3, SET-4]
+- [x] 9.3 Empty states for every view. Completion animations. Toasts. [NFR-6]
+- [x] 9.4 Accessibility pass: keyboard reachability, focus rings, labels, contrast check in both themes. [NFR-7]
+- [x] 9.5 Responsive pass down to 360 px. [NFR-8]
+- [x] 9.6 Performance pass against the NFR-1 budgets for V1.0 views with the seed fixture, including cold start < 2 s. [NFR-1] *(Cold start: `[startup]` console line, timed by hand in a release build.)*
+- [x] 9.7 Confirm the only network request is the update check (CSP `connect-src` in `tauri.conf.json`). [NFR-2, NFR-5]
 
 **✅ Done when:** a full month can be used daily as a replacement for the paper notebook's habit grid and journal pages.
 

@@ -123,7 +123,7 @@ function HabitDetailPage() {
 function HabitDetail({ habit }: { habit: Habit }) {
   const navigate = useNavigate();
   const today = useToday();
-  const { week_start } = useSettings();
+  const { week_start, date_format } = useSettings();
   const { data: categories = [] } = useCategories();
   const { data: tags = [] } = useTags();
   const { archive, remove } = useHabitActions();
@@ -186,7 +186,7 @@ function HabitDetail({ habit }: { habit: Habit }) {
         <dt>Priority</dt>
         <dd>{habit.priority[0]!.toUpperCase() + habit.priority.slice(1)}</dd>
         <dt>Runs</dt>
-        <dd>{describeRun(habit, today)}</dd>
+        <dd>{describeRun(habit, today, date_format)}</dd>
         {tagNames.length > 0 && (
           <>
             <dt>Tags</dt>

@@ -1,5 +1,6 @@
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import { DataPage } from './DataPage';
+import { GeneralPage } from './GeneralPage';
 import { SecurityPage } from './SecurityPage';
 import { CategoriesPage } from '@/features/categories/CategoriesPage';
 import { TagsPage } from '@/features/tags/TagsPage';
@@ -27,7 +28,7 @@ export function SettingsPage() {
       </nav>
       <Routes>
         <Route index element={<Navigate to="/settings/general" replace />} />
-        <Route path="general" element={<p className="muted">Preferences arrive in Phase 9.</p>} />
+        <Route path="general" element={<GeneralPage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="tags" element={<TagsPage />} />
         <Route path="tags/:id" element={<TagView />} />

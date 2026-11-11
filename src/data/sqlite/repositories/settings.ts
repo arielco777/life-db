@@ -1,5 +1,6 @@
 import type { RepoContext } from '../context';
 import { DomainError } from '@/domain/errors';
+import { DATE_FORMATS } from '@/domain/services/dateFormat';
 import type { SettingsRepository } from '@/domain/repositories';
 import { DEFAULT_SETTINGS, type Settings } from '@/domain/types';
 
@@ -8,7 +9,7 @@ const validators: { [K in keyof Settings]: (v: unknown) => boolean } = {
   week_start: (v) => v === 'mon' || v === 'sun',
   day_start_hour: (v) => Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 6,
   theme: (v) => v === 'light' || v === 'dark' || v === 'system',
-  date_format: (v) => typeof v === 'string' && v.length > 0 && v.length <= 40,
+  date_format: (v) => DATE_FORMATS.some((f) => f.pattern === v),
   'backup.auto_enabled': (v) => typeof v === 'boolean',
   'backup.keep_count': (v) => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 100,
   'updates.enabled': (v) => typeof v === 'boolean',

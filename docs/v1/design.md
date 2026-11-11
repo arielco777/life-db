@@ -602,15 +602,19 @@ MONTHLY GOALS
 ### 6.10 Distribution (DIST)
 
 - **Signing:** Windows Authenticode certificate, Apple Developer ID plus notarization, and a Tauri updater key pair. All secrets live in CI secrets, never in the repo.
-- **Updater:** `tauri-plugin-updater` reads a static `latest.json` (e.g. from GitHub Releases). The frontend shows release notes and asks for consent before installing. The check is off when the user disables it (DIST-2). The CSP `connect-src` allows only the update host (NFR-2).
+- **Updater:** `tauri-plugin-updater` reads a static `latest.json` (e.g. from GitHub Releases). The frontend shows release notes and asks for consent before installing. The check is off when the user disables it (DIST-2). The request is made from Rust, so the webview's CSP stays local-only. Until Phase 10, `tests/network.test.ts` pins `connect-src` to Tauri IPC and checks that no frontend code calls a network API (NFR-2).
+- **Startup:** `markInteractive()` (in `src/app/startup.ts`) logs `[startup] daily view ready N ms` once the first daily view has data. Background work, today the daily backup, waits for that plus 2 s via `afterInteractive()`, so it never delays the first screen (NFR-1).
 - **Upgrade safety:** after an update, the first launch runs the migration runner (§4.6), which backs up first. If a migration fails, the app shows a recovery screen with "Open backups folder" and "Report issue" (DIST-3).
 - **Logging:** `tauri-plugin-log` writes to the app log dir with rotation. Frontend errors are forwarded through an error boundary plus `window.onerror` (DIST-6).
 - **About screen:** app version, schema version, data folder, privacy statement, and a feedback/issue link (DIST-4, DIST-5).
 
 ### 6.11 Settings & first run
 
-- First run: if `onboarding.completed` is unset, show a single onboarding screen that suggests habits to tick (SET-1).
-- Settings: profile name, week start, theme, date format, backup options, data folder path with an "Open folder" button (EXP-7).
+- First run: if `onboarding.completed` is unset, show a single onboarding screen that suggests habits to tick (SET-1). It asks for an optional name and offers Exercise, Read, Meditate, Sleep, Coffee and Mood. *Start* creates the ticked habits; *Skip* adds nothing. A database that already has habits or journal entries counts as set up, so people who used the app before onboarding existed never see it.
+- Settings tabs: **General** (name, week start, day start, theme, date format), Categories, Tags, **Data** (backup, restore, automatic backups, data folder path with an "Open folder" button, EXP-7), and **Security**.
+- Date format (SET-2): one of a fixed list of date-fns patterns (`MMM d, yyyy`, `d MMM yyyy`, `yyyy-MM-dd`, `dd/MM/yyyy`, `MM/dd/yyyy`, `dd.MM.yyyy`), each with a yearless short form. It applies to short dates; headings like "Friday, August 14, 2026" keep the written-out form.
+- Theme: `system` removes `data-theme` from `<html>` so the OS preference applies; `light`/`dark` set it (`tokens.css` handles both).
+- The display name shows under "Life DB" in the sidebar (SET-3).
 
 ## 7. UI system
 
@@ -620,6 +624,8 @@ MONTHLY GOALS
 - **Feedback:** brief "check" animations for satisfying completion, a toast for errors, no blocking modals for routine entry (NFR-6). Confirmation dialogs only for deletes, restore and merging tags.
 - **Category pickers and filters:** `<CategorySelect>` offers active categories, plus the record's own archived category labelled "(archived)" (CAT-2). `<CategoryFilter>` offers active categories, then an "Archived" `<optgroup>` built from the `categoryId`s of the records being listed (CAT-5). Users have tens of habits and categories, so collecting them from the loaded records is cheap and needs no extra query.
 - **Accessibility:** native inputs where possible, `aria-label` on grid cells (`"Exercise, August 3: done"`), visible focus rings, AA contrast (NFR-7).
+  - Checked automatically: `tests/a11y.test.tsx` runs axe on every screen, and `src/ui/tokens.test.ts` checks every text colour at 4.5:1 and control edges and focus rings at 3:1, in both themes. It also checks that the two dark blocks in `tokens.css` match.
+  - Quiet `--border` is for cards and grid rules. Inputs, selects and outline buttons use `--control-border` (3:1).
 
 ## 8. Project structure
 
@@ -656,7 +662,7 @@ life-db/
 | Repositories | Vitest + NodeDriver (in-memory `:memory:` DB, all migrations applied) | CRUD, soft delete, uniqueness, upsert, cascade, search triggers, tag merge |
 | Migrations | Vitest | Fresh DB → latest. Also open a fixture DB from each prior version → latest |
 | Components | Vitest + React Testing Library with in-memory repos | HabitInput per type, grid cell editing, keyboard navigation |
-| Performance | Script using `tests/fixtures/seed.ts` (5y × 30 habits, 3k journal entries) | Time the month/day/search queries against the NFR-1 budgets |
+| Performance | `npm run test:perf` (`*.perf.test.*`, run alone and one file at a time, also in CI) on `tests/fixtures/seed.ts` (5y × 30 habits, 3k journal entries) | `data.perf`: the month/day/journal queries. `screens.perf`: switching months and days and showing a save, rendered, against the NFR-1 budgets (2× slack on CI runners) |
 | Manual / E2E | Run the Tauri dev build | Backup/restore, first run, install & update (Phase 10) |
 
 The Rust `db_*` commands get `cargo test` cases for: transaction rollback, backup/restore validation, the DB being unreadable without the key, backup → restore round trip, a foreign-key file rejected, and FTS5 available under SQLCipher.

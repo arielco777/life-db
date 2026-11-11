@@ -3,12 +3,14 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { groupByCategory } from './grouping';
 import { rowStatus } from './rowStatus';
 import { useDay } from './useDay';
+import { markInteractive } from '@/app/startup';
 import { isISODate } from '@/domain/services/clock';
 import { addDays, diffDays } from '@/domain/services/dates';
 import type { ValuesByDate } from '@/domain/services/targets';
 import type { Habit, ISODate } from '@/domain/types';
 import { useCategories } from '@/features/categories/hooks';
 import { HabitEntryField } from '@/features/habits/HabitEntryField';
+import { useHabits } from '@/features/habits/hooks';
 import { entryHeadline, entrySnippet } from '@/features/journal/headline';
 import { QuickJournal } from '@/features/journal/QuickJournal';
 import { useSetSetting, useSettings, useToday } from '@/features/settings/hooks';
@@ -68,6 +70,9 @@ function DayPage({ date }: { date: ISODate }) {
   const today = useToday();
   const day = useDay(date);
   useDayKeys(date, today);
+  useEffect(() => {
+    if (!day.isPending) markInteractive();
+  }, [day.isPending]);
 
   return (
     <section className="day">
@@ -182,12 +187,7 @@ function HabitsSection({ date, day }: { date: ISODate; day: ReturnType<typeof us
       {day.isPending ? (
         <p className="muted">Loading…</p>
       ) : day.habits.length === 0 ? (
-        <div className="card empty">
-          <p>No habits for this day.</p>
-          <Link to="/habits/new" className="button">
-            Add a habit
-          </Link>
-        </div>
+        <NoHabitsToday />
       ) : grouped ? (
         groupByCategory(day.habits, categories).map((g) => {
           const name = g.category?.name ?? 'No category';
@@ -283,5 +283,27 @@ function DayHabitRow({
         label={`${habit.name}, ${shortDate(date)}`}
       />
     </li>
+  );
+}
+
+/** Empty state (task 9.3): a first habit to add, or why none show on this day. */
+function NoHabitsToday() {
+  const { data: all = [] } = useHabits();
+  if (all.some((h) => !h.archivedAt))
+    return (
+      <div className="card empty">
+        <p>No habits run on this day. They may start later, have ended, or be archived.</p>
+        <Link to="/habits" className="button secondary">
+          See your habits
+        </Link>
+      </div>
+    );
+  return (
+    <div className="card empty">
+      <p>No habits yet. Add one thing you'd like to keep track of each day.</p>
+      <Link to="/habits/new" className="button">
+        Add a habit
+      </Link>
+    </div>
   );
 }

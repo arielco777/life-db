@@ -24,6 +24,7 @@ jobs:
       - run: npm run lint
       - run: npx prettier --check .
       - run: npm test
+      - run: npm run test:perf
       - run: npm run build
 
   rust:

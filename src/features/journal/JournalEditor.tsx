@@ -7,7 +7,7 @@ import { useJournalDraft, type SaveStatus } from './useJournalDraft';
 import { isISODate } from '@/domain/services/clock';
 import type { ISODate, JournalEntry } from '@/domain/types';
 import { CategorySelect } from '@/features/categories/CategorySelect';
-import { formatDate } from '@/features/habits/describe';
+import { useFormatDate } from '@/features/settings/hooks';
 import { TagInput } from '@/features/tags/TagInput';
 import { ConfirmDialog } from '@/ui/ConfirmDialog';
 
@@ -37,6 +37,7 @@ interface Props {
 export function JournalEditor({ entry, defaultDate, onCreated }: Props) {
   const ids = useId();
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
   const qc = useQueryClient();
   const { draft, change, saved, status, flush, stop } = useJournalDraft({ entry, defaultDate, onCreated });
   const [preview, setPreview] = useState(false);

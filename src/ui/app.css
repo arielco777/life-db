@@ -43,7 +43,7 @@ input,
 select,
 textarea {
   background: var(--paper-raised);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius);
   padding: var(--space-2) var(--space-3);
 }
@@ -204,7 +204,7 @@ button:disabled {
 button.secondary {
   background: transparent;
   color: var(--ink);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
 }
 button.secondary:hover:not(:disabled) {
   background: var(--paper);
@@ -414,7 +414,7 @@ button.danger {
   align-items: center;
   gap: var(--space-1);
   background: var(--paper-raised);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius);
   padding: var(--space-1) var(--space-2);
   cursor: text;
@@ -562,7 +562,7 @@ button.step {
   padding: 0;
   background: transparent;
   color: var(--ink);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   border-radius: 50%;
   line-height: 1;
 }
@@ -621,7 +621,7 @@ button.check-not-done {
   padding: 0 var(--space-1);
   background: transparent;
   color: var(--ink-muted);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   border-radius: 6px;
   font-variant-numeric: tabular-nums;
 }
@@ -647,6 +647,7 @@ button.check-not-done {
   right: 0;
   z-index: 15;
   width: 260px;
+  max-width: calc(100vw - 2 * var(--space-4));
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -687,7 +688,7 @@ a.button {
 a.button.secondary {
   background: transparent;
   color: var(--ink);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
 }
 .badge {
   display: inline-block;
@@ -776,7 +777,7 @@ fieldset:disabled .type-option {
   flex-direction: column;
   gap: 2px;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius);
   background: var(--paper-raised);
   cursor: pointer;
@@ -797,7 +798,7 @@ fieldset:disabled .type-option {
 
 .segmented {
   display: inline-flex;
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius);
   overflow: hidden;
   align-self: flex-start;
@@ -840,7 +841,7 @@ fieldset:disabled .type-option {
   min-width: 48px;
   background: transparent;
   color: var(--ink);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
 }
 .weekday-picker button.on {
   background: var(--accent);
@@ -1003,6 +1004,9 @@ a.icon-btn {
 }
 
 @media (max-width: 520px) {
+  .dialog {
+    padding: var(--space-4);
+  }
   .day-habit {
     flex-wrap: wrap;
   }
@@ -1411,8 +1415,15 @@ a.icon-btn {
   border-radius: 3px;
   background: var(--paper);
 }
+.markdown pre {
+  overflow-x: auto; /* long code lines scroll, the page doesn't (NFR-8) */
+}
 .markdown table {
   border-collapse: collapse;
+  /* A wide table scrolls on its own instead of widening the page (NFR-8). */
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
 }
 .markdown :is(th, td) {
   border: 1px solid var(--border);
@@ -1441,6 +1452,29 @@ a.icon-btn {
 .security-list {
   margin: 0;
   padding-left: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* ───────── first run & profile ───────── */
+.nav-name {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.onboarding {
+  height: 100%;
+}
+.onboarding .stack {
+  margin: 0 auto;
+  max-width: 520px;
+}
+.onboarding-habits {
   display: grid;
   gap: var(--space-2);
 }
