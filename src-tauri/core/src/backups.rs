@@ -376,7 +376,7 @@ mod tests {
         assert_eq!(names, ["auto-2026-08-03.lifedb", "auto-2026-08-02.lifedb"]);
         assert!(backups.join("pre-migration-v1-to-v2-1.lifedb").exists());
         assert!(backups.join("auto-notes.lifedb").exists());
-        assert!(Database::open(&backups.join("auto-2026-08-03.lifedb"), &key).is_ok());
+        assert!(Database::open(backups.join("auto-2026-08-03.lifedb"), &key).is_ok());
         assert!(auto_backup(&db, &key, dir.path(), "08/03/2026", 2).is_err());
         assert_eq!(
             last_auto_backup(dir.path()).unwrap().as_deref(),
