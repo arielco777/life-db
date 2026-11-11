@@ -1,6 +1,12 @@
-import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from '@tanstack/react-query';
 import { useRepositories } from '@/app/RepositoryProvider';
-import type { NewJournalEntry } from '@/domain/repositories';
+import type { JournalCursor, JournalFilter, NewJournalEntry } from '@/domain/repositories';
 import type { ISODate, JournalEntry, UUID } from '@/domain/types';
 import { tagKeys } from '@/features/tags/hooks';
 import { useToast } from '@/ui/Toast';
@@ -9,7 +15,29 @@ export const journalKeys = {
   all: ['journal'] as const,
   forDate: (date: ISODate) => ['journal', 'date', date] as const,
   detail: (id: UUID) => ['journal', 'detail', id] as const,
+  feed: (filter: JournalFilter) => ['journal', 'feed', filter] as const,
+  facets: ['journal', 'facets'] as const,
 };
+
+/** Entries loaded per feed page. */
+export const FEED_PAGE = 30;
+
+/** The journal feed (JRN-5): newest first, keyset-paginated, filtered. */
+export function useJournalFeed(filter: JournalFilter) {
+  const { journal } = useRepositories();
+  return useInfiniteQuery({
+    queryKey: journalKeys.feed(filter),
+    queryFn: ({ pageParam }) => journal.list(filter, { after: pageParam, limit: FEED_PAGE }),
+    initialPageParam: undefined as JournalCursor | undefined,
+    getNextPageParam: (last) => last.next,
+  });
+}
+
+/** Categories and tags used by any entry, for the feed's filters (CAT-5). */
+export function useJournalFacets() {
+  const { journal } = useRepositories();
+  return useQuery({ queryKey: journalKeys.facets, queryFn: () => journal.facets() });
+}
 
 /** Journal entries written for a date, oldest first (DAY-1). */
 export function useJournalForDate(date: ISODate) {

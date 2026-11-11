@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import {
   Link,
   Navigate,
@@ -9,13 +8,11 @@ import {
   useParams,
   useSearchParams,
 } from 'react-router-dom';
-import { entryHeadline } from './headline';
-import { journalKeys, useJournalEntry } from './hooks';
+import { useJournalEntry } from './hooks';
 import { JournalEditor } from './JournalEditor';
-import { useRepositories } from '@/app/RepositoryProvider';
+import { JournalFeed } from './JournalFeed';
 import { isISODate } from '@/domain/services/clock';
 import type { JournalEntry } from '@/domain/types';
-import { formatDate } from '@/features/habits/describe';
 import { useToday } from '@/features/settings/hooks';
 
 /** /journal, /journal/new[?date=], /journal/:id (JRN-1…7). */
@@ -68,15 +65,8 @@ function JournalEntryRoute() {
   return <JournalEditor key={carriedKey ?? id} entry={query.data} defaultDate={query.data.entryDate} />;
 }
 
-/** The latest entries. The full feed with filters and paging is task 7.1. */
+/** /journal: the feed with its filters (task 7.1). */
 function JournalHome() {
-  const { journal } = useRepositories();
-  const recent = useQuery({
-    queryKey: [...journalKeys.all, 'recent'],
-    queryFn: () => journal.list({}, { limit: 30 }),
-  });
-  const entries = recent.data?.entries ?? [];
-
   return (
     <section className="stack">
       <header className="page-header">
@@ -85,24 +75,7 @@ function JournalHome() {
           New entry
         </Link>
       </header>
-      {recent.isPending ? (
-        <p className="muted">Loading…</p>
-      ) : entries.length === 0 ? (
-        <div className="card empty">
-          <p>No journal entries yet.</p>
-        </div>
-      ) : (
-        <ul className="plain list" aria-label="Recent entries">
-          {entries.map((e) => (
-            <li key={e.id} className="list-row">
-              <span className="small muted journal-date">{formatDate(e.entryDate)}</span>
-              <Link to={`/journal/${e.id}`} className="grow">
-                {entryHeadline(e)}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <JournalFeed />
     </section>
   );
 }

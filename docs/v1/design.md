@@ -435,7 +435,7 @@ interface HabitEntryRepository {
 interface GoalRepository { /* list(filter), get, create, update, remove, reorder,
   milestones: add/update/toggle/reorder/remove, linkHabit/unlinkHabit,
   setMonths(goalId, months[]), forMonth(month) */ }
-interface JournalRepository { /* forDate, list(filter, page), get, create, update, remove */ }
+interface JournalRepository { /* forDate, list(filter, page), facets, get, create, update, remove */ }
 interface LifeEventRepository { /* overlapping(from, to), list, get, create, update, remove */ }
 interface CategoryRepository { /* list, create, update, archive, remove */ }
 interface TagRepository { /* list, search(prefix), getOrCreate(name), rename, merge, remove, usageCounts,
@@ -556,7 +556,8 @@ MONTHLY GOALS
 
 ### 6.5 Journal (`/journal`, `/journal/:id`)
 
-- Reverse-chronological feed grouped by date, with infinite scroll (keyset pagination on `(entry_date, created_at)`). Filters: date range, category, tag.
+- Reverse-chronological feed grouped by date, with infinite scroll (keyset pagination on `(entry_date, created_at, id)`, 30 per page, plus a *Load more* button). Each date heading links to its day (JRN-5). Filters: date range, category (including *No category*), tag. They live in the URL (`?from&to&category&tag`), so going back to the feed restores them.
+- The filter menus come from `JournalRepository.facets()`, the categories and tags used by any entry. The feed is paginated, so the loaded page can't tell which archived categories are in use (CAT-5). Only tags in use are offered.
 - Editor (`/journal/:id`, and `/journal/new?date=` for a new entry): plain `<textarea>` with a Markdown preview toggle (no rich-text editor in V1). Entry date picker, category, tags. There is no Save button.
 - **Autosave** (JRN-4, `useJournalDraft`): title and body save after 800 ms without typing and on blur. Date, category and tags save at once. Saves run one at a time, each sending the latest draft. Pending text is also saved when the editor unmounts and before the window closes: `closeGuard.ts` holds Tauri's close request until registered flushers settle (3 s cap, needs `core:window:allow-destroy`). A save indicator says Saving… / Saved / Couldn't save (Retry).
 - **New entries** are created by their first save that has a title or text, so opening "New entry" and leaving creates nothing. `new` and `:id` share one route: after the first save the URL is replaced with `/journal/<id>` and the editor keeps its React key, so typing is never interrupted.

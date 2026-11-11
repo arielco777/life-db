@@ -130,8 +130,16 @@ export type JournalPatch = {
 export interface JournalFilter {
   from?: ISODate;
   to?: ISODate;
-  categoryId?: UUID;
+  /** A category, or null for entries without one. */
+  categoryId?: UUID | null;
   tagId?: UUID;
+}
+
+/** What the journal's filters can offer: categories and tags used by any entry (CAT-5). */
+export interface JournalFacets {
+  /** Includes null when some entry has no category. */
+  categoryIds: (UUID | null)[];
+  tagIds: UUID[];
 }
 
 export interface JournalCursor {
@@ -149,6 +157,8 @@ export interface JournalRepository {
   forDate(date: ISODate): Promise<JournalEntry[]>;
   /** Reverse chronological, keyset-paginated (JRN-5). */
   list(filter?: JournalFilter, page?: { after?: JournalCursor; limit?: number }): Promise<JournalPage>;
+  /** Categories and tags in use by entries, for the feed's filters. */
+  facets(): Promise<JournalFacets>;
   get(id: UUID): Promise<JournalEntry | null>;
   create(input: NewJournalEntry): Promise<JournalEntry>;
   update(id: UUID, patch: JournalPatch): Promise<JournalEntry>;

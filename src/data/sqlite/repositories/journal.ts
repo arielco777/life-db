@@ -64,7 +64,8 @@ export function createJournalRepository(ctx: RepoContext): JournalRepository {
       };
       if (filter.from) add('j.entry_date >= ?', filter.from);
       if (filter.to) add('j.entry_date <= ?', filter.to);
-      if (filter.categoryId) add('j.category_id = ?', filter.categoryId);
+      if (filter.categoryId === null) where.push('j.category_id IS NULL');
+      else if (filter.categoryId) add('j.category_id = ?', filter.categoryId);
       if (filter.tagId) {
         where.push(`EXISTS (SELECT 1 FROM entity_tags et WHERE et.entity_type = 'journal_entry'
                     AND et.entity_id = j.id AND et.tag_id = ? AND et.deleted_at IS NULL)`);
@@ -89,6 +90,19 @@ export function createJournalRepository(ctx: RepoContext): JournalRepository {
             ? { entryDate: last.entry_date, createdAt: last.created_at, id: last.id }
             : undefined,
       };
+    },
+    async facets() {
+      const [cats, tags] = await Promise.all([
+        db.query<{ category_id: string | null }>(
+          'SELECT DISTINCT category_id FROM journal_entries WHERE deleted_at IS NULL',
+        ),
+        db.query<{ tag_id: string }>(
+          `SELECT DISTINCT et.tag_id FROM entity_tags et
+           JOIN journal_entries j ON j.id = et.entity_id AND j.deleted_at IS NULL
+           WHERE et.entity_type = 'journal_entry' AND et.deleted_at IS NULL`,
+        ),
+      ]);
+      return { categoryIds: cats.map((r) => r.category_id), tagIds: tags.map((r) => r.tag_id) };
     },
     get,
     async create(input) {

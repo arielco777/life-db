@@ -137,7 +137,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 7 — Journal
 
-- [ ] 7.1 Journal feed: grouped by date, keyset pagination, filters for date range, category and tag. [JRN-5, CAT-5]
+- [x] 7.1 Journal feed: grouped by date, keyset pagination, filters for date range, category and tag. [JRN-5, CAT-5]
 - [x] 7.2 Editor: textarea + Markdown preview, title, entry-date picker (defaults to the viewed date, or `logicalToday()`), category, tags. [JRN-1, JRN-3, JRN-6, SET-4]
 - [x] 7.3 Autosave (800 ms debounce, on blur, and on window close). [JRN-4]
 - [x] 7.4 Multiple entries per day in the daily view. Wire up quick entry. [JRN-2, DAY-1]
