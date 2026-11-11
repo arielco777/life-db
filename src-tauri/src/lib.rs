@@ -26,6 +26,8 @@ pub fn run() {
             commands::db_run_script,
             commands::db_backup,
             commands::db_backup_internal,
+            commands::db_auto_backup,
+            commands::db_restore,
             commands::db_info,
         ])
         .run(tauri::generate_context!())

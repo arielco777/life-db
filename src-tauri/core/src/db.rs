@@ -22,7 +22,7 @@ pub struct Database {
 }
 
 /// Opens `path` with the raw device key and verifies the key actually decrypts it.
-fn open_connection(path: &Path, key: &DeviceKey) -> Result<Connection> {
+pub(crate) fn open_connection(path: &Path, key: &DeviceKey) -> Result<Connection> {
     let conn = Connection::open(path)?;
     // Must be the first statement on the connection (SEC-1). Raw-key syntax skips PBKDF2.
     conn.execute_batch(&format!("PRAGMA key = \"x'{}'\";", hex::encode(key)))?;

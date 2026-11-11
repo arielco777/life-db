@@ -1,4 +1,4 @@
-import { backupFileName, formatBytes, withBackupExtension } from './backup';
+import { backupFileName, dailyBackup, formatBytes, withBackupExtension } from './backup';
 
 describe('backup file names', () => {
   it('suggests a dated name', () => {
@@ -27,5 +27,16 @@ describe('formatBytes', () => {
     [3 * 1024 ** 3, '3.0 GB'],
   ])('%d → %s', (bytes, expected) => {
     expect(formatBytes(bytes)).toBe(expected);
+  });
+});
+
+describe('dailyBackup (EXP-6)', () => {
+  it('backs up with the kept count when on, and not at all when off', async () => {
+    const platform = { autoBackup: vi.fn(async () => '/b/auto-2026-08-14.lifedb') };
+    const on = { 'backup.auto_enabled': true, 'backup.keep_count': 5 };
+    expect(await dailyBackup(platform, on, '2026-08-14')).toBe('/b/auto-2026-08-14.lifedb');
+    expect(platform.autoBackup).toHaveBeenCalledWith('2026-08-14', 5);
+    expect(await dailyBackup(platform, { ...on, 'backup.auto_enabled': false }, '2026-08-15')).toBeNull();
+    expect(platform.autoBackup).toHaveBeenCalledTimes(1);
   });
 });

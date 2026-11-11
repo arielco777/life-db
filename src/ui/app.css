@@ -1409,3 +1409,12 @@ a.icon-btn {
 .data-result {
   margin: 0;
 }
+.security-warning {
+  border-color: var(--warning);
+}
+.security-list {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+}

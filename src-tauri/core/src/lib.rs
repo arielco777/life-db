@@ -1,6 +1,7 @@
 //! Life DB core: encrypted SQLite + device-key storage. Tauri-independent so it can be
 //! tested (and reused by mobile builds) without a webview.
 
+pub mod backups;
 pub mod db;
 pub mod error;
 pub mod keystore;

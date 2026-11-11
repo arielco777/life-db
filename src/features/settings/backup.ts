@@ -1,4 +1,5 @@
-import type { ISODate } from '@/domain/types';
+import type { ISODate, Settings } from '@/domain/types';
+import type { PlatformService } from '@/platform/PlatformService';
 
 /** Extension of manual backups (design §6.9). */
 export const BACKUP_EXTENSION = 'lifedb';
@@ -26,4 +27,17 @@ export function formatBytes(bytes: number): string {
     unit++;
   }
   return `${value < 10 ? value.toFixed(1) : Math.round(value)} ${units[unit]}`;
+}
+
+/**
+ * The automatic daily backup (EXP-6), run once the app has started. Does nothing when
+ * turned off in settings; otherwise the platform skips it if today's backup exists.
+ */
+export function dailyBackup(
+  platform: Pick<PlatformService, 'autoBackup'>,
+  settings: Pick<Settings, 'backup.auto_enabled' | 'backup.keep_count'>,
+  today: ISODate,
+): Promise<string | null> {
+  if (!settings['backup.auto_enabled']) return Promise.resolve(null);
+  return platform.autoBackup(today, settings['backup.keep_count']);
 }
