@@ -164,8 +164,8 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 9 — Settings, first run & polish
 
-- [ ] 9.1 First-run onboarding with suggested habits. [SET-1]
-- [ ] 9.2 Settings: profile name, week start, **day starts at** (midnight–6 a.m., default 4 a.m.), theme, date format. [SET-2, SET-3, SET-4]
+- [x] 9.1 First-run onboarding with suggested habits. [SET-1]
+- [x] 9.2 Settings: profile name, week start, **day starts at** (midnight–6 a.m., default 4 a.m.), theme, date format. [SET-2, SET-3, SET-4]
 - [ ] 9.3 Empty states for every view. Completion animations. Toasts. [NFR-6]
 - [ ] 9.4 Accessibility pass: keyboard reachability, focus rings, labels, contrast check in both themes. [NFR-7]
 - [ ] 9.5 Responsive pass down to 360 px. [NFR-8]

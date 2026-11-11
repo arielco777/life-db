@@ -24,7 +24,7 @@ describe('SettingsPage routing', () => {
     '%s redirects to General',
     async (route) => {
       await render(route);
-      expect(await screen.findByText(/Preferences arrive/)).toBeInTheDocument();
+      expect(await screen.findByRole('heading', { name: 'Days and weeks' })).toBeInTheDocument();
       expect(screen.getByLabelText('path')).toHaveTextContent(/^\/settings\/general$/);
     },
   );

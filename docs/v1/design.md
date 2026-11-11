@@ -609,8 +609,11 @@ MONTHLY GOALS
 
 ### 6.11 Settings & first run
 
-- First run: if `onboarding.completed` is unset, show a single onboarding screen that suggests habits to tick (SET-1).
-- Settings: profile name, week start, theme, date format, backup options, data folder path with an "Open folder" button (EXP-7).
+- First run: if `onboarding.completed` is unset, show a single onboarding screen that suggests habits to tick (SET-1). It asks for an optional name and offers Exercise, Read, Meditate, Sleep, Coffee and Mood. *Start* creates the ticked habits; *Skip* adds nothing. A database that already has habits or journal entries counts as set up, so people who used the app before onboarding existed never see it.
+- Settings tabs: **General** (name, week start, day start, theme, date format), Categories, Tags, **Data** (backup, restore, automatic backups, data folder path with an "Open folder" button, EXP-7), and **Security**.
+- Date format (SET-2): one of a fixed list of date-fns patterns (`MMM d, yyyy`, `d MMM yyyy`, `yyyy-MM-dd`, `dd/MM/yyyy`, `MM/dd/yyyy`, `dd.MM.yyyy`), each with a yearless short form. It applies to short dates; headings like "Friday, August 14, 2026" keep the written-out form.
+- Theme: `system` removes `data-theme` from `<html>` so the OS preference applies; `light`/`dark` set it (`tokens.css` handles both).
+- The display name shows under "Life DB" in the sidebar (SET-3).
 
 ## 7. UI system
 
