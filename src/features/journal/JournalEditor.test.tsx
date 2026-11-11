@@ -143,6 +143,22 @@ describe('Journal editor (tasks 7.2–7.5)', () => {
     expect(await screen.findByText('No journal entries yet.')).toBeInTheDocument();
   });
 
+  it('deleting an entry opened from the daily view lands on the journal list', async () => {
+    const app = await open(`/day/${THU}`, async ({ repos }) => {
+      await repos.journal.create({ entryDate: THU, body: 'Opened from the day' });
+      await repos.journal.create({ entryDate: THU, body: 'Stays' });
+    });
+    await app.user.click(await screen.findByRole('link', { name: 'Opened from the day' }));
+    await app.user.click(await screen.findByRole('button', { name: 'Delete' }));
+    await app.user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Delete entry' }),
+    );
+    await waitFor(() => expect(path()).toBe('/journal'));
+    expect(screen.queryByText(/doesn't exist or was deleted/)).not.toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Stays' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Opened from the day' })).not.toBeInTheDocument();
+  });
+
   it('an unknown entry says so', async () => {
     await open('/journal/0190a6e0-0000-7000-8000-00000000dead');
     expect(await screen.findByText(/doesn't exist or was deleted/)).toBeInTheDocument();

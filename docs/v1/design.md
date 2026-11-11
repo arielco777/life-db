@@ -562,7 +562,7 @@ MONTHLY GOALS
 - **New entries** are created by their first save that has a title or text, so opening "New entry" and leaving creates nothing. `new` and `:id` share one route: after the first save the URL is replaced with `/journal/<id>` and the editor keeps its React key, so typing is never interrupted.
 - **Edited note:** "Written Aug 14 · edited Aug 16" appears only when an entry was changed on a later local day than it was written. Same-day changes (autosave, typo fixes) don't count.
 - **Preview** (react-markdown + remark-gfm, loaded on first use): raw HTML is shown as text. Links render as text with the address in a tooltip, so a click can't navigate the app's window away, and images are named but never fetched (offline, privacy).
-- Delete asks for confirmation (JRN-7) and returns to where the entry was opened from.
+- Delete asks for confirmation (JRN-7), then goes to the journal list (replacing the entry in history, so Back never returns to it).
 - The daily view lists every entry for the date (title or first line, plus a snippet under a title) linking to the editor; the quick-entry box has a *Full editor* link for that date (JRN-2, DAY-1).
 - Body is stored as Markdown text.
 
