@@ -63,6 +63,10 @@ button {
   border: 0;
   border-radius: var(--radius);
   padding: var(--space-2) var(--space-3);
+  /* A whole-pixel line (the body's 1.5 × 15px is 22.5px), so a bordered button is exactly
+     --control-h tall. A half-pixel button made a page header 40.5px, which put the month
+     grid on a half pixel, and WebKit then drew its sticky day column 1px off its rows. */
+  line-height: 22px;
   cursor: pointer;
 }
 button:disabled {
@@ -673,6 +677,7 @@ button.check-not-done {
 }
 a.button {
   display: inline-block;
+  line-height: 22px; /* whole pixels, like button */
   background: var(--accent);
   color: var(--accent-ink);
   border-radius: var(--radius);
@@ -1048,16 +1053,36 @@ a.icon-btn {
 }
 .month-scroll {
   /* Own scroll box in both directions so the day column, header and footer can stick. */
-  overflow: hidden;
+  overflow: auto;
   max-height: calc(100dvh - 140px);
   max-width: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--paper-raised);
   align-self: flex-start;
-  &:hover {
-    overflow: auto;
-  }
+}
+/* Scrollbars show only while hovering. They always keep their space, and only the thumb's
+   colour changes: switching overflow on hover made classic (Linux) scrollbars appear and
+   take room, which relaid out the table and shifted rows by a pixel or two. */
+.month-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.month-scroll::-webkit-scrollbar-track,
+.month-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.month-scroll::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  background-clip: padding-box;
+}
+.month-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--ink-muted) 55%, transparent);
+}
+.month-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ink-muted);
 }
 .month-grid {
   border-collapse: separate;
@@ -1340,6 +1365,7 @@ a.icon-btn {
   height: auto;
   padding: 2px var(--space-2);
   font-size: 13px;
+  line-height: 18px;
 }
 .small-button[aria-pressed='true'] {
   background: var(--accent);
