@@ -3,6 +3,7 @@ import { FEATURE_V1_1, SHOW_DEBUG } from './features';
 import { DebugPage } from '@/features/debug/DebugPage';
 import { DayRoute } from '@/features/day/DayPage';
 import { HabitRoutes } from '@/features/habits/HabitPages';
+import { JournalRoutes } from '@/features/journal/JournalPages';
 import { MonthRoute } from '@/features/month/MonthPage';
 import { Placeholder } from '@/features/Placeholder';
 import { SettingsPage } from '@/features/settings/SettingsPage';
@@ -56,7 +57,7 @@ export function App() {
           <Route path="/day/:date?" element={<DayRoute />} />
           <Route path="/month/:ym?" element={<MonthRoute />} />
           <Route path="/habits/*" element={<HabitRoutes />} />
-          <Route path="/journal/*" element={<Placeholder title="Journal" phase="Phase 7" />} />
+          <Route path="/journal/*" element={<JournalRoutes />} />
           <Route path="/settings/*" element={<SettingsPage />} />
           {FEATURE_V1_1 && (
             <>

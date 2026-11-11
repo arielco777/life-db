@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { useCreateJournalEntry } from './hooks';
 import type { ISODate } from '@/domain/types';
 
 /**
  * The daily view's "new entry" box (tasks 5.7, DAY-1 §5): type a line, press
- * Ctrl/⌘+Enter or "Add entry". The full editor (title, tags, category) arrives in Phase 7.
+ * Ctrl/⌘+Enter or "Add entry". "Full editor" opens a new entry for the date with title,
+ * category, tags and Markdown preview (tasks 7.4).
  */
 export function QuickJournal({ date, label }: { date: ISODate; label: string }) {
   const [body, setBody] = useState('');
@@ -32,7 +34,10 @@ export function QuickJournal({ date, label }: { date: ISODate; label: string }) 
         <button type="submit" disabled={!body.trim() || create.isPending}>
           Add entry
         </button>
-        <span className="small muted">Ctrl+Enter to save</span>
+        <span className="small muted grow">Ctrl+Enter to save</span>
+        <Link to={`/journal/new?date=${date}`} className="small">
+          Full editor
+        </Link>
       </div>
     </form>
   );

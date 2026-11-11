@@ -9,6 +9,7 @@ import type { ValuesByDate } from '@/domain/services/targets';
 import type { Habit, ISODate } from '@/domain/types';
 import { useCategories } from '@/features/categories/hooks';
 import { HabitEntryField } from '@/features/habits/HabitEntryField';
+import { entryHeadline, entrySnippet } from '@/features/journal/headline';
 import { QuickJournal } from '@/features/journal/QuickJournal';
 import { useSetSetting, useSettings, useToday } from '@/features/settings/hooks';
 
@@ -121,8 +122,9 @@ function DayPage({ date }: { date: ISODate }) {
           <ul className="plain list" aria-label="Journal entries">
             {day.journal.map((j) => (
               <li key={j.id} className="list-row">
-                <Link to={`/journal/${j.id}`} className="grow">
-                  {j.title || j.body?.split('\n').find((l) => l.trim()) || 'Untitled'}
+                <Link to={`/journal/${j.id}`} className="grow stack-xs journal-link">
+                  <span>{entryHeadline(j)}</span>
+                  {entrySnippet(j) && <span className="small muted">{entrySnippet(j)}</span>}
                 </Link>
               </li>
             ))}

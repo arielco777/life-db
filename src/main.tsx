@@ -5,6 +5,7 @@ import { HashRouter } from 'react-router-dom';
 import { App } from './app/App';
 import { boot, type BootResult } from './app/boot';
 import { BootScreen } from './app/BootScreen';
+import { installCloseGuard } from './app/closeGuard';
 import { RepositoryProvider } from './app/RepositoryProvider';
 import { ToastProvider } from './ui/Toast';
 import './ui/tokens.css';
@@ -18,6 +19,7 @@ function Root() {
   const [result, setResult] = useState<BootResult | null>(null);
   useEffect(() => {
     void boot().then(setResult);
+    void installCloseGuard();
   }, []);
 
   if (!result || result.kind !== 'ready') return <BootScreen result={result} />;

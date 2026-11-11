@@ -501,7 +501,7 @@ Data loaded with parallel queries (`useDay`): habits active on the date, entries
 - **Saving:** `useSetEntry()` does an optimistic TanStack Query update, then calls `entryRepo.set`. On error it rolls back and shows a toast (ENT-5, NFR-1).
 - **Keyboard** (DAY-3): one focus order through all inputs. A window key handler maps ←/→ to the previous/next day and `t` to today. It ignores keys typed in text fields, selects and dialogs, keys a widget already handled (`defaultPrevented`, e.g. arrows in a rating) and keys pressed with modifiers.
 - **Group by category** (DAY-4): a checkbox in the habits header, stored as the `day.group_by_category` setting so it carries over to other devices once sync exists. Groups follow the category order from Settings, habits keep their own order within a group, and "No category" comes last.
-- **Quick journal** (DAY-1 §5): a textarea under the day's entries. Ctrl/⌘+Enter or *Add entry* creates an entry for that date. The full editor (title, tags, category) is Phase 7.
+- **Quick journal** (DAY-1 §5): a textarea under the day's entries. Ctrl/⌘+Enter or *Add entry* creates an entry for that date; *Full editor* opens `/journal/new?date=` with title, category, tags and preview.
 - **Row status** (DAY-5, HAB-5): under each habit name, "Not scheduled" on off days (still loggable), day targets as met / below / over, week and month targets as progress so far ("3 / 4 this week", "1h 30m / 10h this month", "avg 6.5 this week · target ≥ 7"), and ●●○ dots for N-per-week habits without a target.
 
 ### 6.2 Monthly view (`/month/:yyyy-mm`)
@@ -557,7 +557,13 @@ MONTHLY GOALS
 ### 6.5 Journal (`/journal`, `/journal/:id`)
 
 - Reverse-chronological feed grouped by date, with infinite scroll (keyset pagination on `(entry_date, created_at)`). Filters: date range, category, tag.
-- Editor: plain `<textarea>` with Markdown preview toggle (no rich-text editor in V1). Autosave debounced to 800 ms, plus on blur and window close (JRN-4). Entry date picker, category, tags.
+- Editor (`/journal/:id`, and `/journal/new?date=` for a new entry): plain `<textarea>` with a Markdown preview toggle (no rich-text editor in V1). Entry date picker, category, tags. There is no Save button.
+- **Autosave** (JRN-4, `useJournalDraft`): title and body save after 800 ms without typing and on blur. Date, category and tags save at once. Saves run one at a time, each sending the latest draft. Pending text is also saved when the editor unmounts and before the window closes: `closeGuard.ts` holds Tauri's close request until registered flushers settle (3 s cap, needs `core:window:allow-destroy`). A save indicator says Saving… / Saved / Couldn't save (Retry).
+- **New entries** are created by their first save that has a title or text, so opening "New entry" and leaving creates nothing. `new` and `:id` share one route: after the first save the URL is replaced with `/journal/<id>` and the editor keeps its React key, so typing is never interrupted.
+- **Edited note:** "Written Aug 14 · edited Aug 16" appears only when an entry was changed on a later local day than it was written. Same-day changes (autosave, typo fixes) don't count.
+- **Preview** (react-markdown + remark-gfm, loaded on first use): raw HTML is shown as text. Links render as text with the address in a tooltip, so a click can't navigate the app's window away, and images are named but never fetched (offline, privacy).
+- Delete asks for confirmation (JRN-7) and returns to where the entry was opened from.
+- The daily view lists every entry for the date (title or first line, plus a snippet under a title) linking to the editor; the quick-entry box has a *Full editor* link for that date (JRN-2, DAY-1).
 - Body is stored as Markdown text.
 
 ### 6.6 Life events (`/events`)
