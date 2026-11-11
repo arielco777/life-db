@@ -389,6 +389,30 @@ describe('habit entries', () => {
 });
 
 describe('journal', () => {
+  it('filters by "no category" and reports the categories and tags in use (JRN-5, CAT-5)', async () => {
+    const { repos } = await setup();
+    const t = await repos.tags.getOrCreate('travel');
+    await repos.tags.getOrCreate('unused');
+    await repos.journal.create({ entryDate: '2026-08-10', body: 'plain' });
+    await repos.journal.create({
+      entryDate: '2026-08-11',
+      body: 'health',
+      categoryId: DEFAULT_CATEGORY_IDS.health,
+      tagIds: [t.id],
+    });
+    const gone = await repos.journal.create({
+      entryDate: '2026-08-12',
+      body: 'deleted',
+      categoryId: DEFAULT_CATEGORY_IDS.money,
+    });
+    await repos.journal.remove(gone.id);
+
+    expect((await repos.journal.list({ categoryId: null })).entries.map((e) => e.body)).toEqual(['plain']);
+    const f = await repos.journal.facets();
+    expect(new Set(f.categoryIds)).toEqual(new Set([null, DEFAULT_CATEGORY_IDS.health]));
+    expect(f.tagIds).toEqual([t.id]);
+  });
+
   it('allows many entries per day and keeps entry_date separate from created_at (JRN-2, JRN-3)', async () => {
     const { repos, clock } = await setup();
     const a = await repos.journal.create({ entryDate: '2026-08-14', body: 'Morning' });
