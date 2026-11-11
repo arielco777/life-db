@@ -9,6 +9,8 @@ const KEYRING_ACCOUNT: &str = "device-key";
 
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
             let store = OsKeyStore::new(KEYRING_SERVICE, KEYRING_ACCOUNT);

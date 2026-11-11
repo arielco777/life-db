@@ -19,5 +19,3 @@ export type DbStatus =
   | { state: 'error'; message: string };
 
 export const dbStatus = () => invoke<DbStatus>('db_status');
-export const dbBackup = (destPath: string) => invoke<void>('db_backup', { destPath });
-export const dbInfo = () => invoke<{ path: string; sizeBytes: number }>('db_info');

@@ -151,12 +151,12 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 > JSON / CSV / Markdown export and import (EXP-1..3) are deferred to V1.5.
 
-- [ ] 8.1 `PlatformService` (Tauri impl): save/open dialogs, reveal folder. [FC-4]
-- [ ] 8.2 Manual backup through the save dialog, with a note that it restores only on this device. [EXP-4]
+- [ ] 8.1 `PlatformService` (Tauri impl): save/open dialogs, reveal folder. [FC-4] *(Save dialog, reveal folder, backup and data info done in 8A; the open dialog comes with restore.)*
+- [x] 8.2 Manual backup through the save dialog, with a note that it restores only on this device. [EXP-4]
 - [ ] 8.3 Rust `db_restore`: open with device key, validate, back up the current DB, swap, reopen. The frontend reloads afterwards. [EXP-5]
 - [ ] 8.4 Settings → Security: key-file fallback warning, plain explanation of what's encrypted. [SEC-2, SEC-4]
 - [ ] 8.5 Automatic daily backups with pruning to `keep_count`, configurable in settings. [EXP-6]
-- [ ] 8.6 Data folder path plus an "Open folder" button in settings. [EXP-7]
+- [x] 8.6 Data folder path plus an "Open folder" button in settings. [EXP-7]
 
 **✅ Done when:** a backup restores on the same device with identical data, and a newer-version or invalid file is rejected safely.
 

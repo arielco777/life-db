@@ -1399,3 +1399,13 @@ a.icon-btn {
   color: var(--ink-muted);
   font-style: italic;
 }
+
+/* ───────── settings → data ───────── */
+.data-path {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+.data-result {
+  margin: 0;
+}

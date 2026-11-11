@@ -7,6 +7,8 @@ import { boot, type BootResult } from './app/boot';
 import { BootScreen } from './app/BootScreen';
 import { installCloseGuard } from './app/closeGuard';
 import { RepositoryProvider } from './app/RepositoryProvider';
+import { PlatformProvider } from './platform/PlatformProvider';
+import { tauriPlatform } from './platform/tauriPlatform';
 import { ToastProvider } from './ui/Toast';
 import './ui/tokens.css';
 import './ui/app.css';
@@ -25,13 +27,15 @@ function Root() {
   if (!result || result.kind !== 'ready') return <BootScreen result={result} />;
   return (
     <RepositoryProvider repos={result.repos}>
-      <QueryClientProvider client={queryClient}>
-        <ToastProvider>
-          <HashRouter>
-            <App />
-          </HashRouter>
-        </ToastProvider>
-      </QueryClientProvider>
+      <PlatformProvider platform={tauriPlatform}>
+        <QueryClientProvider client={queryClient}>
+          <ToastProvider>
+            <HashRouter>
+              <App />
+            </HashRouter>
+          </ToastProvider>
+        </QueryClientProvider>
+      </PlatformProvider>
     </RepositoryProvider>
   );
 }

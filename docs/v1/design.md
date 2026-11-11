@@ -588,7 +588,8 @@ MONTHLY GOALS
 
 | Action | Implementation |
 | --- | --- |
-| Backup (EXP-4) | Save dialog → `db_backup(path)`. Default name `life-db-YYYY-MM-DD.lifedb`. The UI states that the file restores only on this device |
+| Backup (EXP-4) | Save dialog → `db_backup(path)`. Default name `life-db-YYYY-MM-DD.lifedb`; a name typed without an extension gets `.lifedb` (GTK dialogs don't add it). The UI states that the file restores only on this device, then shows where it was saved with a *Show in folder* link |
+| Data location (EXP-7) | `db_info` → database path and size, plus *Open folder*, which opens the file manager with `life.db` selected |
 | Restore (EXP-5) | Open dialog → `db_restore(path)`: Rust opens the file read-only with the device key, checks `schema_migrations` exists and that its max version ≤ the app's, backs up the current DB to `backups/pre-restore-<ts>.db`, swaps the files, reopens, and the frontend reloads. A file that won't open gives a clear "not a Life DB backup from this device" error |
 | Auto backup (EXP-6) | On app start, if the newest automatic backup is older than 24h, run `db_backup` to `backups/auto-YYYY-MM-DD.db` and prune down to `keep_count` |
 
@@ -635,7 +636,7 @@ life-db/
 │  │  ├─ driver.ts          # SqlDriver interface
 │  │  ├─ tauriDriver.ts
 │  │  └─ sqlite/            # repositories, mappers, migrations/*.sql
-│  ├─ platform/             # PlatformService (dialogs, fs) – tauri impl
+│  ├─ platform/             # PlatformService (dialogs, reveal folder, backup, data info) – tauri impl; tests use tests/fakePlatform.ts
 │  ├─ features/             # day/, month/, habits/, goals/, journal/, events/,
 │  │                        # analytics/, search/, settings/  (components + hooks)
 │  ├─ ui/                   # shared components, tokens.css
