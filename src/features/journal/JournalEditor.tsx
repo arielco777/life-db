@@ -1,7 +1,8 @@
 import { lazy, Suspense, useId, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { Link, useNavigate } from 'react-router-dom';
 import { editedLaterOn, localDateOf } from './edited';
-import { useDeleteJournalEntry } from './hooks';
+import { journalKeys, useDeleteJournalEntry } from './hooks';
 import { useJournalDraft, type SaveStatus } from './useJournalDraft';
 import { isISODate } from '@/domain/services/clock';
 import type { ISODate, JournalEntry } from '@/domain/types';
@@ -36,7 +37,7 @@ interface Props {
 export function JournalEditor({ entry, defaultDate, onCreated }: Props) {
   const ids = useId();
   const navigate = useNavigate();
-  const location = useLocation();
+  const qc = useQueryClient();
   const { draft, change, saved, status, flush, stop } = useJournalDraft({ entry, defaultDate, onCreated });
   const [preview, setPreview] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -46,10 +47,14 @@ export function JournalEditor({ entry, defaultDate, onCreated }: Props) {
   const deleteEntry = async () => {
     if (!saved) return;
     await stop();
-    remove.mutate(saved.id, {
-      // Back to wherever the entry was opened from; the journal when opened directly.
-      onSuccess: () => (location.key === 'default' ? navigate('/journal') : navigate(-1)),
-    });
+    try {
+      await remove.mutateAsync(saved.id);
+    } catch {
+      return; // the toast says why; the entry stays open
+    }
+    // Back to the journal; replace, so Back doesn't return to the deleted entry.
+    navigate('/journal', { replace: true });
+    qc.removeQueries({ queryKey: journalKeys.detail(saved.id) });
   };
 
   return (

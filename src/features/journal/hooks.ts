@@ -82,7 +82,11 @@ export function useCreateJournalEntry() {
   });
 }
 
-/** Soft delete (JRN-7). */
+/**
+ * Soft delete (JRN-7). The entry's own cached detail is left alone: the open editor
+ * still shows it, and clearing it would swap the page to "doesn't exist" before the
+ * editor can leave. The editor drops it once it has navigated away.
+ */
 export function useDeleteJournalEntry() {
   const { journal } = useRepositories();
   const qc = useQueryClient();
@@ -90,12 +94,10 @@ export function useDeleteJournalEntry() {
   return useMutation({
     mutationFn: (id: UUID) => journal.remove(id),
     onError: (e) => toast.error(e),
-    onSuccess: (_, id) => {
-      qc.setQueryData(journalKeys.detail(id), null);
-      return Promise.all([
+    onSuccess: () =>
+      Promise.all([
         qc.invalidateQueries({ queryKey: journalKeys.all, predicate: (q) => q.queryKey[1] !== 'detail' }),
         qc.invalidateQueries({ queryKey: tagKeys.all }),
-      ]);
-    },
+      ]),
   });
 }
