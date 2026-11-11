@@ -1,5 +1,5 @@
 import type { Habit, HabitTarget } from '../types';
-import { aggregate, evaluateTarget, periodRange, valuesByDate } from './targets';
+import { aggregate, evaluateTarget, periodRange, valuesByDate, valuesByHabit } from './targets';
 
 const h = (type: Habit['type'], target: HabitTarget) => ({ type, target });
 const vals = (o: Record<string, number>) => new Map(Object.entries(o));
@@ -16,6 +16,21 @@ describe('periodRange', () => {
 describe('valuesByDate', () => {
   it('keys entry values by date', () => {
     expect(valuesByDate([{ date: '2026-08-14', value: 3 }]).get('2026-08-14')).toBe(3);
+  });
+});
+
+describe('valuesByHabit', () => {
+  it('groups entry values per habit', () => {
+    const m = valuesByHabit([
+      { habitId: 'a', date: '2026-08-01', value: 1 },
+      { habitId: 'b', date: '2026-08-01', value: 7 },
+      { habitId: 'a', date: '2026-08-02', value: 0 },
+    ]);
+    expect([...m.get('a')!]).toEqual([
+      ['2026-08-01', 1],
+      ['2026-08-02', 0],
+    ]);
+    expect(m.get('b')?.get('2026-08-01')).toBe(7);
   });
 });
 
