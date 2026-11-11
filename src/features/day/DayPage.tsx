@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { groupByCategory } from './grouping';
 import { rowStatus } from './rowStatus';
 import { useDay } from './useDay';
+import { markInteractive } from '@/app/startup';
 import { isISODate } from '@/domain/services/clock';
 import { addDays, diffDays } from '@/domain/services/dates';
 import type { ValuesByDate } from '@/domain/services/targets';
@@ -69,6 +70,9 @@ function DayPage({ date }: { date: ISODate }) {
   const today = useToday();
   const day = useDay(date);
   useDayKeys(date, today);
+  useEffect(() => {
+    if (!day.isPending) markInteractive();
+  }, [day.isPending]);
 
   return (
     <section className="day">

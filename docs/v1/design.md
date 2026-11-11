@@ -602,7 +602,8 @@ MONTHLY GOALS
 ### 6.10 Distribution (DIST)
 
 - **Signing:** Windows Authenticode certificate, Apple Developer ID plus notarization, and a Tauri updater key pair. All secrets live in CI secrets, never in the repo.
-- **Updater:** `tauri-plugin-updater` reads a static `latest.json` (e.g. from GitHub Releases). The frontend shows release notes and asks for consent before installing. The check is off when the user disables it (DIST-2). The CSP `connect-src` allows only the update host (NFR-2).
+- **Updater:** `tauri-plugin-updater` reads a static `latest.json` (e.g. from GitHub Releases). The frontend shows release notes and asks for consent before installing. The check is off when the user disables it (DIST-2). The request is made from Rust, so the webview's CSP stays local-only. Until Phase 10, `tests/network.test.ts` pins `connect-src` to Tauri IPC and checks that no frontend code calls a network API (NFR-2).
+- **Startup:** `markInteractive()` (in `src/app/startup.ts`) logs `[startup] daily view ready N ms` once the first daily view has data. Background work, today the daily backup, waits for that plus 2 s via `afterInteractive()`, so it never delays the first screen (NFR-1).
 - **Upgrade safety:** after an update, the first launch runs the migration runner (§4.6), which backs up first. If a migration fails, the app shows a recovery screen with "Open backups folder" and "Report issue" (DIST-3).
 - **Logging:** `tauri-plugin-log` writes to the app log dir with rotation. Frontend errors are forwarded through an error boundary plus `window.onerror` (DIST-6).
 - **About screen:** app version, schema version, data folder, privacy statement, and a feedback/issue link (DIST-4, DIST-5).
@@ -661,7 +662,7 @@ life-db/
 | Repositories | Vitest + NodeDriver (in-memory `:memory:` DB, all migrations applied) | CRUD, soft delete, uniqueness, upsert, cascade, search triggers, tag merge |
 | Migrations | Vitest | Fresh DB → latest. Also open a fixture DB from each prior version → latest |
 | Components | Vitest + React Testing Library with in-memory repos | HabitInput per type, grid cell editing, keyboard navigation |
-| Performance | Script using `tests/fixtures/seed.ts` (5y × 30 habits, 3k journal entries) | Time the month/day/search queries against the NFR-1 budgets |
+| Performance | `npm run test:perf` (`*.perf.test.*`, run alone and one file at a time, also in CI) on `tests/fixtures/seed.ts` (5y × 30 habits, 3k journal entries) | `data.perf`: the month/day/journal queries. `screens.perf`: switching months and days and showing a save, rendered, against the NFR-1 budgets (2× slack on CI runners) |
 | Manual / E2E | Run the Tauri dev build | Backup/restore, first run, install & update (Phase 10) |
 
 The Rust `db_*` commands get `cargo test` cases for: transaction rollback, backup/restore validation, the DB being unreadable without the key, backup → restore round trip, a foreign-key file rejected, and FTS5 available under SQLCipher.

@@ -5,6 +5,7 @@ import type { Repositories } from '@/domain/repositories';
 import { toISODate } from '@/domain/services/clock';
 import { dailyBackup } from '@/features/settings/backup';
 import { tauriPlatform } from '@/platform/tauriPlatform';
+import { afterInteractive } from './startup';
 
 export type BootResult =
   | { kind: 'ready'; repos: Repositories; status: Extract<DbStatus, { state: 'open' }> }
@@ -28,11 +29,14 @@ export async function boot(): Promise<BootResult> {
       },
     });
     const repos = createRepositories(tauriDriver);
-    // EXP-6: in the background, so startup doesn't wait on the copy.
-    void repos.settings
-      .getAll()
-      .then((settings) => dailyBackup(tauriPlatform, settings, toISODate(new Date())))
-      .catch((e: unknown) => console.error('Automatic backup failed:', e instanceof Error ? e.message : e));
+    // EXP-6: in the background, after the first screen is up. The copy holds the database
+    // while it runs, so starting it during startup would delay the daily view (NFR-1).
+    afterInteractive(() => {
+      void repos.settings
+        .getAll()
+        .then((settings) => dailyBackup(tauriPlatform, settings, toISODate(new Date())))
+        .catch((e: unknown) => console.error('Automatic backup failed:', e instanceof Error ? e.message : e));
+    });
     return { kind: 'ready', repos, status };
   } catch (e) {
     if (e instanceof DatabaseTooNewError)

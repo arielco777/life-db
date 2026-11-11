@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from 'node:url';
 const host = process.env.TAURI_DEV_HOST;
 
 // https://v2.tauri.app/start/frontend/vite/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
@@ -30,6 +30,13 @@ export default defineConfig({
     environment: 'node',
     passWithNoTests: true,
     setupFiles: ['tests/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.{ts,tsx}'],
+    // Timing tests (NFR-1) run alone, one file at a time: `npm run test:perf` (--mode perf).
+    // Sharing the CPU with the other test files would make their timings meaningless.
+    include:
+      mode === 'perf'
+        ? ['tests/**/*.perf.test.{ts,tsx}']
+        : ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.{ts,tsx}'],
+    exclude: mode === 'perf' ? [] : ['**/*.perf.test.{ts,tsx}', '**/node_modules/**'],
+    fileParallelism: mode !== 'perf',
   },
-});
+}));
