@@ -1048,13 +1048,16 @@ a.icon-btn {
 }
 .month-scroll {
   /* Own scroll box in both directions so the day column, header and footer can stick. */
-  overflow: auto;
+  overflow: hidden;
   max-height: calc(100dvh - 140px);
   max-width: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--paper-raised);
   align-self: flex-start;
+  &:hover {
+    overflow: auto;
+  }
 }
 .month-grid {
   border-collapse: separate;
@@ -1081,25 +1084,28 @@ a.icon-btn {
 /* Angled habit names: the header cell is tall and narrow; the label is rotated -60°
    from its bottom-left corner so long names lean into the space above the next columns. */
 .month-grid th.habit-col {
-  height: 140px;
+  /* Table cells ignore min/max-height; `height` already acts as the minimum. */
+  height: 120px;
   width: 52px;
   min-width: 52px;
-  max-width: 52px;
   vertical-align: bottom;
   white-space: nowrap;
   font-weight: 500;
   overflow: visible;
 }
 .month-grid .angled {
-  width: 52px;
+  min-width: 52px;
+  display: block;
   transform: translate(26px, -6px) rotate(-60deg);
   transform-origin: bottom left;
 }
 .month-grid .angled span {
   display: inline-block;
-  /* Sized to the text, not to the 52px column; ~150px leaning at 60° fits the 140px header. */
+  /* Sized to the text, and the column grows with it from 52px. Leaning at 60°, ~120px of
+     text plus its line height rises about 115px, which fits the 120px header. Longer names
+     end in "…", and the full name is in the column's title tooltip. */
   width: max-content;
-  max-width: 150px;
+  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: bottom;
