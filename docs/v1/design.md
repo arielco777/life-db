@@ -623,6 +623,8 @@ MONTHLY GOALS
 - **Feedback:** brief "check" animations for satisfying completion, a toast for errors, no blocking modals for routine entry (NFR-6). Confirmation dialogs only for deletes, restore and merging tags.
 - **Category pickers and filters:** `<CategorySelect>` offers active categories, plus the record's own archived category labelled "(archived)" (CAT-2). `<CategoryFilter>` offers active categories, then an "Archived" `<optgroup>` built from the `categoryId`s of the records being listed (CAT-5). Users have tens of habits and categories, so collecting them from the loaded records is cheap and needs no extra query.
 - **Accessibility:** native inputs where possible, `aria-label` on grid cells (`"Exercise, August 3: done"`), visible focus rings, AA contrast (NFR-7).
+  - Checked automatically: `tests/a11y.test.tsx` runs axe on every screen, and `src/ui/tokens.test.ts` checks every text colour at 4.5:1 and control edges and focus rings at 3:1, in both themes. It also checks that the two dark blocks in `tokens.css` match.
+  - Quiet `--border` is for cards and grid rules. Inputs, selects and outline buttons use `--control-border` (3:1).
 
 ## 8. Project structure
 
