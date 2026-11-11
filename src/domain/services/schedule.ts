@@ -24,6 +24,37 @@ export function isScheduled(habit: Schedulable, date: ISODate): boolean {
   return f.type === 'weekdays' ? f.days.includes(weekdayOf(date)) : true;
 }
 
+/**
+ * HAB-5. An active day the habit shouldn't be done on: an off day of a weekday habit whose
+ * other days are rest days. Rest days can still be logged; the log is flagged.
+ */
+export function isRestDay(habit: Schedulable, date: ISODate): boolean {
+  const f = habit.frequency;
+  return (
+    f.type === 'weekdays' &&
+    !!f.restOnOtherDays &&
+    isActiveOn(habit, date) &&
+    !f.days.includes(weekdayOf(date))
+  );
+}
+
+/**
+ * A value that counts as having done the habit: anything logged, except a boolean "not
+ * done" (0). Marking a rest day "not done" just confirms the rest.
+ */
+export const isDoneValue = (habit: Pick<Habit, 'type'>, value: number | undefined): boolean =>
+  value !== undefined && !(habit.type === 'boolean' && value === 0);
+
+/** Rest days in `range` on which the habit was done anyway (HAB-5). */
+export const restDaysLogged = (
+  habit: Schedulable & Pick<Habit, 'type'>,
+  values: ReadonlyMap<ISODate, number>,
+  range: DateRange,
+): number =>
+  [...values.entries()].filter(
+    ([d, v]) => d >= range.from && d <= range.to && isRestDay(habit, d) && isDoneValue(habit, v),
+  ).length;
+
 /** Scheduled dates inside `range` (HAB-5). */
 export function scheduledDays(habit: Schedulable, range: DateRange): ISODate[] {
   const active = activeRange(habit, range);

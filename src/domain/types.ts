@@ -19,7 +19,17 @@ export interface HabitTarget {
 }
 
 export type HabitFrequency =
-  { type: 'daily' } | { type: 'weekdays'; days: Weekday[] } | { type: 'times_per_week'; count: number };
+  | { type: 'daily' }
+  | {
+      type: 'weekdays';
+      days: Weekday[];
+      /**
+       * HAB-5. The other days are rest days — the habit shouldn't be done on them. Logging
+       * one is still allowed but flagged. Absent/false: the other days are optional.
+       */
+      restOnOtherDays?: boolean;
+    }
+  | { type: 'times_per_week'; count: number };
 
 export interface RatingScale {
   min: number;

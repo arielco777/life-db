@@ -5,6 +5,7 @@ interface EntryMenuProps {
   /** Used in accessible names, e.g. "Sleep, August 14". */
   label: string;
   isBoolean: boolean;
+  disabled?: boolean;
   entry: HabitEntry | undefined;
   onSaveNote(note: string | null): void;
   onMarkNotDone(): void;
@@ -16,7 +17,15 @@ interface EntryMenuProps {
  * and "Clear" (ENT-2). Non-modal (NFR-6): Escape or clicking outside closes it, and the
  * note saves when the popover closes.
  */
-export function EntryMenu({ label, isBoolean, entry, onSaveNote, onMarkNotDone, onClear }: EntryMenuProps) {
+export function EntryMenu({
+  label,
+  isBoolean,
+  disabled,
+  entry,
+  onSaveNote,
+  onMarkNotDone,
+  onClear,
+}: EntryMenuProps) {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState('');
   const rootRef = useRef<HTMLSpanElement>(null);
@@ -44,6 +53,7 @@ export function EntryMenu({ label, isBoolean, entry, onSaveNote, onMarkNotDone, 
     <span className="entry-menu" ref={rootRef}>
       <button
         ref={buttonRef}
+        disabled={disabled}
         type="button"
         className={`icon${hasNote ? ' has-note' : ''}`}
         aria-label={hasNote ? `${label}: note and options (has note)` : `${label}: note and options`}

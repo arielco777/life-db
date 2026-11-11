@@ -125,10 +125,11 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 - [x] 6.1 `/month/:ym` route with prev/next/this-month and a month picker. Prefetch neighbouring months. [MON-2]
 - [x] 6.2 `useMonth(ym)`: habits active during the month and entries for the month. [MON-1, MON-8]
 - [x] 6.3 Grid laid out like a paper tracker: days as rows, habits as columns with angled names; sticky day column and header row, horizontal scroll when habits don't fit, per-type cell rendering with category-color tint. [MON-1, MON-6, NFR-8]
-- [ ] 6.4 Cell editing: boolean click toggles, popover input for other types, ↑/↓ days and ←/→/Tab habits, digit keys start editing. [MON-3]
+- [x] 6.4 Cell editing: boolean click toggles, popover input for other types, ↑/↓ days and ←/→/Tab habits, digit keys start editing. [MON-3]
 - [x] 6.5 Summary footer row using `stats.ts`. [MON-4]
 - [x] 6.6 Day number → daily view link. Styling for today's row (logical), weekends, unscheduled and target-met cells. [MON-5, MON-6]
-- [ ] 6.7 Memoized cells and an a11y label for each cell. [NFR-1, NFR-7]
+- [x] 6.7 Memoized cells and an a11y label for each cell. [NFR-1, NFR-7]
+- [x] 6.8 Rest days: weekday habits choose "Other days: optional / rest days" (migration 0003). Rest days are labelled in the daily view and the grid; doing the habit on one is saved but flagged, and counted in the month summary. [HAB-5]
 
 **✅ Done when:** the grid looks and works like the notebook page, and month navigation renders in < 200 ms on seeded data (NFR-1).
 

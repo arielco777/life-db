@@ -67,4 +67,22 @@ describe('summaryLines (MON-4)', () => {
       label: 'Average 7.3',
     });
   });
+
+  it('flags rest days the habit was done on anyway (HAB-5)', () => {
+    const s = {
+      type: 'boolean',
+      done: 12,
+      expected: 13,
+      completion: 12 / 13,
+      currentStreak: 1,
+      longestStreak: 5,
+      streakUnit: 'day',
+    } as const;
+    expect(summaryLines({}, s, en, 2)).toEqual({
+      main: '12/13',
+      sub: '92% ⚠ 2',
+      label: '12 of 13 scheduled days done (92%); done on 2 rest days',
+    });
+    expect(summaryLines({}, { ...s, completion: null }, en, 1).sub).toBe('⚠ 1');
+  });
 });

@@ -101,6 +101,10 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 **HAB-5 Frequency.** A habit has a schedule: `daily` (default), `specific weekdays` (e.g. Mon/Wed/Fri), or `n times per week`.
 - WHEN a date is not scheduled for a weekday-based habit THEN the daily view SHALL show the habit as "not scheduled" (it can still be logged), and analytics SHALL leave that date out of completion rates.
+- A weekday-based habit SHALL say what its other days are: **optional** (default; the habit may still be done) or **rest days** (the habit shouldn't be done, e.g. recovery days between workouts).
+- WHEN a date is a rest day THEN the daily view SHALL show "Rest day" instead of "not scheduled", and the monthly grid SHALL mark the cell as a rest day.
+- WHEN the habit is done on a rest day anyway (any value except a checkbox's "not done") THEN the entry SHALL be saved, and the daily view, the grid cell and the month summary SHALL flag it. Rest days stay out of completion rates.
+- Rest days are part of the habit's schedule, so a later "what's left today" summary can leave those habits out.
 
 **HAB-6 Priority.** Each habit has a priority: `low` / `medium` / `high` (default `medium`). Priority is independent of category.
 
@@ -117,7 +121,7 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 **ENT-1 One value per habit per day.** There is at most one entry per (habit, date). Logging again overwrites the existing value, and the entry keeps the same ID even after it's cleared and logged again (FC-5).
 
-**ENT-2 Log / edit / clear.** The user can set, change or clear the value for any habit on any date, including past dates.
+**ENT-2 Log / edit / clear.** The user can set, change or clear the value for any habit on any date up to the logical today (SET-4), with no limit on how far back. Future dates, and dates outside the habit's start/end dates, are shown but can't be logged.
 - Clearing a value SHALL remove the entry. ("No entry" means not logged. It is different from logging 0 or "not done".)
 
 **ENT-3 Optional note.** An entry MAY carry a short text note.

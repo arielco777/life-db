@@ -1,7 +1,14 @@
 import type { DateRange } from '@/domain/repositories';
 import { endOfMonth, endOfWeek, eachDay, startOfMonth, startOfWeek } from '@/domain/services/dates';
 import { formatNumber, formatValue } from '@/domain/services/format';
-import { expectedForWeek, isScheduled, weeksOf, type WeekStart } from '@/domain/services/schedule';
+import {
+  expectedForWeek,
+  isDoneValue,
+  isRestDay,
+  isScheduled,
+  weeksOf,
+  type WeekStart,
+} from '@/domain/services/schedule';
 import { evaluateTarget, type TargetStatus, type ValuesByDate } from '@/domain/services/targets';
 import type { Habit, ISODate } from '@/domain/types';
 
@@ -21,6 +28,10 @@ export function dayWindow(date: ISODate, weekStart: WeekStart): DateRange {
 export interface RowStatus {
   /** False for weekday habits on an off day: shown dimmed, still loggable (HAB-5). */
   scheduled: boolean;
+  /** A rest day of a weekday habit (HAB-5): the habit shouldn't be done today. */
+  rest: boolean;
+  /** Done anyway on a rest day: still saved, but flagged. */
+  restBroken: boolean;
   /** "N times per week" progress, when the habit has no explicit target. */
   week?: { done: number; need: number };
   target?: { status: TargetStatus; text: string };
@@ -36,7 +47,12 @@ const amount = (h: RowHabit, v: number) =>
 
 /** What a daily-view row says under the habit name (DAY-5, HAB-5). */
 export function rowStatus(h: RowHabit, values: ValuesByDate, date: ISODate, weekStart: WeekStart): RowStatus {
-  const out: RowStatus = { scheduled: isScheduled(h, date) };
+  const rest = isRestDay(h, date);
+  const out: RowStatus = {
+    scheduled: isScheduled(h, date),
+    rest,
+    restBroken: rest && isDoneValue(h, values.get(date)),
+  };
 
   const ev = evaluateTarget(h, values, date, weekStart);
   if (ev) {

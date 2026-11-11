@@ -34,9 +34,9 @@ async function open(route: string, seed?: (repos: Repos) => Promise<unknown>) {
 
 /** Text of the cell for (day, column index) in the grid body. */
 const cell = (day: number, col: number) => {
-  const rows = within(screen.getByRole('table')).getAllByRole('row');
+  const rows = within(screen.getByRole('grid')).getAllByRole('row');
   // rows[0] is the header; days follow in order.
-  return within(rows[day]!).getAllByRole('cell')[col]!;
+  return within(rows[day]!).getAllByRole('gridcell')[col]!;
 };
 
 describe('Monthly view: routing and navigation (tasks 6.1, MON-2)', () => {
@@ -83,7 +83,7 @@ describe('Monthly grid (tasks 6.2, 6.3, 6.5, 6.6, MON-1, MON-4…6, MON-8)', () 
       await repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: '2026-01-01' });
       await repos.habits.create({ name: 'Coffee', type: 'number', unit: 'cups', startDate: '2026-01-01' });
     });
-    const table = await screen.findByRole('table', { name: 'Habits for August 2026' });
+    const table = await screen.findByRole('grid', { name: 'Habits for August 2026' });
     const headers = within(table).getAllByRole('columnheader');
     expect(headers.map((h) => h.textContent)).toEqual(['Day', 'Exercise', 'Coffee (cups)']);
     expect(headers[2]).toHaveAttribute('title', 'Coffee (cups)');
@@ -115,11 +115,13 @@ describe('Monthly grid (tasks 6.2, 6.3, 6.5, 6.6, MON-1, MON-4…6, MON-8)', () 
       await repos.entries.set(sl.id, '2026-08-01', 7.25);
       await repos.entries.set(md.id, '2026-08-01', 8);
     });
-    await screen.findByRole('table');
+    await screen.findByRole('grid');
     expect(cell(1, 0)).toHaveTextContent('✓');
     expect(cell(1, 0)).toHaveClass('logged', 'done');
     expect(cell(1, 0).style.getPropertyValue('--cat')).toBe('#5f9e6e');
-    expect(within(cell(1, 0)).getByLabelText('done')).toBeInTheDocument();
+    expect(cell(1, 0)).toHaveAccessibleName('Exercise, Saturday, August 1: done');
+    expect(cell(2, 0)).toHaveAccessibleName('Exercise, Sunday, August 2: not done');
+    expect(cell(1, 1)).toHaveAccessibleName('Reading, Saturday, August 1: 1h 30m');
     expect(cell(2, 0)).toHaveTextContent('✗');
     expect(cell(2, 0)).not.toHaveClass('logged');
     expect(cell(1, 1)).toHaveTextContent('1h30');
@@ -146,7 +148,7 @@ describe('Monthly grid (tasks 6.2, 6.3, 6.5, 6.6, MON-1, MON-4…6, MON-8)', () 
       await repos.entries.set(coffee.id, '2026-08-01', 1);
       await repos.entries.set(coffee.id, '2026-08-02', 4);
     });
-    await screen.findByRole('table');
+    await screen.findByRole('grid');
     expect(cell(3, 0)).toHaveClass('inactive'); // Aug 3: before the start date
     expect(cell(6, 0)).toHaveClass('unscheduled'); // Thu Aug 6
     expect(cell(7, 0)).not.toHaveClass('unscheduled'); // Fri Aug 7
@@ -167,7 +169,7 @@ describe('Monthly grid (tasks 6.2, 6.3, 6.5, 6.6, MON-1, MON-4…6, MON-8)', () 
       });
       await repos.habits.create({ name: 'Later', type: 'boolean', startDate: '2026-09-01' });
     });
-    const table = await screen.findByRole('table');
+    const table = await screen.findByRole('grid');
     expect(
       within(table)
         .getAllByRole('columnheader')
@@ -189,10 +191,10 @@ describe('Monthly grid (tasks 6.2, 6.3, 6.5, 6.6, MON-1, MON-4…6, MON-8)', () 
       await repos.entries.set(cups.id, '2026-08-01', 2);
       await repos.entries.set(cups.id, '2026-08-02', 3);
     });
-    await screen.findByRole('table');
+    await screen.findByRole('grid');
     // August 2026 is in the past relative to the real clock, so the whole month counts.
     const summary = screen.getByRole('rowheader', { name: 'Month' }).closest('tr')!;
-    const cells = within(summary).getAllByRole('cell');
+    const cells = [...summary.querySelectorAll('td')];
     expect(cells[0]).toHaveTextContent('3/31');
     expect(cells[0]).toHaveAccessibleName('Exercise: 3 of 31 scheduled days done (10%)');
     expect(cells[1]).toHaveTextContent('avg 2.5');

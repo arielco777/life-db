@@ -16,7 +16,11 @@ export const habitTargetSchema = z.object({
 
 export const habitFrequencySchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('daily') }),
-  z.object({ type: z.literal('weekdays'), days: z.array(z.enum(WEEKDAYS as [string, ...string[]])).min(1) }),
+  z.object({
+    type: z.literal('weekdays'),
+    days: z.array(z.enum(WEEKDAYS as [string, ...string[]])).min(1),
+    restOnOtherDays: z.boolean().optional(),
+  }),
   z.object({ type: z.literal('times_per_week'), count: z.number().int().min(1).max(7) }),
 ]);
 

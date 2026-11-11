@@ -892,14 +892,19 @@ fieldset:disabled .type-option {
   border-top: 1px solid var(--border);
   padding-top: var(--space-4);
 }
-.end-options {
+.end-options,
+.other-days {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1) var(--space-3);
 }
-.end-options .row {
+.end-options .row,
+.other-days .row {
   margin: 0;
+}
+.other-days {
+  margin-top: var(--space-2);
 }
 
 /* ───────── daily view (DAY-1) ───────── */
@@ -962,6 +967,10 @@ a.icon-btn {
   flex-wrap: nowrap;
 }
 .habit-label {
+  font-weight: 600;
+}
+.rest-flag {
+  color: var(--warning);
   font-weight: 600;
 }
 .day-habit.unscheduled .habit-label {
@@ -1039,13 +1048,16 @@ a.icon-btn {
 }
 .month-scroll {
   /* Own scroll box in both directions so the day column, header and footer can stick. */
-  overflow: auto;
+  overflow: hidden;
   max-height: calc(100dvh - 140px);
   max-width: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--paper-raised);
   align-self: flex-start;
+  &:hover {
+    overflow: auto;
+  }
 }
 .month-grid {
   border-collapse: separate;
@@ -1072,23 +1084,28 @@ a.icon-btn {
 /* Angled habit names: the header cell is tall and narrow; the label is rotated -60°
    from its bottom-left corner so long names lean into the space above the next columns. */
 .month-grid th.habit-col {
+  /* Table cells ignore min/max-height; `height` already acts as the minimum. */
   height: 120px;
   width: 52px;
   min-width: 52px;
-  max-width: 52px;
   vertical-align: bottom;
   white-space: nowrap;
   font-weight: 500;
   overflow: visible;
 }
 .month-grid .angled {
-  width: 52px;
+  min-width: 52px;
+  display: block;
   transform: translate(26px, -6px) rotate(-60deg);
   transform-origin: bottom left;
 }
 .month-grid .angled span {
   display: inline-block;
-  max-width: 130px;
+  /* Sized to the text, and the column grows with it from 52px. Leaning at 60°, ~120px of
+     text plus its line height rises about 115px, which fits the 120px header. Longer names
+     end in "…", and the full name is in the column's title tooltip. */
+  width: max-content;
+  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: bottom;
@@ -1104,13 +1121,19 @@ a.icon-btn {
   font-weight: 400;
   min-width: 64px;
 }
+.month-grid tbody th,
+.month-grid tbody td {
+  box-sizing: border-box;
+  height: 32px;
+  vertical-align: middle;
+  line-height: 1;
+}
 .month-grid .day-cell a {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-2);
   padding: 0 var(--space-2);
-  height: 30px;
-  line-height: 30px;
+  height: 100%;
   color: var(--ink);
   text-decoration: none;
 }
@@ -1127,7 +1150,7 @@ a.icon-btn {
   font-size: 12px;
 }
 .month-grid tr.weekend .day-cell,
-.month-grid tr.weekend td {
+.month-grid tr.weekend td:not(.logged) {
   background-color: color-mix(in srgb, var(--paper) 70%, var(--paper-raised));
 }
 .month-grid tr.today .day-cell {
@@ -1143,7 +1166,6 @@ a.icon-btn {
 
 .month-grid td.cell {
   width: 52px;
-  height: 30px;
   text-align: center;
   white-space: nowrap;
 }
@@ -1174,6 +1196,20 @@ a.icon-btn {
 }
 .month-grid td.inactive {
   background-color: var(--paper);
+}
+/* Rest days (HAB-5): a dash says "not meant to happen"; doing it anyway gets a corner flag. */
+.month-grid td.rest:not(.logged) {
+  color: var(--border);
+}
+.month-grid td.rest-broken::after {
+  content: '!';
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--warning);
 }
 
 .month-grid tfoot th,
@@ -1207,4 +1243,43 @@ a.icon-btn {
 }
 .summary-sub {
   color: var(--ink-muted);
+}
+
+/* ───────── monthly grid editing (MON-3) ───────── */
+.month-grid td.cell {
+  position: relative;
+  cursor: pointer;
+}
+.month-grid td.cell:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.month-grid td.inactive {
+  cursor: default;
+}
+.cell-editor {
+  position: absolute;
+  z-index: 5;
+  top: -1px;
+  left: -1px;
+}
+.cell-editor input {
+  width: 72px;
+  height: 32px;
+  padding: 0 var(--space-1);
+  text-align: center;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.18);
+  border-color: var(--focus);
+}
+.cell-editor.popover {
+  width: auto;
+  padding: var(--space-2);
+  top: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.month-grid td.inactive,
+.month-grid td.future {
+  cursor: default;
 }

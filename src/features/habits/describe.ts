@@ -34,12 +34,15 @@ export function describeFrequency(f: Habit['frequency'], weekStart: 'mon' | 'sun
     case 'weekdays': {
       const set = new Set(f.days);
       if (set.size === 7) return 'Daily';
-      if (set.size === 5 && !set.has('sat') && !set.has('sun')) return 'Weekdays';
-      if (set.size === 2 && set.has('sat') && set.has('sun')) return 'Weekends';
-      return orderedWeekdays(weekStart)
-        .filter((d) => set.has(d))
-        .map((d) => WEEKDAY_SHORT[d])
-        .join(', ');
+      const rest = f.restOnOtherDays ? ' · rest other days' : '';
+      if (set.size === 5 && !set.has('sat') && !set.has('sun')) return `Weekdays${rest}`;
+      if (set.size === 2 && set.has('sat') && set.has('sun')) return `Weekends${rest}`;
+      return (
+        orderedWeekdays(weekStart)
+          .filter((d) => set.has(d))
+          .map((d) => WEEKDAY_SHORT[d])
+          .join(', ') + rest
+      );
     }
   }
 }

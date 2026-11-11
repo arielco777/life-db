@@ -5,6 +5,7 @@ import { DayRoute } from './DayPage';
 import { renderWithApp } from '../../../tests/render';
 import type { setup } from '../../../tests/helpers';
 import { logicalToday } from '@/domain/services/clock';
+import { addDays } from '@/domain/services/dates';
 
 type Repos = Awaited<ReturnType<typeof setup>>['repos'];
 const THU = '2026-08-13';
@@ -97,6 +98,26 @@ describe('Daily view: routing and navigation (tasks 5.1, DAY-3)', () => {
 });
 
 describe('Daily view: habits (tasks 5.3, 5.4, DAY-1, DAY-5, HAB-5)', () => {
+  it('a future day is read-only, with a note saying why (ENT-2)', async () => {
+    const tomorrow = addDays(logicalToday(4), 1);
+    await open(`/day/${tomorrow}`, (repos) =>
+      repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: start }),
+    );
+    const box = await screen.findByRole('checkbox', { name: /^Exercise, / });
+    expect(screen.getByRole('note')).toHaveTextContent('hasn’t happened yet');
+    expect(box).toBeDisabled();
+    expect(screen.getByRole('button', { name: /note and options/ })).toBeDisabled();
+  });
+
+  it('today is not read-only', async () => {
+    await open(`/day/${logicalToday(4)}`, (repos) =>
+      repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: start }),
+    );
+    const box = await screen.findByRole('checkbox', { name: /^Exercise, / });
+    await waitFor(() => expect(box).toBeEnabled());
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+  });
+
   it('lists the habits active that day in user order, all types in one section', async () => {
     await open(`/day/${THU}`, async (repos) => {
       await repos.habits.create({ name: 'Exercise', type: 'boolean', startDate: start });
@@ -134,6 +155,26 @@ describe('Daily view: habits (tasks 5.3, 5.4, DAY-1, DAY-5, HAB-5)', () => {
     expect(screen.getByText('Not scheduled')).toBeInTheDocument();
     await waitFor(() => expect(box).toBeEnabled());
     await app.user.click(box);
+    await waitFor(async () =>
+      expect((await app.repos.entries.forRange({ from: THU, to: THU }))[0]?.value).toBe(1),
+    );
+  });
+
+  it('rest days say so, and doing the habit anyway is saved but flagged (HAB-5)', async () => {
+    const app = await open(`/day/${THU}`, (repos) =>
+      repos.habits.create({
+        name: 'Gym',
+        type: 'boolean',
+        startDate: start,
+        frequency: { type: 'weekdays', days: ['mon', 'wed', 'fri'], restOnOtherDays: true },
+      }),
+    );
+    const box = await screen.findByRole('checkbox', { name: 'Gym, August 13' });
+    expect(screen.getByText('Rest day')).toBeInTheDocument();
+    expect(screen.queryByText('Not scheduled')).not.toBeInTheDocument();
+    await waitFor(() => expect(box).toBeEnabled());
+    await app.user.click(box);
+    expect(await screen.findByText('⚠ Done on a rest day')).toBeInTheDocument();
     await waitFor(async () =>
       expect((await app.repos.entries.forRange({ from: THU, to: THU }))[0]?.value).toBe(1),
     );
