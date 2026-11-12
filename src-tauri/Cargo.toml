@@ -1,6 +1,6 @@
 [package]
 name = "life-db"
-version = "0.1.0"
+version = "1.0.0"
 description = "Life DB — a personal life notebook"
 edition = "2024"
 
