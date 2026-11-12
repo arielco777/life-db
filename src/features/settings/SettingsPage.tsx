@@ -1,4 +1,5 @@
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import { AboutPage } from './AboutPage';
 import { DataPage } from './DataPage';
 import { GeneralPage } from './GeneralPage';
 import { SecurityPage } from './SecurityPage';
@@ -12,6 +13,7 @@ const TABS = [
   { to: 'tags', label: 'Tags' },
   { to: 'data', label: 'Data' },
   { to: 'security', label: 'Security' },
+  { to: 'about', label: 'About' },
 ];
 
 /** /settings/* — sub-pages share one header and tab bar. */
@@ -34,6 +36,7 @@ export function SettingsPage() {
         <Route path="tags/:id" element={<TagView />} />
         <Route path="data" element={<DataPage />} />
         <Route path="security" element={<SecurityPage />} />
+        <Route path="about" element={<AboutPage />} />
         <Route path="*" element={<Navigate to="/settings/general" replace />} />
       </Routes>
     </section>

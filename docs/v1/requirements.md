@@ -309,6 +309,7 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 ### 4.15 Distribution (DIST)
 
 **DIST-1 Installers.** Signed installers for Windows (MSI/NSIS, code-signed), macOS (DMG, signed and notarized) and Linux (AppImage and .deb).
+- *V1.0 decision:* installers ship **unsigned** (no paid certificates for now). Windows shows a SmartScreen warning, and macOS needs the app to be allowed once in System Settings. Signing is added if certificates are bought. Updates are still signature-verified with the free Tauri updater key (DIST-2).
 
 **DIST-2 Updates.** The app SHALL check for updates (on start, at most once a day, can be turned off in settings), show release notes, and install an update only after the user agrees. Update packages SHALL be signature-verified.
 

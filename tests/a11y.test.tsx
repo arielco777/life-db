@@ -72,6 +72,7 @@ describe('Accessibility of every screen (axe)', () => {
     ['/settings/tags', 'heading'],
     ['/settings/data', 'heading'],
     ['/settings/security', 'heading'],
+    ['/settings/about', 'heading'],
   ])('%s', async (route, role) => {
     await open(route);
     await screen.findAllByRole(role, {}, SLOW);

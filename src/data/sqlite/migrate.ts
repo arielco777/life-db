@@ -51,7 +51,7 @@ export interface MigrateOptions {
 }
 
 /**
- * Applies pending migrations, each atomically together with its schema_migrations row.
+ * Applies all pending migrations, with their schema_migrations rows, in one transaction.
  * Refuses to touch a DB created by a newer app version.
  */
 export async function migrate(
@@ -66,9 +66,16 @@ export async function migrate(
   if (pending.length === 0) return { from, to: from };
   if (from > 0 && beforeMigrate) await beforeMigrate(from, latest);
 
-  for (const m of pending) {
-    const record = `INSERT INTO schema_migrations (version, name, applied_at) VALUES (${m.version}, '${m.name.replace(/'/g, "''")}', '${nowUtc(clock)}');`;
-    await driver.runScript(`${m.sql}\n;\n${record}`);
-  }
+  // All pending migrations in ONE transaction (DIST-3): if any step fails, the database
+  // stays exactly at `from`, so the previous app version can still open it. Migrations must
+  // therefore be transaction-safe (no PRAGMA foreign_keys, VACUUM or BEGIN/COMMIT).
+  const appliedAt = nowUtc(clock);
+  const script = pending
+    .map(
+      (m) =>
+        `${m.sql}\n;\nINSERT INTO schema_migrations (version, name, applied_at) VALUES (${m.version}, '${m.name.replace(/'/g, "''")}', '${appliedAt}');`,
+    )
+    .join('\n');
+  await driver.runScript(script);
   return { from, to: latest };
 }

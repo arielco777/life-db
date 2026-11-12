@@ -4,6 +4,8 @@ interface ConfirmDialogProps {
   title: string;
   children?: ReactNode;
   confirmLabel: string;
+  /** Defaults to "Cancel". */
+  cancelLabel?: string;
   /** Styles the confirm button as destructive. */
   danger?: boolean;
   busy?: boolean;
@@ -12,7 +14,8 @@ interface ConfirmDialogProps {
 }
 
 /**
- * Confirmation for destructive actions only: deletes, restore, merging tags (design §7).
+ * Confirmation for actions that can't be taken back: deletes, restore, merging tags, and
+ * installing an update (design §7).
  * Rendered while open; Escape or the backdrop cancels; focus starts on Cancel so Enter
  * never destroys data by accident.
  */
@@ -20,6 +23,7 @@ export function ConfirmDialog({
   title,
   children,
   confirmLabel,
+  cancelLabel = 'Cancel',
   danger,
   busy,
   onConfirm,
@@ -65,8 +69,8 @@ export function ConfirmDialog({
         <h2 id={titleId}>{title}</h2>
         {children && <div className="dialog-body">{children}</div>}
         <div className="dialog-actions">
-          <button ref={cancelRef} type="button" className="secondary" onClick={onCancel}>
-            Cancel
+          <button ref={cancelRef} type="button" className="secondary" disabled={busy} onClick={onCancel}>
+            {cancelLabel}
           </button>
           <button type="button" className={danger ? 'danger' : undefined} disabled={busy} onClick={onConfirm}>
             {confirmLabel}

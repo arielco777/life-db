@@ -1,6 +1,8 @@
 import { vi } from 'vitest';
 import type {
+  AvailableUpdate,
   DataInfo,
+  LogLevel,
   FileDialogOptions,
   PlatformService,
   SaveFileOptions,
@@ -15,6 +17,8 @@ export function fakePlatform(info: Partial<DataInfo> = {}) {
   const state = {
     nextSavePath: null as string | null,
     nextOpenPath: null as string | null,
+    /** What the next update check finds. */
+    nextUpdate: null as AvailableUpdate | null,
     backups: [] as string[],
   };
   const service = {
@@ -29,6 +33,15 @@ export function fakePlatform(info: Partial<DataInfo> = {}) {
       async (_path: string): Promise<string> => '/home/me/.local/share/life-db/backups/pre-restore-1.lifedb',
     ),
     reloadApp: vi.fn((): void => {}),
+    appInfo: vi.fn(async () => ({
+      version: '1.0.0',
+      schemaVersion: 3,
+      logFile: '/home/me/.local/share/life-db/logs/life-db.log',
+    })),
+    openInBrowser: vi.fn(async (_url: string): Promise<void> => {}),
+    log: vi.fn((_level: LogLevel, _message: string): void => {}),
+    checkForUpdate: vi.fn(async (): Promise<AvailableUpdate | null> => state.nextUpdate),
+    restartApp: vi.fn(async (): Promise<void> => {}),
     dataInfo: vi.fn(async (): Promise<DataInfo> => ({
       path: '/home/me/.local/share/life-db/life.db',
       sizeBytes: 2_516_582,

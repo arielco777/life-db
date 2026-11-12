@@ -1,0 +1,94 @@
+name: Release
+
+# Builds installers for Windows, macOS and Linux and puts them in a DRAFT GitHub release,
+# with the signed updater files (latest.json) the app's update check reads (DIST-1, DIST-2).
+# Start it by pushing a version tag on main: see docs/RELEASING.md.
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Tag matches the app version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/version.mjs check "${{ github.ref_name }}"
+
+  build:
+    name: Build (${{ matrix.name }})
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            runner: ubuntu-24.04
+            args: ''
+          - name: Windows
+            runner: windows-latest
+            args: ''
+          # One universal app for Intel and Apple silicon Macs.
+          - name: macOS
+            runner: macos-latest
+            args: --target universal-apple-darwin
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Tauri system dependencies
+        if: matrix.name == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.name == 'macOS' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signs the update packages; the app only installs updates signed with this key.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Life DB ${{ github.ref_name }}
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: true
+          args: ${{ matrix.args }}
+          releaseBody: |
+            _Replace this with what's new. The app shows these notes before installing an update._
+
+            ## Installing
+
+            Life DB's installers aren't code-signed yet, so your system asks once before opening it:
+
+            - **Windows** (`.msi` or `-setup.exe`): if SmartScreen says "Windows protected your PC", choose **More info → Run anyway**.
+            - **macOS** (`.dmg`): drag Life DB to Applications and open it. If macOS says it can't be checked, open **System Settings → Privacy & Security**, scroll down, and choose **Open Anyway**.
+            - **Linux**: `.AppImage` (make it executable and run it), `.deb` or `.rpm`. No warning.
+
+            Updates after this are checked and installed from inside the app, and each one is verified against Life DB's signature.

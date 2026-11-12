@@ -1,7 +1,11 @@
+import { getVersion } from '@tauri-apps/api/app';
 import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
-import { revealItemInDir } from '@tauri-apps/plugin-opener';
-import type { DataInfo, PlatformService } from './PlatformService';
+import * as logger from '@tauri-apps/plugin-log';
+import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener';
+import { relaunch } from '@tauri-apps/plugin-process';
+import { check } from '@tauri-apps/plugin-updater';
+import type { AppInfo, AvailableUpdate, DataInfo, PlatformService } from './PlatformService';
 import { LATEST_SCHEMA_VERSION } from '@/data/sqlite';
 
 /** Tauri rejects with the Rust error's message as a plain string; keep it as an Error's message. */
@@ -26,4 +30,34 @@ export const tauriPlatform: PlatformService = {
     window.location.reload();
   },
   dataInfo: () => call(invoke<DataInfo>('db_info')),
+  appInfo: async (): Promise<AppInfo> => ({
+    version: await call(getVersion()),
+    schemaVersion: LATEST_SCHEMA_VERSION,
+    logFile: await call(invoke<string>('app_log_file')),
+  }),
+  openInBrowser: (url) => call(openUrl(url)),
+  log: (level, message) => {
+    // Never let logging itself throw into the caller.
+    void logger[level](message).catch(() => {});
+  },
+  checkForUpdate: async (): Promise<AvailableUpdate | null> => {
+    const update = await call(check());
+    if (!update) return null;
+    return {
+      version: update.version,
+      notes: update.body ?? '',
+      install: (onProgress) => {
+        let total: number | undefined;
+        let done = 0;
+        return call(
+          update.downloadAndInstall((e) => {
+            if (e.event === 'Started') total = e.data.contentLength;
+            if (e.event === 'Progress') done += e.data.chunkLength;
+            onProgress?.(e.event === 'Finished' ? 1 : total ? Math.min(done / total, 1) : null);
+          }),
+        );
+      },
+    };
+  },
+  restartApp: () => call(relaunch()),
 };

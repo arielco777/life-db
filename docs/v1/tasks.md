@@ -178,16 +178,16 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 10 — Distribution & V1.0 release
 
-- [ ] 10.1 Get signing credentials: Windows code-signing cert, Apple Developer ID plus notarization, Tauri updater key pair. Store them as CI secrets. [DIST-1]
-- [ ] 10.2 GitHub Actions release workflow with `tauri-action`: signed installers for Windows, macOS and Linux. [DIST-1, NFR-9]
-- [ ] 10.3 `tauri-plugin-updater`: daily check, release-notes dialog, install with consent, setting to turn it off. [DIST-2]
-- [ ] 10.4 Upgrade test: install release N, add data, update to N+1 with a new migration, verify the data and the pre-migration backup. Simulate a failed migration and show the recovery screen. [DIST-3, NFR-3]
-- [ ] 10.5 About screen: versions, privacy statement, feedback/issue link (design §11 Q5). [DIST-4, DIST-5]
-- [ ] 10.6 `tauri-plugin-log` with rotation, error boundary and `window.onerror` forwarding, "Open log" in About. Check that logs contain no user content. [DIST-6, SEC-3]
+- [ ] ~~10.1~~ *Deferred: V1.0 ships unsigned (DIST-1 note); only the free Tauri updater key is needed.* Get signing credentials: Windows code-signing cert, Apple Developer ID plus notarization, Tauri updater key pair. Store them as CI secrets. [DIST-1]
+- [x] 10.2 GitHub Actions release workflow with `tauri-action`: installers for Windows, macOS and Linux (unsigned, see DIST-1 note), plus signed updater files. [DIST-1, NFR-9] *(Workflow and docs/RELEASING.md written; its first real run is the V1.0 tag.)*
+- [x] 10.3 `tauri-plugin-updater`: daily check, release-notes dialog, install with consent, setting to turn it off. [DIST-2]
+- [ ] 10.4 Upgrade test: install release N, add data, update to N+1 with a new migration, verify the data and the pre-migration backup. Simulate a failed migration and show the recovery screen. [DIST-3, NFR-3] *(Failed migration: done, now all-or-nothing, with a recovery screen and a test. The real N → N+1 update waits for two published releases.)*
+- [x] 10.5 About screen: versions, privacy statement, feedback/issue link (design §11 Q5). [DIST-4, DIST-5]
+- [x] 10.6 `tauri-plugin-log` with rotation, error boundary and `window.onerror` forwarding, "Open log" in About. Check that logs contain no user content. [DIST-6, SEC-3]
 - [ ] 10.7 Clean-machine install test on each OS (no dev tools installed).
 - [ ] 10.8 Tag and publish **V1.0**.
 
-**✅ Done when:** a new user can download, install, use and update the app on all three OSes without warnings or data loss.
+**✅ Done when:** a new user can download, install, use and update the app on all three OSes without data loss. Unsigned installers show the OS's one-time warning; the release notes explain how to get past it.
 
 ---
 

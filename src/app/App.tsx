@@ -1,4 +1,5 @@
-import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { ErrorBoundary } from './ErrorBoundary';
 import { FEATURE_V1_1, SHOW_DEBUG } from './features';
 import { DebugPage } from '@/features/debug/DebugPage';
 import { DayRoute } from '@/features/day/DayPage';
@@ -9,6 +10,7 @@ import { FirstRunGate } from '@/features/onboarding/FirstRun';
 import { Placeholder } from '@/features/Placeholder';
 import { useApplyTheme, useSettings } from '@/features/settings/hooks';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { UpdateNotice } from '@/features/updates/UpdateNotice';
 
 interface NavItem {
   to: string;
@@ -42,6 +44,8 @@ export function App() {
 
 function Shell() {
   const name = useSettings()['profile.display_name'];
+  // One boundary per screen: navigating away from a crashed screen recovers.
+  const screen = useLocation().pathname.split('/')[1];
   return (
     <div className="shell">
       <nav className="nav" aria-label="Main">
@@ -67,24 +71,27 @@ function Shell() {
         )}
       </nav>
       <main className="page">
-        <Routes>
-          <Route path="/" element={<Navigate to="/day" replace />} />
-          <Route path="/day/:date?" element={<DayRoute />} />
-          <Route path="/month/:ym?" element={<MonthRoute />} />
-          <Route path="/habits/*" element={<HabitRoutes />} />
-          <Route path="/journal/*" element={<JournalRoutes />} />
-          <Route path="/settings/*" element={<SettingsPage />} />
-          {FEATURE_V1_1 && (
-            <>
-              <Route path="/goals/*" element={<Placeholder title="Goals" phase="Phase 11" />} />
-              <Route path="/events" element={<Placeholder title="Events" phase="Phase 12" />} />
-              <Route path="/analytics" element={<Placeholder title="Analytics" phase="Phase 13" />} />
-              <Route path="/search" element={<Placeholder title="Search" phase="Phase 14" />} />
-            </>
-          )}
-          {SHOW_DEBUG && <Route path="/debug" element={<DebugPage />} />}
-          <Route path="*" element={<Navigate to="/day" replace />} />
-        </Routes>
+        <UpdateNotice />
+        <ErrorBoundary key={screen}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/day" replace />} />
+            <Route path="/day/:date?" element={<DayRoute />} />
+            <Route path="/month/:ym?" element={<MonthRoute />} />
+            <Route path="/habits/*" element={<HabitRoutes />} />
+            <Route path="/journal/*" element={<JournalRoutes />} />
+            <Route path="/settings/*" element={<SettingsPage />} />
+            {FEATURE_V1_1 && (
+              <>
+                <Route path="/goals/*" element={<Placeholder title="Goals" phase="Phase 11" />} />
+                <Route path="/events" element={<Placeholder title="Events" phase="Phase 12" />} />
+                <Route path="/analytics" element={<Placeholder title="Analytics" phase="Phase 13" />} />
+                <Route path="/search" element={<Placeholder title="Search" phase="Phase 14" />} />
+              </>
+            )}
+            {SHOW_DEBUG && <Route path="/debug" element={<DebugPage />} />}
+            <Route path="*" element={<Navigate to="/day" replace />} />
+          </Routes>
+        </ErrorBoundary>
       </main>
     </div>
   );
