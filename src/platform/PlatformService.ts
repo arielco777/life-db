@@ -20,6 +20,18 @@ export interface AppInfo {
   logFile: string;
 }
 
+/** A newer version on the update server (DIST-2). */
+export interface AvailableUpdate {
+  version: string;
+  /** Release notes (Markdown), '' if none. */
+  notes: string;
+  /**
+   * Downloads, verifies the signature and installs the update. `onProgress` gets 0–1, or
+   * null while the size is unknown. The app must restart afterwards (`restartApp`).
+   */
+  install(onProgress?: (fraction: number | null) => void): Promise<void>;
+}
+
 export type LogLevel = 'error' | 'warn' | 'info';
 
 export interface FileDialogOptions {
@@ -67,4 +79,8 @@ export interface PlatformService {
    * (SEC-3); `src/app/diagnostics.ts` does that for errors.
    */
   log(level: LogLevel, message: string): void;
+  /** Asks the update server for a newer version (DIST-2). Null when up to date. */
+  checkForUpdate(): Promise<AvailableUpdate | null>;
+  /** Restarts the app, e.g. into an installed update. */
+  restartApp(): Promise<void>;
 }

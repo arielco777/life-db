@@ -10,9 +10,14 @@ export const settingsKeys = { all: ['settings'] as const };
 
 /** All settings, falling back to defaults while loading so callers never wait on them. */
 export function useSettings(): Settings {
+  return useSettingsState().settings;
+}
+
+/** Settings plus whether they've actually loaded (not just defaults). */
+export function useSettingsState(): { settings: Settings; loaded: boolean } {
   const { settings } = useRepositories();
   const { data } = useQuery({ queryKey: settingsKeys.all, queryFn: () => settings.getAll() });
-  return data ?? DEFAULT_SETTINGS;
+  return { settings: data ?? DEFAULT_SETTINGS, loaded: data !== undefined };
 }
 
 /** The logical today (SET-4), computed at render time. */

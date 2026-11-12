@@ -2,9 +2,8 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
- * The app makes no network requests (NFR-2, NFR-5, task 9.7). Phase 10's update check will
- * be the one exception: tauri-plugin-updater makes it from Rust, and its host is added here
- * and to the CSP then.
+ * The app's only network request is the update check (NFR-2, NFR-5, tasks 9.7, 10.3). It's
+ * made from Rust by tauri-plugin-updater, so the webview's CSP stays local-only.
  */
 const root = join(__dirname, '..');
 const conf = JSON.parse(readFileSync(join(root, 'src-tauri/tauri.conf.json'), 'utf8'));
@@ -43,6 +42,14 @@ describe('no network access (NFR-2, task 9.7)', () => {
     expect(open.allow).toEqual([{ url: `${BROWSER_LINKS[0]}/*` }]);
     expect(caps.permissions).not.toContain('opener:default');
     expect(caps.permissions).not.toContain('opener:allow-default-urls');
+  });
+
+  it("updates come only from this project's GitHub Releases, signed (DIST-2)", () => {
+    expect(conf.plugins.updater.endpoints).toEqual([
+      'https://github.com/arielco777/life-db/releases/latest/download/latest.json',
+    ]);
+    expect(atob(conf.plugins.updater.pubkey)).toMatch(/^untrusted comment: minisign public key/);
+    expect(conf.bundle.createUpdaterArtifacts).toBe(true);
   });
 
   it('connect-src is only Tauri IPC', () => {

@@ -10,6 +10,7 @@ import { FirstRunGate } from '@/features/onboarding/FirstRun';
 import { Placeholder } from '@/features/Placeholder';
 import { useApplyTheme, useSettings } from '@/features/settings/hooks';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { UpdateNotice } from '@/features/updates/UpdateNotice';
 
 interface NavItem {
   to: string;
@@ -70,6 +71,7 @@ function Shell() {
         )}
       </nav>
       <main className="page">
+        <UpdateNotice />
         <ErrorBoundary key={screen}>
           <Routes>
             <Route path="/" element={<Navigate to="/day" replace />} />

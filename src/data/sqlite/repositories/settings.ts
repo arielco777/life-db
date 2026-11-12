@@ -13,6 +13,7 @@ const validators: { [K in keyof Settings]: (v: unknown) => boolean } = {
   'backup.auto_enabled': (v) => typeof v === 'boolean',
   'backup.keep_count': (v) => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 100,
   'updates.enabled': (v) => typeof v === 'boolean',
+  'updates.last_checked': (v) => typeof v === 'string' && (v === '' || !Number.isNaN(Date.parse(v))),
   'onboarding.completed': (v) => typeof v === 'boolean',
   'day.group_by_category': (v) => typeof v === 'boolean',
 };

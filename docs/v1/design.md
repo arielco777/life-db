@@ -602,7 +602,14 @@ MONTHLY GOALS
 ### 6.10 Distribution (DIST)
 
 - **Signing:** Windows Authenticode certificate, Apple Developer ID plus notarization, and a Tauri updater key pair. All secrets live in CI secrets, never in the repo.
-- **Updater:** `tauri-plugin-updater` reads a static `latest.json` (e.g. from GitHub Releases). The frontend shows release notes and asks for consent before installing. The check is off when the user disables it (DIST-2). The request is made from Rust, so the webview's CSP stays local-only. Until Phase 10, `tests/network.test.ts` pins `connect-src` to Tauri IPC and checks that no frontend code calls a network API (NFR-2).
+- **Updater** (DIST-2):
+  - `tauri-plugin-updater` reads `releases/latest/download/latest.json` from this repo's GitHub Releases. Packages are verified against the minisign public key in `tauri.conf.json`.
+  - The check runs from Rust, so the webview's CSP stays local-only (`tests/network.test.ts`). It happens once the app is up, at most once a day (`updates.last_checked`), and only if `updates.enabled`.
+  - A found update shows a quiet banner. *See what's new* opens the release notes (Markdown) with *Install and restart* / *Not now*. Pending saves are flushed, the update is downloaded and verified, then the app restarts.
+  - Settings → About has the on/off switch and *Check now*.
+- **Releases:** pushing a `vX.Y.Z` tag runs `.github/workflows/release.yml`.
+  - It checks that the tag matches the version in all four files (`scripts/version.mjs`), then builds with `tauri-action` into a **draft** release, with install notes for unsigned builds.
+  - Publishing the draft is what makes it the update. Steps are in `docs/RELEASING.md`.
 - **Startup:** `markInteractive()` (in `src/app/startup.ts`) logs `[startup] daily view ready N ms` once the first daily view has data. Background work, today the daily backup, waits for that plus 2 s via `afterInteractive()`, so it never delays the first screen (NFR-1).
 - **Upgrade safety:** after an update, the first launch runs the migration runner (§4.6), which backs up first. If a migration fails, the app shows a recovery screen with "Open backups folder" and "Report issue" (DIST-3).
 - **Logging:** `tauri-plugin-log` writes `<app log dir>/life-db.log`, rotated at 1 MB, keeping 5 files, at level info (DIST-6).

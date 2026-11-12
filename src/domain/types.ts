@@ -115,6 +115,8 @@ export interface Settings {
   'backup.auto_enabled': boolean;
   'backup.keep_count': number;
   'updates.enabled': boolean;
+  /** DIST-2: when updates were last checked (ISO timestamp), '' if never. */
+  'updates.last_checked': string;
   'onboarding.completed': boolean;
   /** Daily view: group habits by category (DAY-4). */
   'day.group_by_category': boolean;
@@ -129,6 +131,7 @@ export const DEFAULT_SETTINGS: Settings = {
   'backup.auto_enabled': true,
   'backup.keep_count': 7,
   'updates.enabled': true,
+  'updates.last_checked': '',
   'onboarding.completed': false,
   'day.group_by_category': false,
 };

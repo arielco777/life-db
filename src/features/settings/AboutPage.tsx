@@ -2,6 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ISSUES_URL, issueUrl } from '@/app/diagnostics';
 import { usePlatform } from '@/platform/PlatformProvider';
+import { toISODate } from '@/domain/services/clock';
+import { useFormatDate, useSetSetting, useSettings } from './hooks';
+import { useCheckForUpdates } from '@/features/updates/updates';
 import { useToast } from '@/ui/Toast';
 
 /** Settings → About (task 10.5): versions, privacy statement, support (DIST-4, DIST-5, DIST-6). */
@@ -42,8 +45,9 @@ export function AboutPage() {
             Life DB sends nothing about you or how you use it: no analytics, no tracking, no crash reports.
           </li>
           <li>
-            It doesn't go online at all. Checking for new versions will be the one exception when it arrives,
-            and you'll be able to turn it off.
+            The only time it goes online is to check GitHub for a new version, at most once a day. The check
+            sends nothing about you, though like any web request it reveals your IP address to GitHub. You can
+            turn it off below.
           </li>
           <li>
             Errors are written to a log file on this device. It records what went wrong, never what you wrote.
@@ -55,6 +59,8 @@ export function AboutPage() {
           is explained in <Link to="/settings/security">Security</Link>.
         </p>
       </section>
+
+      <UpdatesSection />
 
       <section className="card stack" aria-labelledby="about-support">
         <h2 id="about-support">Problems and ideas</h2>
@@ -75,6 +81,46 @@ export function AboutPage() {
           over the log before attaching it.
         </p>
       </section>
+    </section>
+  );
+}
+
+/** Turning automatic checks off, and checking now (DIST-2). */
+function UpdatesSection() {
+  const settings = useSettings();
+  const set = useSetSetting();
+  const check = useCheckForUpdates();
+  const formatDate = useFormatDate();
+  const last = settings['updates.last_checked'];
+
+  return (
+    <section className="card stack" aria-labelledby="about-updates">
+      <h2 id="about-updates">Updates</h2>
+      <label className="row check-row">
+        <input
+          type="checkbox"
+          checked={settings['updates.enabled']}
+          onChange={(e) => set.mutate({ key: 'updates.enabled', value: e.target.checked })}
+        />
+        <span>Check for new versions once a day</span>
+      </label>
+      <div className="row">
+        <button type="button" className="secondary" onClick={() => check.mutate()} disabled={check.isPending}>
+          {check.isPending ? 'Checking…' : 'Check now'}
+        </button>
+      </div>
+      <p className="small muted" role="status">
+        {check.isError
+          ? 'Couldn’t reach GitHub. Check your connection and try again.'
+          : check.isSuccess && !check.data
+            ? 'You have the latest version.'
+            : check.data
+              ? `Version ${check.data.version} is available. See the notice at the top of the page.`
+              : last
+                ? `Last checked ${formatDate(toISODate(new Date(last)))}.`
+                : 'Not checked yet.'}
+      </p>
+      <p className="small muted">Updates install only when you choose to, after showing what's new.</p>
     </section>
   );
 }

@@ -32,6 +32,9 @@ pub fn run() {
         .plugin(log_plugin())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        // DIST-2: signed updates from GitHub Releases, checked from Rust (not the webview).
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
             log::info!("Life DB {} starting", app.package_info().version);
             let data_dir = app.path().app_data_dir()?;
