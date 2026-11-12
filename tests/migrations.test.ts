@@ -41,6 +41,15 @@ describe('migrations', () => {
     expect(upgrade).toHaveBeenCalledWith(1, LATEST_SCHEMA_VERSION);
   });
 
+  it('roll back every pending migration if one fails (DIST-3)', async () => {
+    const driver = createNodeDriver();
+    await migrate(driver, { migrations: MIGRATIONS.slice(0, 1) });
+    const bad = { version: 9000, name: 'bad', sql: 'SELECT * FROM no_such_table;' };
+    await expect(migrate(driver, { migrations: [...MIGRATIONS, bad] })).rejects.toThrow();
+    // The migrations after 0001 ran fine before 9000 failed, but they were undone with it.
+    expect(await currentSchemaVersion(driver)).toBe(1);
+  });
+
   it('roll back a failing migration completely', async () => {
     const driver = createNodeDriver();
     await migrate(driver);

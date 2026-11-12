@@ -193,6 +193,10 @@ button:disabled {
   margin: 12vh auto;
   padding: 0 var(--space-4);
 }
+.boot-actions {
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}
 .boot pre {
   white-space: pre-wrap;
   background: var(--paper-raised);
@@ -1477,4 +1481,19 @@ a.icon-btn {
 .onboarding-habits {
   display: grid;
   gap: var(--space-2);
+}
+
+/* ───────── about ───────── */
+.about-versions {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+.about-versions dt {
+  color: var(--ink-muted);
+}
+.about-versions dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
 }

@@ -382,7 +382,7 @@ Mapping per source table: habits → (name, description), goals → (title, desc
 ### 4.6 Migrations
 
 - Files live at `src/data/sqlite/migrations/NNNN_name.sql` and are bundled with Vite (`import.meta.glob(..., { as: 'raw' })`).
-- Startup: read `MAX(version)` from `schema_migrations`. If migrations are pending, call `db_backup` to `backups/pre-migration-<version>-<ts>.db`, then run each pending migration together with its `schema_migrations` insert in one `db_transaction`.
+- Startup: read `MAX(version)` from `schema_migrations`. If migrations are pending, call `db_backup` to `backups/pre-migration-<version>-<ts>.db`. Then run **all** pending migrations, with their `schema_migrations` inserts, as one script in one transaction (DIST-3). If any step fails, the database stays at its old version, so the previous app still opens it, and the app shows a recovery screen. Migrations must therefore be transaction-safe: no `PRAGMA foreign_keys`, `VACUUM` or `BEGIN`/`COMMIT`.
 - If the DB's version is newer than the app knows about, refuse to open it and show an "update the app" message.
 - The test suite runs every migration from scratch against `better-sqlite3`, and checks that the seed data is there.
 
@@ -605,8 +605,14 @@ MONTHLY GOALS
 - **Updater:** `tauri-plugin-updater` reads a static `latest.json` (e.g. from GitHub Releases). The frontend shows release notes and asks for consent before installing. The check is off when the user disables it (DIST-2). The request is made from Rust, so the webview's CSP stays local-only. Until Phase 10, `tests/network.test.ts` pins `connect-src` to Tauri IPC and checks that no frontend code calls a network API (NFR-2).
 - **Startup:** `markInteractive()` (in `src/app/startup.ts`) logs `[startup] daily view ready N ms` once the first daily view has data. Background work, today the daily backup, waits for that plus 2 s via `afterInteractive()`, so it never delays the first screen (NFR-1).
 - **Upgrade safety:** after an update, the first launch runs the migration runner (§4.6), which backs up first. If a migration fails, the app shows a recovery screen with "Open backups folder" and "Report issue" (DIST-3).
-- **Logging:** `tauri-plugin-log` writes to the app log dir with rotation. Frontend errors are forwarded through an error boundary plus `window.onerror` (DIST-6).
-- **About screen:** app version, schema version, data folder, privacy statement, and a feedback/issue link (DIST-4, DIST-5).
+- **Logging:** `tauri-plugin-log` writes `<app log dir>/life-db.log`, rotated at 1 MB, keeping 5 files, at level info (DIST-6).
+  - Rust logs startup, the DB status, and backup/restore outcomes, never SQL parameters.
+  - The frontend forwards uncaught errors and unhandled rejections (`installErrorLogging`), and screens that fail to render (a per-screen `ErrorBoundary` with *Try again*, *Go to today*, *Report an issue* and *Open log*).
+  - `scrub()` removes anything quoted from messages first, because error messages quote values (SEC-3).
+- **About screen** (Settings → About): app and data version, the privacy statement, *Report an issue* and *Open log file* (DIST-4, DIST-5).
+  - Issues go to GitHub Issues on `arielco777/life-db`, opened in the browser with the versions prefilled and any error scrubbed. The user reviews everything before sending.
+  - The opener capability allows only that URL.
+- **Boot error screens** (key missing, startup error, failed migration) offer *Report an issue* and *Open log file*. A failed migration also offers *Open backups folder*.
 
 ### 6.11 Settings & first run
 
@@ -685,4 +691,4 @@ The Rust `db_*` commands get `cargo test` cases for: transaction rollback, backu
 2. Should rating scales other than 1–10 (e.g. 1–5) be offered in V1, or should 1–10 be fixed? (The design supports both.)
 3. Should the journal get a WYSIWYG Markdown editor later, or stay a plain textarea?
 4. Which chart library? Pick at Phase 13 based on bundle size.
-5. Where do feedback and issue reports go (GitHub Issues, email, form)? This is needed for DIST-4.
+5. ~~Where do feedback and issue reports go?~~ **Decided:** GitHub Issues on `arielco777/life-db` (DIST-4).

@@ -8,7 +8,7 @@ use serde::Serialize;
 use serde_json::{Map, Value as Json};
 use std::path::PathBuf;
 use std::sync::RwLock;
-use tauri::State;
+use tauri::{AppHandle, Manager, State};
 
 pub struct AppDb {
     /// Write-locked only while a restore swaps the file (EXP-5); every other command reads.
@@ -119,8 +119,12 @@ pub fn db_auto_backup(
     keep_count: usize,
 ) -> Result<Option<String>> {
     let key = state.key()?;
-    let created =
-        state.with_db(|db| backups::auto_backup(db, key, &state.data_dir, &today, keep_count))?;
+    let created = state
+        .with_db(|db| backups::auto_backup(db, key, &state.data_dir, &today, keep_count))
+        .inspect_err(|e| log::error!("automatic backup failed: {e}"))?;
+    if created.is_some() {
+        log::info!("automatic backup written");
+    }
     Ok(created.map(|p| p.display().to_string()))
 }
 
@@ -131,14 +135,22 @@ pub fn db_auto_backup(
 pub fn db_restore(state: State<'_, AppDb>, src_path: String, max_version: i64) -> Result<String> {
     let key = state.key()?;
     let mut slot = state.db.write().unwrap_or_else(|p| p.into_inner());
-    let safety = backups::restore(
+    match backups::restore(
         &mut slot,
         key,
         &state.data_dir,
         &PathBuf::from(src_path),
         max_version,
-    )?;
-    Ok(safety.display().to_string())
+    ) {
+        Ok(safety) => {
+            log::info!("restored a backup; previous data saved to the backups folder");
+            Ok(safety.display().to_string())
+        }
+        Err(e) => {
+            log::warn!("restore refused or failed: {e}");
+            Err(e)
+        }
+    }
 }
 
 #[tauri::command]
@@ -159,4 +171,17 @@ pub fn db_info(state: State<'_, AppDb>) -> Result<DbInfo> {
             last_auto_backup: backups::last_auto_backup(&state.data_dir)?,
         })
     })
+}
+
+/// Path of the current log file (DIST-6), for "Open log".
+#[tauri::command]
+pub fn app_log_file(app: AppHandle) -> Result<String> {
+    let dir = app
+        .path()
+        .app_log_dir()
+        .map_err(|e| Error::Invalid(e.to_string()))?;
+    Ok(dir
+        .join(format!("{}.log", crate::LOG_FILE_STEM))
+        .display()
+        .to_string())
 }

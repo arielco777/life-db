@@ -11,6 +11,17 @@ export interface DataInfo {
   lastAutoBackup: string | null;
 }
 
+/** About the installed app (DIST-4, DIST-6). */
+export interface AppInfo {
+  version: string;
+  /** The newest data (schema) version this app knows. */
+  schemaVersion: number;
+  /** The current log file. */
+  logFile: string;
+}
+
+export type LogLevel = 'error' | 'warn' | 'info';
+
 export interface FileDialogOptions {
   title: string;
   filters: { name: string; extensions: string[] }[];
@@ -48,4 +59,12 @@ export interface PlatformService {
   /** Starts the app again from the daily view, e.g. after a restore. */
   reloadApp(): void;
   dataInfo(): Promise<DataInfo>;
+  appInfo(): Promise<AppInfo>;
+  /** Opens a web page in the user's browser (only the project's issue tracker is allowed). */
+  openInBrowser(url: string): Promise<void>;
+  /**
+   * Writes one line to the local log file (DIST-6). Callers must keep user content out
+   * (SEC-3); `src/app/diagnostics.ts` does that for errors.
+   */
+  log(level: LogLevel, message: string): void;
 }

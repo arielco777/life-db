@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import type {
   DataInfo,
+  LogLevel,
   FileDialogOptions,
   PlatformService,
   SaveFileOptions,
@@ -29,6 +30,13 @@ export function fakePlatform(info: Partial<DataInfo> = {}) {
       async (_path: string): Promise<string> => '/home/me/.local/share/life-db/backups/pre-restore-1.lifedb',
     ),
     reloadApp: vi.fn((): void => {}),
+    appInfo: vi.fn(async () => ({
+      version: '1.0.0',
+      schemaVersion: 3,
+      logFile: '/home/me/.local/share/life-db/logs/life-db.log',
+    })),
+    openInBrowser: vi.fn(async (_url: string): Promise<void> => {}),
+    log: vi.fn((_level: LogLevel, _message: string): void => {}),
     dataInfo: vi.fn(async (): Promise<DataInfo> => ({
       path: '/home/me/.local/share/life-db/life.db',
       sizeBytes: 2_516_582,
