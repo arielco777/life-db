@@ -16,14 +16,26 @@ concurrency:
 
 jobs:
   version:
-    name: Tag matches the app version
+    name: Tag matches the app version and release notes
     runs-on: ubuntu-latest
+    outputs:
+      notes: ${{ steps.notes.outputs.notes }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
       - run: node scripts/version.mjs check "${{ github.ref_name }}"
+      # RELEASE_NOTES.md must describe this version and contain no placeholder text.
+      - run: node scripts/release-notes.mjs check "${{ github.ref_name }}"
+      - id: notes
+        run: |
+          delimiter="NOTES_$(openssl rand -hex 16)"
+          {
+            echo "notes<<$delimiter"
+            node scripts/release-notes.mjs body
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
 
   build:
     name: Build (${{ matrix.name }})
@@ -44,7 +56,7 @@ jobs:
             args: --target universal-apple-darwin
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Tauri system dependencies
         if: matrix.name == 'Linux'
@@ -52,7 +64,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -81,7 +93,7 @@ jobs:
           includeUpdaterJson: true
           args: ${{ matrix.args }}
           releaseBody: |
-            _Replace this with what's new. The app shows these notes before installing an update._
+            ${{ needs.version.outputs.notes }}
 
             ## Installing
 
@@ -92,3 +104,20 @@ jobs:
             - **Linux**: `.AppImage` (make it executable and run it), `.deb` or `.rpm`. No warning.
 
             Updates after this are checked and installed from inside the app, and each one is verified against Life DB's signature.
+
+  # tauri-action copies the whole release body (notes + "Installing") into latest.json.
+  # The app shows latest.json's notes before an update, so give it just what's new.
+  updater-notes:
+    name: Release notes in latest.json
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Replace the notes in latest.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NOTES: ${{ needs.version.outputs.notes }}
+        run: |
+          gh release download "${{ github.ref_name }}" --pattern latest.json --dir dist
+          jq --arg notes "$NOTES" '.notes = $notes' dist/latest.json > latest.json
+          gh release upload "${{ github.ref_name }}" latest.json --clobber
