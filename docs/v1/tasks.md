@@ -185,7 +185,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 - [x] 10.5 About screen: versions, privacy statement, feedback/issue link (design §11 Q5). [DIST-4, DIST-5]
 - [x] 10.6 `tauri-plugin-log` with rotation, error boundary and `window.onerror` forwarding, "Open log" in About. Check that logs contain no user content. [DIST-6, SEC-3]
 - [ ] 10.7 Clean-machine install test on each OS (no dev tools installed).
-- [ ] 10.8 Tag and publish **V1.0**.
+- [x] 10.8 Tag and publish **V1.0**. *(Published 2026-11-12 as v1.0.0. Release notes now come from `RELEASE_NOTES.md`, so the update dialog shows them.)*
 
 **✅ Done when:** a new user can download, install, use and update the app on all three OSes without data loss. Unsigned installers show the OS's one-time warning; the release notes explain how to get past it.
 
