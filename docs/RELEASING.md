@@ -1,8 +1,9 @@
 # Releasing Life DB
 
-Releases are built by GitHub Actions (`.github/workflows/release.yml`) when a version tag
-is pushed. The workflow creates a **draft** release. Nothing reaches users until you
-publish it.
+Releases are automatic. When `main` gets an app version that hasn't been released yet,
+GitHub Actions (`.github/workflows/release.yml`) builds every platform and **publishes**
+the release. Installed apps then find the update. Pushes to `main` that keep an already
+released version do nothing, so merging `dev` without a version bump is safe.
 
 ## One-time setup
 
@@ -39,30 +40,33 @@ publish it.
    - `npm run version:check` prints the version and fails if the files disagree.
    - `node scripts/release-notes.mjs check v1.0.1` fails if the notes are for another
      version, empty, or still contain placeholder text (`TODO`, `TBD`, "replace this").
-2. Merge `dev` into `main` (PR).
-3. Tag `main` and push the tag:
+2. Merge `dev` into `main` (PR). That's the release. The workflow:
+   - reads the version and stops if `v1.0.1` is already released;
+   - checks `RELEASE_NOTES.md` is for 1.0.1, failing the run (and releasing nothing) if not;
+   - builds Windows (`.msi`, `-setup.exe`), macOS (universal `.dmg`) and Linux (`.AppImage`,
+     `.deb`, `.rpm`), all signed for the updater, into a draft;
+   - once all three built, writes the notes into `latest.json` and publishes. GitHub creates
+     the `v1.0.1` tag on the merged commit at that moment.
 
-   ```bash
-   git switch main && git pull
-   git tag v1.0.1 && git push origin v1.0.1
-   ```
-
-   The workflow checks the tag against the app version and the release notes, then builds
-   Windows (`.msi`, `-setup.exe`), macOS (universal `.dmg`) and Linux (`.AppImage`, `.deb`,
-   `.rpm`), all signed for the updater. Last, it writes the notes into `latest.json`.
-4. Open the draft release on GitHub and check it: the notes from `RELEASE_NOTES.md`, then the
-   "Installing" section, the installers, their `.sig` files and `latest.json`.
-5. **Publish.** Installed apps find it at their next daily check, or straight away with
-   *Settings → About → Check now*.
+   If any build fails, nothing is published. Fix the cause on `dev`, merge again, and the
+   run starts over: it deletes the leftover draft first. To retry without a new commit, use
+   *Actions → Release → Run workflow* on `main`.
+3. Installed apps find the update at their next daily check, or straight away with
+   *Settings → About → Check now*. Check the release page if you like: the notes from
+   `RELEASE_NOTES.md`, then the "Installing" section, the installers, their `.sig` files
+   and `latest.json`.
 
 ## Notes
 
 - **Unsigned installers** (DIST-1 note): Windows SmartScreen and macOS Gatekeeper ask once.
   The release notes explain what to click. Code signing can be added later through
   `tauri-action` secrets, with no change to the app.
-- **Editing notes after the build** changes only the GitHub page. The app reads the notes
+- **Editing notes after the release** changes only the GitHub page. The app reads the notes
   in `latest.json`, which the workflow writes from `RELEASE_NOTES.md`. To change those too,
-  edit `notes` in `latest.json` and upload it again to the release before publishing.
+  edit `notes` in `latest.json` and upload it again to the release.
+- **Pulling a bad release**: mark it as a pre-release (or delete it) on GitHub, so
+  `latest.json` points back at the previous one, then release a fixed version. Never reuse
+  a version number: apps that installed it won't update to the same number again.
 - The update check reads `releases/latest/download/latest.json`. "Latest" means the
   newest published release that isn't a draft or pre-release.
 - **Database changes**: a release with new migrations upgrades the data on first start,

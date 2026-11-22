@@ -1,34 +1,62 @@
 name: Release
 
-# Builds installers for Windows, macOS and Linux and puts them in a DRAFT GitHub release,
-# with the signed updater files (latest.json) the app's update check reads (DIST-1, DIST-2).
-# Start it by pushing a version tag on main: see docs/RELEASING.md.
+# Releases the app whenever main gets a version that hasn't been released yet (DIST-1, DIST-2).
+# The version and RELEASE_NOTES.md are set in a PR to dev (docs/RELEASING.md); merging dev
+# into main then builds Windows, macOS and Linux installers plus the signed updater files
+# (latest.json), and publishes the release. GitHub creates the vX.Y.Z tag on publish.
+# A push to main whose version is already released does nothing.
 on:
   push:
-    tags: ['v*.*.*']
+    branches: [main]
+  # Retry by hand, e.g. after a failed build: Actions → Release → Run workflow (on main).
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+# One release run at a time; a second push waits instead of racing the first.
 concurrency:
-  group: release-${{ github.ref }}
+  group: release
   cancel-in-progress: false
 
 jobs:
   version:
-    name: Tag matches the app version and release notes
+    name: New version?
     runs-on: ubuntu-latest
     outputs:
+      release: ${{ steps.check.outputs.release }}
+      tag: ${{ steps.check.outputs.tag }}
       notes: ${{ steps.notes.outputs.notes }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-      - run: node scripts/version.mjs check "${{ github.ref_name }}"
+      - id: check
+        name: Compare the app version with published releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          version=$(node scripts/version.mjs)   # fails if the four files disagree
+          tag="v$version"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if draft=$(gh release view "$tag" --json isDraft --jq .isDraft 2>/dev/null); then
+            if [ "$draft" = "false" ]; then
+              echo "release=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::$tag is already released. Bump the version in a PR to dev to release again."
+              exit 0
+            fi
+            # A draft left by an earlier failed run: start over so no old files mix in.
+            gh release delete "$tag" --yes
+          fi
+          echo "release=true" >> "$GITHUB_OUTPUT"
+          echo "::notice::Releasing $tag"
       # RELEASE_NOTES.md must describe this version and contain no placeholder text.
-      - run: node scripts/release-notes.mjs check "${{ github.ref_name }}"
+      - if: steps.check.outputs.release == 'true'
+        run: node scripts/release-notes.mjs check "${{ steps.check.outputs.tag }}"
       - id: notes
+        if: steps.check.outputs.release == 'true'
         run: |
           delimiter="NOTES_$(openssl rand -hex 16)"
           {
@@ -40,6 +68,7 @@ jobs:
   build:
     name: Build (${{ matrix.name }})
     needs: version
+    if: needs.version.outputs.release == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -86,8 +115,10 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: Life DB ${{ github.ref_name }}
+          # Built as a draft; the publish job releases it once every platform has built.
+          tagName: ${{ needs.version.outputs.tag }}
+          releaseName: Life DB ${{ needs.version.outputs.tag }}
+          releaseCommitish: ${{ github.sha }}
           releaseDraft: true
           prerelease: false
           includeUpdaterJson: true
@@ -106,18 +137,24 @@ jobs:
             Updates after this are checked and installed from inside the app, and each one is verified against Life DB's signature.
 
   # tauri-action copies the whole release body (notes + "Installing") into latest.json.
-  # The app shows latest.json's notes before an update, so give it just what's new.
-  updater-notes:
-    name: Release notes in latest.json
+  # The app shows latest.json's notes before an update, so give it just what's new. Then
+  # publish: only now does the update reach installed apps.
+  publish:
+    name: Publish
     needs: [version, build]
+    if: needs.version.outputs.release == 'true'
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ needs.version.outputs.tag }}
     steps:
-      - name: Replace the notes in latest.json
+      - name: Put just the notes in latest.json
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
           NOTES: ${{ needs.version.outputs.notes }}
         run: |
-          gh release download "${{ github.ref_name }}" --pattern latest.json --dir dist
+          gh release download "$TAG" --pattern latest.json --dir dist
           jq --arg notes "$NOTES" '.notes = $notes' dist/latest.json > latest.json
-          gh release upload "${{ github.ref_name }}" latest.json --clobber
+          gh release upload "$TAG" latest.json --clobber
+      - name: Publish the release
+        run: gh release edit "$TAG" --draft=false --latest
