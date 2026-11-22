@@ -122,13 +122,13 @@ Repositories build a list of statements and pass the whole list to `transaction(
     | `entity_tags` | `naturalId('entity_tag', tagId, entityType, entityId)` |
     | default `categories` | fixed constants (one per seeded category) |
 
-    Two devices that log Coffee for Aug 14 produce the **same** row ID, so V1.5 sync resolves it as one record (last `updated_at` wins) instead of two that clash. Tags get random IDs because they can be renamed. V1.5 sync merges tags that share a normalized name, reusing TAG-4 merge.
+    Two devices that log Coffee for Aug 14 produce the **same** row ID, so cloud sync (V5) resolves it as one record (last `updated_at` wins) instead of two that clash. Tags get random IDs because they can be renamed. Cloud sync merges tags that share a normalized name, reusing TAG-4 merge.
 - **Timestamps:** `created_at`, `updated_at`, `deleted_at` are `TEXT` ISO-8601 UTC (`2026-08-14T09:30:00.000Z`). The repository sets `updated_at` on every write.
 - **Calendar dates:** `TEXT 'YYYY-MM-DD'`, local, never converted (NFR-11). Lexical order is the same as chronological order, so range queries use plain string comparison.
 - **Soft delete:** every syncable table has `deleted_at`. All reads filter `deleted_at IS NULL`. Uniqueness constraints are partial indexes `WHERE deleted_at IS NULL`.
 - **Enums:** `TEXT` with `CHECK` constraints.
 - **Booleans:** `INTEGER 0/1`.
-- **Link tables** (`goal_habits`, `entity_tags`, `goal_months`) also get their own (natural) `id` and soft delete, so V1.5 can sync them as rows.
+- **Link tables** (`goal_habits`, `entity_tags`, `goal_months`) also get their own (natural) `id` and soft delete, so cloud sync (V5) can sync them as rows.
 - **Re-creating a natural-ID row** (log → clear → log again, unlink → relink) **revives** the soft-deleted row: `INSERT … ON CONFLICT(id) DO UPDATE SET …, deleted_at = NULL, updated_at = ?`. Because a natural-ID row is never duplicated, its uniqueness index is a plain `UNIQUE` (not partial).
 
 ### 4.2 ER sketch
@@ -686,7 +686,7 @@ The Rust `db_*` commands get `cargo test` cases for: transaction rollback, backu
 | --- | --- |
 | V1.5 export/import | Versioned JSON shape planned in §6.9. JSON is the **portable, device-independent format**: each device's DB is encrypted with its own key, so data moves between devices (desktop ↔ mobile) via JSON export → import, which rebuilds a local DB. The JSON shape equals the domain types, so export/import are repository calls. JSON exports are unencrypted, so show a warning and consider an optional password. |
 | Budgeting module (V3) | Same stack (React + TS), so it can become a feature folder (`src/features/money/`) with its own migrations and repositories on the same `SqlDriver` |
-| V1.5 sync | Sync sends per-record changes using the same JSON shapes, not whole export files. Natural IDs (FC-5) mean records two devices create for the same thing merge instead of duplicating. UUID v7 PKs, `updated_at` on every write, soft deletes on all tables including link tables, and a repository seam where change tracking can be inserted. A later migration can add `sync_state` / `dirty` columns or a change log. |
+| V5 cloud sync (last) | Sync sends per-record changes using the same JSON shapes, not whole export files. Natural IDs (FC-5) mean records two devices create for the same thing merge instead of duplicating. UUID v7 PKs, `updated_at` on every write, soft deletes on all tables including link tables, and a repository seam where change tracking can be inserted. A later migration can add `sync_state` / `dirty` columns or a change log. |
 | Postgres mirror | Plain types (TEXT, REAL, INTEGER), no SQLite-only data types, and enums as CHECK constraints map cleanly to Postgres |
 | Mobile | Tauri 2 mobile targets. `PlatformService` isolates dialogs and the file system. Responsive layout down to 360 px. Mobile uses the **same SQLite + SQLCipher schema, migrations and repositories** as desktop (Tauri 2 runs the same Rust code), so device DBs never differ in format. rusqlite bundled SQLCipher builds for iOS and Android. Key storage goes behind a `KeyStore` trait (§3.3). |
 | V1.5 app lock | Wraps the existing device key. No DB re-encryption needed (§3.3). |
