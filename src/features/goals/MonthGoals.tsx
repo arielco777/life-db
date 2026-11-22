@@ -13,17 +13,10 @@ import { MONTH_NAMES } from '@/features/month/labels';
 export function MonthGoals({ ym }: { ym: ISOMonth }) {
   const ids = useId();
   const { data: goals = [], isPending } = useMonthGoals(ym);
-  const { data: all = [] } = useGoals();
   const { create, setMonths } = useGoalActions();
   const [title, setTitle] = useState('');
-  const [pick, setPick] = useState('');
+  const [picking, setPicking] = useState(false);
   const monthName = MONTH_NAMES[Number(ym.slice(5)) - 1]!;
-  const addable = all.filter((g) => !isFinished(g.status) && !g.months.includes(ym));
-
-  const addExisting = (id: string) => {
-    const g = all.find((x) => x.id === id);
-    if (g) setMonths.mutate({ goalId: g.id, months: [...g.months, ym] }, { onSuccess: () => setPick('') });
-  };
 
   return (
     <section className="day-section stack-sm" aria-labelledby={`${ids}-heading`}>
@@ -75,24 +68,54 @@ export function MonthGoals({ ym }: { ym: ISOMonth }) {
             Add monthly goal
           </button>
         </form>
-        {addable.length > 0 && (
-          <select
-            aria-label={`Add an existing goal to ${monthName}`}
-            value={pick}
-            onChange={(e) => {
-              setPick(e.target.value);
-              if (e.target.value) addExisting(e.target.value);
-            }}
-          >
-            <option value="">Add an existing goal…</option>
-            {addable.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.title}
-              </option>
-            ))}
-          </select>
+        {picking ? (
+          <ExistingGoalPicker ym={ym} monthName={monthName} onDone={() => setPicking(false)} />
+        ) : (
+          <button type="button" className="secondary" onClick={() => setPicking(true)}>
+            Add an existing goal…
+          </button>
         )}
       </div>
     </section>
+  );
+}
+
+/**
+ * Unfinished goals not yet in the month. Loaded only when opened: listing every goal is
+ * needless work on each month visit (NFR-1).
+ */
+function ExistingGoalPicker({ ym, monthName, onDone }: { ym: ISOMonth; monthName: string; onDone(): void }) {
+  const { data: all, isPending } = useGoals();
+  const { setMonths } = useGoalActions();
+  const addable = (all ?? []).filter((g) => !isFinished(g.status) && !g.months.includes(ym));
+  if (isPending) return <span className="small muted">Loading goals…</span>;
+  if (addable.length === 0)
+    return (
+      <span className="small muted">
+        Every unfinished goal is already in {monthName}.{' '}
+        <button type="button" className="ghost small-button" onClick={onDone}>
+          OK
+        </button>
+      </span>
+    );
+  return (
+    <select
+      aria-label={`Add an existing goal to ${monthName}`}
+      value=""
+      autoFocus
+      onBlur={onDone}
+      onKeyDown={(e) => e.key === 'Escape' && onDone()}
+      onChange={(e) => {
+        const g = addable.find((x) => x.id === e.target.value);
+        if (g) setMonths.mutate({ goalId: g.id, months: [...g.months, ym] }, { onSuccess: onDone });
+      }}
+    >
+      <option value="">Choose a goal…</option>
+      {addable.map((g) => (
+        <option key={g.id} value={g.id}>
+          {g.title}
+        </option>
+      ))}
+    </select>
   );
 }

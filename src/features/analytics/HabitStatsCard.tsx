@@ -73,7 +73,8 @@ export function HabitStatsCard({
     <article className="card stack-sm habit-stats" aria-labelledby={`stats-${habit.id}`}>
       <h3 id={`stats-${habit.id}`} className="habit-stats-title">
         {linkName ? <Link to={`/habits/${habit.id}`}>{habit.name}</Link> : habit.name}
-        {habit.archivedAt && <span className="badge">Archived</span>}
+        {/* On the habit page the heading already says so. */}
+        {linkName && habit.archivedAt && <span className="badge">Archived</span>}
       </h3>
       <table className="stats-table" aria-label={`${habit.name} stats`}>
         <thead>

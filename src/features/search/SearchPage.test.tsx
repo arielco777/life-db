@@ -8,7 +8,6 @@ import type { setup } from '../../../tests/helpers';
 import { App } from '@/app/App';
 import { DEFAULT_CATEGORY_IDS } from '@/domain/ids';
 
-vi.mock('@/app/features', () => ({ FEATURE_V1_1: true, SHOW_DEBUG: false }));
 vi.mock('@/app/startup', () => ({ afterInteractive: () => {}, markInteractive: () => {} }));
 
 type Repos = Awaited<ReturnType<typeof setup>>['repos'];

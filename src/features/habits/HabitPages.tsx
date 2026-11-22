@@ -8,7 +8,6 @@ import { useHabit, useHabitActions, useHabitHasEntries } from './hooks';
 import type { HabitPatch, NewHabit } from '@/domain/repositories';
 import { addDays } from '@/domain/services/dates';
 import type { Habit } from '@/domain/types';
-import { FEATURE_V1_1 } from '@/app/features';
 import { HabitStatsSection } from '@/features/analytics/HabitStatsSection';
 import { useCategories } from '@/features/categories/hooks';
 import { useHabitGoals } from '@/features/goals/hooks';
@@ -190,7 +189,7 @@ function HabitDetail({ habit }: { habit: Habit }) {
         <dd>{habit.priority[0]!.toUpperCase() + habit.priority.slice(1)}</dd>
         <dt>Runs</dt>
         <dd>{describeRun(habit, today, date_format)}</dd>
-        {FEATURE_V1_1 && <LinkedGoals habitId={habit.id} />}
+        <LinkedGoals habitId={habit.id} />
         {tagNames.length > 0 && (
           <>
             <dt>Tags</dt>
@@ -219,7 +218,7 @@ function HabitDetail({ habit }: { habit: Habit }) {
         </div>
       )}
 
-      {FEATURE_V1_1 && <HabitStatsSection habit={habit} />}
+      <HabitStatsSection habit={habit} />
 
       <div className="row danger-zone">
         <button

@@ -246,8 +246,8 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 15 — V1.1 release
 
-- [ ] 15.1 Remove the V1.1 feature flag. Run the performance pass again for the new views. [NFR-1]
-- [ ] 15.2 Upgrade test: a V1.0 install with real-looking data updates to V1.1 with no data change. [DIST-3]
+- [x] 15.1 Remove the V1.1 feature flag. Run the performance pass again for the new views. [NFR-1] *(`tests/screens.perf.test.tsx` now also times goals, events, analytics and search. The seed fixture gained goals and events.)*
+- [x] 15.2 Upgrade test: a V1.0 install with real-looking data updates to V1.1 with no data change. [DIST-3] *(`tests/upgrade.test.ts`. The real 1.0.0 → 1.1.0 update through the updater is checked by hand after 15.3.)*
 - [ ] 15.3 Tag and publish **V1.1** through the updater.
 
 **✅ Done when:** every V1 requirement ID has been checked off.

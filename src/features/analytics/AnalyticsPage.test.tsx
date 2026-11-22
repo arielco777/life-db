@@ -8,8 +8,6 @@ import type { setup } from '../../../tests/helpers';
 import { DEFAULT_CATEGORY_IDS } from '@/domain/ids';
 import { HabitRoutes } from '@/features/habits/HabitPages';
 
-vi.mock('@/app/features', () => ({ FEATURE_V1_1: true, SHOW_DEBUG: false }));
-
 type Repos = Awaited<ReturnType<typeof setup>>['repos'];
 
 function Where() {

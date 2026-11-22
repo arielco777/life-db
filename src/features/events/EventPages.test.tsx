@@ -10,9 +10,6 @@ import { DayRoute } from '@/features/day/DayPage';
 import { MonthRoute } from '@/features/month/MonthPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 
-// The daily and monthly views show events only in V1.1 builds.
-vi.mock('@/app/features', () => ({ FEATURE_V1_1: true, SHOW_DEBUG: false }));
-
 type Repos = Awaited<ReturnType<typeof setup>>['repos'];
 
 function Where() {
