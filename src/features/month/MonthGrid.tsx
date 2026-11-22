@@ -30,6 +30,8 @@ interface GridProps {
   habits: Habit[];
   valuesByHabit: Map<string, ValuesByDate>;
   today: ISODate;
+  /** Names of the life events on each day, marked next to the day number (MON-6). */
+  eventDays?: ReadonlyMap<ISODate, string[]>;
 }
 
 type Pos = { row: number; col: number };
@@ -55,7 +57,7 @@ const EMPTY: ValuesByDate = new Map();
  * on click, Enter or a typed digit. Cells are memoised on primitive props, so editing one
  * re-renders only that cell and the summary row (NFR-1).
  */
-export function MonthGrid({ ym, habits, valuesByHabit, today }: GridProps) {
+export function MonthGrid({ ym, habits, valuesByHabit, today, eventDays }: GridProps) {
   const { week_start } = useSettings();
   const { data: categories = [] } = useCategories();
   const colors = useMemo(() => new Map(categories.map((c) => [c.id, c.color])), [categories]);
@@ -182,19 +184,24 @@ export function MonthGrid({ ym, habits, valuesByHabit, today }: GridProps) {
               ]
                 .filter(Boolean)
                 .join(' ');
+              const events = eventDays?.get(d);
               return (
                 <tr key={d} className={cls || undefined}>
                   <th scope="row" className="day-cell">
                     <Link
                       to={`/day/${d}`}
-                      aria-label={dayLong(d)}
+                      aria-label={events ? `${dayLong(d)}, ${events.join(', ')}` : dayLong(d)}
                       aria-current={d === today ? 'date' : undefined}
                       tabIndex={-1}
                     >
                       <span className="day-num">{Number(d.slice(8))}</span>
                       <span className="day-wd">{weekdayShort(d)}</span>
+                      {events && (
+                        <span className="event-marker" title={events.join(', ')} aria-hidden>
+                          ✦
+                        </span>
+                      )}
                     </Link>
-                    {/* V1.1: life-event marker (MON-6). */}
                   </th>
                   {habits.map((h, col) => {
                     const values = valuesByHabit.get(h.id) ?? EMPTY;

@@ -11,7 +11,7 @@ const journalLabel = (j: JournalEntry) =>
     ?.slice(0, 80) ||
   'Untitled';
 
-/** /settings/tags/:id — every record carrying the tag (TAG-5). Events join in V1.1 (Phase 12). */
+/** /settings/tags/:id — every record carrying the tag (TAG-5). */
 export function TagView() {
   const { id = '' } = useParams();
   const { data: tags, isPending: tagsPending } = useTags();
@@ -29,7 +29,12 @@ export function TagView() {
     );
   }
 
-  const empty = data && data.habits.length === 0 && data.goals.length === 0 && data.journal.length === 0;
+  const empty =
+    data &&
+    data.habits.length === 0 &&
+    data.goals.length === 0 &&
+    data.events.length === 0 &&
+    data.journal.length === 0;
   return (
     <section className="stack">
       <Link to=".." relative="path" className="small">
@@ -67,6 +72,22 @@ export function TagView() {
                 {g.status !== 'active' && (
                   <span className="muted small">{STATUS_LABELS[g.status].toLowerCase()}</span>
                 )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {!!data?.events.length && (
+        <div className="stack-sm">
+          <h3>Events</h3>
+          <ul className="plain list" aria-label="Events">
+            {data.events.map((e) => (
+              <li key={e.id} className="list-row">
+                <span className="muted small mono">{e.startDate}</span>
+                <Link to={`/events/${e.id}`} className="grow">
+                  {e.name}
+                </Link>
               </li>
             ))}
           </ul>

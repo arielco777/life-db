@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRepositories } from '@/app/RepositoryProvider';
 import { normalizeTagName } from '@/domain/schemas';
-import type { Goal, Habit, JournalEntry, Tag, UUID } from '@/domain/types';
+import type { Goal, Habit, JournalEntry, LifeEvent, Tag, UUID } from '@/domain/types';
 import { useToast } from '@/ui/Toast';
 
 export const tagKeys = {
@@ -25,10 +25,11 @@ export function useTagUsage() {
 export interface TaggedRecords {
   habits: Habit[];
   goals: Goal[];
+  events: LifeEvent[];
   journal: JournalEntry[];
 }
 
-/** Records carrying a tag (TAG-5). Events join in V1.1 (Phase 12). */
+/** Records carrying a tag (TAG-5). */
 export function useTaggedRecords(tagId: UUID) {
   const repos = useRepositories();
   return useQuery({
@@ -36,14 +37,18 @@ export function useTaggedRecords(tagId: UUID) {
     queryFn: async (): Promise<TaggedRecords> => {
       const refs = await repos.tags.taggedWith(tagId);
       const ids = (type: string) => refs.filter((r) => r.entityType === type).map((r) => r.entityId);
-      const [habits, goals, journal] = await Promise.all([
+      const [habits, goals, events, journal] = await Promise.all([
         Promise.all(ids('habit').map((id) => repos.habits.get(id))),
         Promise.all(ids('goal').map((id) => repos.goals.get(id))),
+        Promise.all(ids('life_event').map((id) => repos.events.get(id))),
         Promise.all(ids('journal_entry').map((id) => repos.journal.get(id))),
       ]);
       return {
         habits: habits.filter((h): h is Habit => !!h).sort((a, b) => a.name.localeCompare(b.name)),
         goals: goals.filter((g): g is Goal => !!g).sort((a, b) => a.title.localeCompare(b.title)),
+        events: events
+          .filter((e): e is LifeEvent => !!e)
+          .sort((a, b) => (a.startDate < b.startDate ? 1 : a.startDate > b.startDate ? -1 : 0)),
         journal: journal
           .filter((j): j is JournalEntry => !!j)
           .sort((a, b) => (a.entryDate < b.entryDate ? 1 : a.entryDate > b.entryDate ? -1 : 0)),

@@ -98,6 +98,20 @@ export const newMilestoneSchema = z.object({
   targetDate: isoDate.optional(),
 });
 
+export const newLifeEventSchema = z
+  .object({
+    name: z.string().trim().min(1, 'Name is required').max(200),
+    description: optText,
+    startDate: isoDate,
+    endDate: isoDate.optional(),
+    categoryId: uuid.optional(),
+    tagIds: z.array(uuid).optional(),
+  })
+  .refine((e) => !e.endDate || e.endDate >= e.startDate, {
+    message: 'End date must not be before start date',
+    path: ['endDate'],
+  });
+
 /** Parses with a zod schema and converts failures into a DomainError('validation'). */
 export function parseOrThrow<S extends z.ZodType>(schema: S, input: unknown): z.output<S> {
   const r = schema.safeParse(input);

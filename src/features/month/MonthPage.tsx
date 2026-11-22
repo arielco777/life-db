@@ -1,11 +1,14 @@
 import { FEATURE_V1_1 } from '@/app/features';
+import { useMemo } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { MONTH_NAMES, monthTitle } from './labels';
 import { MonthGrid } from './MonthGrid';
 import { isISOMonth, useMonth } from './useMonth';
-import { addMonths, monthOf } from '@/domain/services/dates';
+import { addMonths, monthOf, monthRange } from '@/domain/services/dates';
 import type { ISOMonth } from '@/domain/types';
 import { useCategories } from '@/features/categories/hooks';
+import { eventsByDay } from '@/features/events/DayEvents';
+import { useEventsOverlapping } from '@/features/events/hooks';
 import { MonthGoals } from '@/features/goals/MonthGoals';
 import { useToday } from '@/features/settings/hooks';
 
@@ -22,6 +25,8 @@ function MonthPage({ ym }: { ym: ISOMonth }) {
   const today = useToday();
   const thisMonth = monthOf(today);
   const month = useMonth(ym);
+  const { data: events } = useEventsOverlapping(monthRange(ym), FEATURE_V1_1);
+  const eventDays = useMemo(() => eventsByDay(events ?? [], monthRange(ym)), [events, ym]);
   // Wait for categories too, so cells don't flash the fallback tint before their colour arrives.
   const categoriesPending = useCategories().isPending;
   const year = Number(ym.slice(0, 4));
@@ -95,7 +100,13 @@ function MonthPage({ ym }: { ym: ISOMonth }) {
           </Link>
         </div>
       ) : (
-        <MonthGrid ym={ym} habits={month.habits} valuesByHabit={month.valuesByHabit} today={today} />
+        <MonthGrid
+          ym={ym}
+          habits={month.habits}
+          valuesByHabit={month.valuesByHabit}
+          today={today}
+          eventDays={eventDays}
+        />
       )}
 
       {FEATURE_V1_1 && <MonthGoals ym={ym} />}
