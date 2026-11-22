@@ -1,3 +1,4 @@
+import { FEATURE_V1_1 } from '@/app/features';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { MONTH_NAMES, monthTitle } from './labels';
 import { MonthGrid } from './MonthGrid';
@@ -5,6 +6,7 @@ import { isISOMonth, useMonth } from './useMonth';
 import { addMonths, monthOf } from '@/domain/services/dates';
 import type { ISOMonth } from '@/domain/types';
 import { useCategories } from '@/features/categories/hooks';
+import { MonthGoals } from '@/features/goals/MonthGoals';
 import { useToday } from '@/features/settings/hooks';
 
 /** /month and /month/:ym (tasks 6.1). No or invalid month → the month of the logical today. */
@@ -96,7 +98,7 @@ function MonthPage({ ym }: { ym: ISOMonth }) {
         <MonthGrid ym={ym} habits={month.habits} valuesByHabit={month.valuesByHabit} today={today} />
       )}
 
-      {/* V1.1: the month's goals (MON-7) render here. */}
+      {FEATURE_V1_1 && <MonthGoals ym={ym} />}
     </section>
   );
 }

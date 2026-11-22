@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRepositories } from '@/app/RepositoryProvider';
 import type { GoalPatch, MilestonePatch, NewGoal, NewMilestone } from '@/domain/repositories';
-import type { Goal, UUID } from '@/domain/types';
+import type { Goal, ISOMonth, UUID } from '@/domain/types';
 import { useToday } from '@/features/settings/hooks';
 import { tagKeys } from '@/features/tags/hooks';
 import { useToast } from '@/ui/Toast';
@@ -10,6 +10,8 @@ export const goalKeys = {
   all: ['goals'] as const,
   list: ['goals', 'list'] as const,
   detail: (id: UUID) => ['goals', 'detail', id] as const,
+  forMonth: (month: ISOMonth) => ['goals', 'forMonth', month] as const,
+  forHabit: (habitId: UUID) => ['goals', 'forHabit', habitId] as const,
 };
 
 /** Every goal, in user order, with milestones and links. Filter in the caller. */
@@ -21,6 +23,18 @@ export function useGoals() {
 export function useGoal(id: UUID) {
   const { goals } = useRepositories();
   return useQuery({ queryKey: goalKeys.detail(id), queryFn: () => goals.get(id) });
+}
+
+/** A month's goals (GOAL-6, MON-7). */
+export function useMonthGoals(month: ISOMonth) {
+  const { goals } = useRepositories();
+  return useQuery({ queryKey: goalKeys.forMonth(month), queryFn: () => goals.forMonth(month) });
+}
+
+/** Goals a habit is linked to (GOAL-5). */
+export function useHabitGoals(habitId: UUID) {
+  const { goals } = useRepositories();
+  return useQuery({ queryKey: goalKeys.forHabit(habitId), queryFn: () => goals.forHabit(habitId) });
 }
 
 /** Goal and milestone mutations. Each refreshes every goal query; errors show a toast. */
@@ -53,6 +67,15 @@ export function useGoalActions() {
     ...opts,
   });
   const removeMilestone = useMutation({ mutationFn: (id: UUID) => goals.removeMilestone(id), ...opts });
+  const setHabits = useMutation({
+    mutationFn: ({ goalId, habitIds }: { goalId: UUID; habitIds: UUID[] }) =>
+      goals.setHabits(goalId, habitIds),
+    ...opts,
+  });
+  const setMonths = useMutation({
+    mutationFn: ({ goalId, months }: { goalId: UUID; months: ISOMonth[] }) => goals.setMonths(goalId, months),
+    ...opts,
+  });
 
   /** Optimistically patches one goal in the detail and list caches, rolling back on error. */
   const patchCached = async (goalId: UUID, fn: (g: Goal) => Goal) => {
@@ -113,5 +136,7 @@ export function useGoalActions() {
     toggleMilestone,
     reorderMilestones,
     removeMilestone,
+    setHabits,
+    setMonths,
   };
 }
