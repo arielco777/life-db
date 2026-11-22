@@ -10,8 +10,42 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Docs-only changes skip the test jobs. They are skipped rather than left out, because
+  # dev's branch protection requires both checks and GitHub counts a skipped job as passed.
+  changes:
+    name: Code changed?
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - id: diff
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          # No usable base (new branch, force push): run everything.
+          if ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "code=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          # Docs = Markdown files and docs/. RELEASE_NOTES.md is code: a test and the
+          # release workflow parse it.
+          files=$(git diff --name-only "$(git merge-base "$BASE" HEAD)" HEAD)
+          code=$(printf '%s\n' "$files" | grep -vE '^docs/|\.md$' || true)
+          if printf '%s\n' "$files" | grep -qx 'RELEASE_NOTES.md'; then
+            code="$code RELEASE_NOTES.md"
+          fi
+          if [ -n "$code" ]; then
+            echo "Code changed:"; echo "$code"; echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Docs only: skipping tests."; echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
+
   frontend:
     name: Frontend (typecheck, lint, test, build)
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -30,6 +64,8 @@ jobs:
 
   rust:
     name: Rust (fmt, clippy, test)
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
