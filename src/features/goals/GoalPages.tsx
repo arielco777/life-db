@@ -4,6 +4,8 @@ import { STATUS_LABELS, STATUS_ORDER } from './describe';
 import { draftFrom, GoalForm } from './GoalForm';
 import { GoalsPage } from './GoalsPage';
 import { useGoal, useGoalActions } from './hooks';
+import { GoalMonths } from './GoalMonths';
+import { LinkedHabits } from './LinkedHabits';
 import { Milestones } from './Milestones';
 import { ProgressBar } from './ProgressBar';
 import type { GoalPatch, NewGoal } from '@/domain/repositories';
@@ -189,6 +191,8 @@ function GoalDetail({ goal }: { goal: Goal }) {
       {goal.description && <p className="description">{goal.description}</p>}
 
       <Milestones goal={goal} />
+      <LinkedHabits goal={goal} />
+      <GoalMonths goal={goal} />
 
       <div className="row danger-zone">
         <button type="button" className="secondary" onClick={() => setConfirmDelete(true)}>

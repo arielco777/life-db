@@ -3,6 +3,7 @@ import { entryKeys } from './entryHooks';
 import { useRepositories } from '@/app/RepositoryProvider';
 import type { DateRange, HabitPatch, NewHabit } from '@/domain/repositories';
 import type { Habit, UUID } from '@/domain/types';
+import { goalKeys } from '@/features/goals/hooks';
 import { tagKeys } from '@/features/tags/hooks';
 import { useToast } from '@/ui/Toast';
 
@@ -49,6 +50,7 @@ export function useHabitActions() {
     Promise.all([
       qc.invalidateQueries({ queryKey: habitKeys.all }),
       qc.invalidateQueries({ queryKey: tagKeys.all }), // usage counts change with habit tags
+      qc.invalidateQueries({ queryKey: goalKeys.all }), // goals list their linked habits
     ]);
   const opts = { onSettled: invalidate, onError: (e: unknown) => toast.error(e) };
 

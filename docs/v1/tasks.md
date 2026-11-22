@@ -200,10 +200,10 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 - [x] 11.3 Goals list grouped by status, with progress bars and a category filter. [GOAL-1, GOAL-2, CAT-5]
 - [x] 11.4 Goal form and detail page: fields, status (sets `completed_at`), progress mode controls. [GOAL-1, GOAL-2, GOAL-4]
 - [x] 11.5 Milestones: inline add, toggle, edit, drag reorder, delete. [GOAL-3, GOAL-7]
-- [ ] 11.6 Link/unlink habits, with linked habit month stats on the detail page. [GOAL-5]
-- [ ] 11.7 Month assignment multi-picker, the month goals list below the monthly grid, and "Add monthly goal" from the monthly view. [GOAL-6, MON-7]
-- [ ] 11.8 Daily view goals section (goals with linked habits and their status for the day). [DAY-1, GOAL-5]
-- [ ] 11.9 Tags on goals. Goals appear in the tag view. [TAG-1, TAG-5]
+- [x] 11.6 Link/unlink habits, with linked habit month stats on the detail page. [GOAL-5]
+- [x] 11.7 Month assignment multi-picker, the month goals list below the monthly grid, and "Add monthly goal" from the monthly view. [GOAL-6, MON-7]
+- [x] 11.8 Daily view goals section (goals with linked habits and their status for the day). [DAY-1, GOAL-5]
+- [x] 11.9 Tags on goals. Goals appear in the tag view. [TAG-1, TAG-5]
 
 **✅ Done when:** "Learn French" from the overview can be modelled end to end (milestones and linked habits) and shows up in the daily and monthly views.
 

@@ -3,12 +3,14 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { groupByCategory } from './grouping';
 import { rowStatus } from './rowStatus';
 import { useDay } from './useDay';
+import { FEATURE_V1_1 } from '@/app/features';
 import { markInteractive } from '@/app/startup';
 import { isISODate } from '@/domain/services/clock';
 import { addDays, diffDays } from '@/domain/services/dates';
 import type { ValuesByDate } from '@/domain/services/targets';
 import type { Habit, ISODate } from '@/domain/types';
 import { useCategories } from '@/features/categories/hooks';
+import { DayGoals } from '@/features/goals/DayGoals';
 import { HabitEntryField } from '@/features/habits/HabitEntryField';
 import { useHabits } from '@/features/habits/hooks';
 import { entryHeadline, entrySnippet } from '@/features/journal/headline';
@@ -117,7 +119,9 @@ function DayPage({ date }: { date: ISODate }) {
 
       <HabitsSection date={date} day={day} />
 
-      {/* V1.1: goals with habits linked for the day (DAY-1 §4) render here. */}
+      {FEATURE_V1_1 && !day.isPending && (
+        <DayGoals date={date} habits={day.habits} valuesByHabit={day.valuesByHabit} />
+      )}
 
       <section className="day-section" aria-labelledby="day-journal">
         <h2 id="day-journal" className="section-title">

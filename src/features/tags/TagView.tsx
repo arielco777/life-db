@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useTaggedRecords, useTags } from './hooks';
 import type { JournalEntry } from '@/domain/types';
+import { STATUS_LABELS } from '@/features/goals/describe';
 
 const journalLabel = (j: JournalEntry) =>
   j.title ||
@@ -10,7 +11,7 @@ const journalLabel = (j: JournalEntry) =>
     ?.slice(0, 80) ||
   'Untitled';
 
-/** /settings/tags/:id — every record carrying the tag (TAG-5). Goals and events join in V1.1. */
+/** /settings/tags/:id — every record carrying the tag (TAG-5). Events join in V1.1 (Phase 12). */
 export function TagView() {
   const { id = '' } = useParams();
   const { data: tags, isPending: tagsPending } = useTags();
@@ -28,7 +29,7 @@ export function TagView() {
     );
   }
 
-  const empty = data && data.habits.length === 0 && data.journal.length === 0;
+  const empty = data && data.habits.length === 0 && data.goals.length === 0 && data.journal.length === 0;
   return (
     <section className="stack">
       <Link to=".." relative="path" className="small">
@@ -48,6 +49,24 @@ export function TagView() {
                   {h.name}
                 </Link>
                 {h.archivedAt && <span className="muted small">archived</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {!!data?.goals.length && (
+        <div className="stack-sm">
+          <h3>Goals</h3>
+          <ul className="plain list" aria-label="Goals">
+            {data.goals.map((g) => (
+              <li key={g.id} className="list-row">
+                <Link to={`/goals/${g.id}`} className="grow">
+                  {g.title}
+                </Link>
+                {g.status !== 'active' && (
+                  <span className="muted small">{STATUS_LABELS[g.status].toLowerCase()}</span>
+                )}
               </li>
             ))}
           </ul>

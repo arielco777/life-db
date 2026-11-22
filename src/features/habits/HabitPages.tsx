@@ -8,7 +8,9 @@ import { useHabit, useHabitActions, useHabitHasEntries } from './hooks';
 import type { HabitPatch, NewHabit } from '@/domain/repositories';
 import { addDays } from '@/domain/services/dates';
 import type { Habit } from '@/domain/types';
+import { FEATURE_V1_1 } from '@/app/features';
 import { useCategories } from '@/features/categories/hooks';
+import { useHabitGoals } from '@/features/goals/hooks';
 import { useSettings, useToday } from '@/features/settings/hooks';
 import { useTags } from '@/features/tags/hooks';
 import { ConfirmDialog } from '@/ui/ConfirmDialog';
@@ -187,6 +189,7 @@ function HabitDetail({ habit }: { habit: Habit }) {
         <dd>{habit.priority[0]!.toUpperCase() + habit.priority.slice(1)}</dd>
         <dt>Runs</dt>
         <dd>{describeRun(habit, today, date_format)}</dd>
+        {FEATURE_V1_1 && <LinkedGoals habitId={habit.id} />}
         {tagNames.length > 0 && (
           <>
             <dt>Tags</dt>
@@ -248,5 +251,24 @@ function HabitDetail({ habit }: { habit: Habit }) {
         </ConfirmDialog>
       )}
     </section>
+  );
+}
+
+/** The goals this habit is linked to (GOAL-5). Links are made on the goal's page. */
+function LinkedGoals({ habitId }: { habitId: string }) {
+  const { data: goals = [] } = useHabitGoals(habitId);
+  if (goals.length === 0) return null;
+  return (
+    <>
+      <dt>Goals</dt>
+      <dd>
+        {goals.map((g, i) => (
+          <span key={g.id}>
+            {i > 0 && ', '}
+            <Link to={`/goals/${g.id}`}>{g.title}</Link>
+          </span>
+        ))}
+      </dd>
+    </>
   );
 }
