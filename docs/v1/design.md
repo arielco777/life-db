@@ -690,7 +690,7 @@ The Rust `db_*` commands get `cargo test` cases for: transaction rollback, backu
 | Postgres mirror | Plain types (TEXT, REAL, INTEGER), no SQLite-only data types, and enums as CHECK constraints map cleanly to Postgres |
 | Mobile | Tauri 2 mobile targets. `PlatformService` isolates dialogs and the file system. Responsive layout down to 360 px. Mobile uses the **same SQLite + SQLCipher schema, migrations and repositories** as desktop (Tauri 2 runs the same Rust code), so device DBs never differ in format. rusqlite bundled SQLCipher builds for iOS and Android. Key storage goes behind a `KeyStore` trait (§3.3). |
 | V1.5 app lock | Wraps the existing device key. No DB re-encryption needed (§3.3). |
-| V2 analytics / V4 AI | Clean, typed, time-stamped source data. `search_index` can be complemented by embeddings later. |
+| V2 analytics / V4 AI | Clean, typed, time-stamped source data. `search_index` can be complemented by embeddings from a local Ollama model, stored in the encrypted DB. |
 
 ## 11. Open questions
 

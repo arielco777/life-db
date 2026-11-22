@@ -621,6 +621,8 @@ SQLite remains useful locally.
 
 Premium is the cloud, so it arrives with V5. Until then every feature is free and local.
 
+Pricing, and exactly which features are free or premium, will be decided later and iteratively, based on real use. What follows is a starting concept, not a commitment.
+
 The business model, once the cloud exists, can be:
 
 ### Free
@@ -640,7 +642,9 @@ The business model, once the cloud exists, can be:
 - Cloud sync
 - Automatic backup
 - Multi-device access
-- Eventually AI features
+- AI features, on every device
+
+AI becomes a premium feature once the cloud exists. Not every phone can run a local model, so AI on mobile needs a hosted model, and that has a running cost. Until then, V4's AI runs locally on desktop through Ollama.
 
 This avoids artificially restricting the core Life DB.
 
@@ -699,7 +703,12 @@ Money
         │
         ▼
 V4
-AI Companion
+Local AI Companion (Ollama)
+│
+├── Ollama on the user's computer
+├── Answers built on V2 analytics
+├── Semantic journal search
+└── Optional: any OpenAI-compatible endpoint
         │
         ▼
 V5 (last, once there are enough users)
@@ -711,6 +720,7 @@ Cloud
 ├── Sync Engine
 ├── Multi-device
 ├── Cloud Backup
+├── Hosted AI (phones and devices without a local model)
 └── Premium tier
 ```
 
@@ -774,6 +784,31 @@ Life Events
 
 and identify meaningful relationships.
 
+### How V4 works: local AI via Ollama
+
+The AI companion runs **locally**, through [Ollama](https://ollama.com) on the user's own computer. Journal entries and habit data never leave the device, there is no server or account, and it costs nothing to run. This keeps V4 independent of the cloud (V5). Later, with the cloud, AI becomes a premium feature backed by a hosted model, so it also works on phones that can't run one locally (see §18).
+
+**Setup.** Ollama is a separate install, and models (2–5 GB) are too large to bundle with Life DB. The app detects Ollama at `localhost:11434`, shows in Settings → AI whether a model is available, and guides the user through installing one. AI is optional: every other feature works without it.
+
+**Division of work.** Models that run on a normal laptop (about 3–8 billion parameters) write and summarise well but are unreliable at arithmetic over years of data. So:
+
+1. **Life DB computes the facts.** SQL and the V2 analytics layer produce the numbers: averages, trends, comparisons such as mood on days with and without exercise, what changed around a given date.
+2. **The model explains them.** It receives those facts and a few relevant journal excerpts, and writes the answer. Answers cite the figures and entries they came from, which keeps the model from inventing things.
+
+For "Why haven't I been sleeping well?", the app finds the drop in sleep and what changed around it (new habits, life events, journal themes), and the model turns that into an explanation.
+
+This makes V2 a prerequisite: its analytics are the engine the AI relies on.
+
+**Semantic search.** A small local embedding model turns journal entries into vectors, stored in the encrypted database. Search then finds entries by meaning ("times I felt overwhelmed") as well as by word. A few thousand entries can be compared directly, so no vector-database extension is needed.
+
+**Provider.** Life DB talks to the model through one interface using the OpenAI-compatible API, which Ollama, LM Studio and llama.cpp all provide. Ollama is the default and the only one documented for users; a user can point the app at another endpoint, including a hosted provider with their own key. When the endpoint is not on the user's own computer, the app warns that their data will leave the device.
+
+**Limits.**
+
+- Needs roughly 8 GB of RAM; answers take a few seconds on machines without a good GPU.
+- Desktop only: Ollama does not run on phones, and not every phone can run a model. AI on mobile waits for the hosted, premium AI in V5.
+- Calls go through the Rust side of the app, not the webview, like the database.
+
 ---
 
 # 21. Product Philosophy
@@ -806,7 +841,7 @@ Add advanced analytics, money and AI only when the core Life DB is useful, and c
 
 ### AI is not the product
 
-The AI is eventually an interface over the Life DB.
+The AI is eventually an interface over the Life DB, running on the user's own computer.
 
 The Life DB itself is the foundation.
 
