@@ -621,6 +621,8 @@ SQLite remains useful locally.
 
 Premium is the cloud, so it arrives with V5. Until then every feature is free and local.
 
+Pricing, and exactly which features are free or premium, will be decided later and iteratively, based on real use. What follows is a starting concept, not a commitment.
+
 The business model, once the cloud exists, can be:
 
 ### Free
