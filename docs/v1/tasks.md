@@ -149,7 +149,7 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 8 — Backup & restore
 
-> JSON / CSV / Markdown export and import (EXP-1..3) are deferred to V1.5.
+> JSON / CSV / Markdown export and import (EXP-1..3) are deferred to V1.5: see [`docs/v1.5/tasks.md`](../v1.5/tasks.md).
 
 - [x] 8.1 `PlatformService` (Tauri impl): save/open dialogs, reveal folder. [FC-4]
 - [x] 8.2 Manual backup through the save dialog, with a note that it restores only on this device. [EXP-4]

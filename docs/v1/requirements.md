@@ -273,7 +273,7 @@ Acceptance criteria use "WHEN … THEN the system SHALL …".
 
 ### 4.12 Backup & restore (EXP)
 
-> EXP-1 (JSON export), EXP-2 (CSV export) and EXP-3 (journal Markdown export), plus data import, are **deferred to V1.5**. In V1, the user's copy of their data is the `.db` backup file below.
+> EXP-1 (JSON export), EXP-2 (CSV export) and EXP-3 (journal Markdown export), plus data import, are **deferred to V1.5** (see [`docs/v1.5`](../v1.5/requirements.md)). In V1, the user's copy of their data is the `.db` backup file below.
 
 **EXP-4 Database backup.** Save a consistent copy of the SQLite database to a user-chosen location. Backups are encrypted with the device key (SEC-2), so in V1 they can be restored only on the same device and OS account.
 
