@@ -1,6 +1,7 @@
 import { seedLargeDataset } from './fixtures/seed';
 import { setup } from './helpers';
 import { dayWindow } from '@/features/day/rowStatus';
+import { buildHabitCsv, buildJournalFiles, buildJsonExport } from '@/features/transfer/build';
 
 /**
  * Data-layer share of the NFR-1 budgets on 5y × 30 habits + 3k journal entries.
@@ -51,5 +52,33 @@ describe('performance on a multi-year dataset (NFR-1)', () => {
     expect(word).toBeLessThan(150);
     expect(prefix).toBeLessThan(150);
     expect(filtered).toBeLessThan(150);
+  }, 60_000);
+
+  // NFR-12 (V1.5): each export of the whole dataset in under 5 s, building the file's text.
+  // Writing it is Rust's job and adds little.
+  it('exports the whole dataset within NFR-12', async () => {
+    const { repos, driver } = await setup('2026-08-31T12:00:00');
+    await seedLargeDataset(driver);
+    const timed = async <T>(fn: () => Promise<T>) => {
+      const t0 = performance.now();
+      const out = await fn();
+      return [performance.now() - t0, out] as const;
+    };
+    const [json, text] = await timed(() => buildJsonExport(repos, '1.5.0'));
+    const [csv, sheet] = await timed(() =>
+      buildHabitCsv(repos, { layout: 'long', includeArchived: true, dates: {} }),
+    );
+    const [wide] = await timed(() =>
+      buildHabitCsv(repos, { layout: 'wide', includeArchived: true, dates: {} }),
+    );
+    const [md, files] = await timed(() => buildJournalFiles(repos, {}));
+    console.info(
+      `export: JSON ${json.toFixed(0)} ms (${(text.length / 1e6).toFixed(1)} MB), ` +
+        `CSV ${csv.toFixed(0)} ms (${sheet.entries} entries), wide ${wide.toFixed(0)} ms, ` +
+        `Markdown ${md.toFixed(0)} ms (${files.length} files)`,
+    );
+    expect(sheet.entries).toBeGreaterThan(30_000);
+    expect(files).toHaveLength(3000);
+    for (const ms of [json, csv, wide, md]) expect(ms).toBeLessThan(5000);
   }, 60_000);
 });

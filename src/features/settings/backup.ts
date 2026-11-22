@@ -11,9 +11,12 @@ export const backupFileName = (today: ISODate) => `life-db-${today}.${BACKUP_EXT
  * Some save dialogs (GTK on Linux) don't add the filter's extension when the user types a
  * bare name. A name with no extension gets `.lifedb`; a name the user gave one keeps it.
  */
-export function withBackupExtension(path: string): string {
+export const withBackupExtension = (path: string): string => withExtension(path, BACKUP_EXTENSION);
+
+/** `path` with `.ext` added when the file name has no extension (see above). */
+export function withExtension(path: string, ext: string): string {
   const name = path.split(/[/\\]/).pop() ?? '';
-  return name.replace(/^\.+/, '').includes('.') ? path : `${path}.${BACKUP_EXTENSION}`;
+  return name.replace(/^\.+/, '').includes('.') ? path : `${path}.${ext}`;
 }
 
 /** 2516582 → "2.4 MB". */

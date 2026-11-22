@@ -50,12 +50,16 @@ export function AboutPage() {
             turn it off below.
           </li>
           <li>
+            Exports are files you choose to create. Unless you protect an export with a password, anyone who
+            has the file can read it.
+          </li>
+          <li>
             Errors are written to a log file on this device. It records what went wrong, never what you wrote.
             It's only shared if you attach it to a report yourself.
           </li>
         </ul>
         <p className="small muted">
-          Backups, restore and where your data lives are in <Link to="/settings/data">Data</Link>; encryption
+          Backups, exports and where your data lives are in <Link to="/settings/data">Data</Link>; encryption
           is explained in <Link to="/settings/security">Security</Link>.
         </p>
       </section>

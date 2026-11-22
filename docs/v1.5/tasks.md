@@ -33,9 +33,9 @@ V1.5 ships as **app version 1.5.0** through the updater. It has no data migratio
 
 ### 16C. UI
 
-- [ ] 16.7 Settings → Data → *Export*: three actions with their options (password and confirm for JSON; layout, dates and archived for CSV; dates for Markdown), the unencrypted warning, the "can't be recovered" note for passwords, the saved path with *Show in folder*. Component tests and axe. [EXP-1..3, EXP-8]
-- [ ] 16.8 Update the privacy statement on the About page. [DIST-5]
-- [ ] 16.9 Perf test: each export of the seeded NFR-1 dataset under 5 s. [NFR-12]
+- [x] 16.7 Settings → Data → *Export*: three actions with their options (password and confirm for JSON; layout, dates and archived for CSV; dates for Markdown), the unencrypted warning, the "can't be recovered" note for passwords, the saved path with *Show in folder*. Component tests and axe. [EXP-1..3, EXP-8]
+- [x] 16.8 Update the privacy statement on the About page. [DIST-5]
+- [x] 16.9 Perf test: each export of the seeded NFR-1 dataset under 5 s. [NFR-12]
 
 **✅ Done when:** all three exports open correctly in their target apps (a JSON viewer, Excel/LibreOffice, a Markdown editor); a protected export can't be read without its password; export times are within NFR-12.
 

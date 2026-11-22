@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useId, useState } from 'react';
 import { BACKUP_EXTENSION, backupFileName, formatBytes, withBackupExtension } from './backup';
 import { useFormatDate, useSetSetting, useSettings, useToday } from './hooks';
+import { ExportSection } from '@/features/transfer/ExportSection';
 import { usePlatform } from '@/platform/PlatformProvider';
 import { ConfirmDialog } from '@/ui/ConfirmDialog';
 import { useToast } from '@/ui/Toast';
@@ -14,8 +15,8 @@ const KEEP_CHOICES = [3, 5, 7, 14, 30, 60, 90];
 const fileName = (path: string) => path.split(/[/\\]/).pop() ?? path;
 
 /**
- * Settings → Data (tasks 8.2, 8.3, 8.5, 8.6): manual backup (EXP-4), restore (EXP-5),
- * automatic daily backups (EXP-6) and where the data lives (EXP-7).
+ * Settings → Data (tasks 8.2, 8.3, 8.5, 8.6, 16.7): manual backup (EXP-4), restore (EXP-5),
+ * export (EXP-1..3, EXP-8), automatic daily backups (EXP-6) and where the data lives (EXP-7).
  */
 export function DataPage() {
   const platform = usePlatform();
@@ -24,6 +25,7 @@ export function DataPage() {
     <section className="stack">
       <BackupSection />
       <RestoreSection />
+      <ExportSection />
       <AutoBackupSection lastAutoBackup={info.data?.lastAutoBackup} />
       <section className="card stack" aria-labelledby="data-folder">
         <h2 id="data-folder">Data folder</h2>
@@ -67,7 +69,7 @@ function BackupSection() {
       <p>Save a copy of all your habits, goals, journal and events to a file you choose.</p>
       <p className="small muted">
         Backups are encrypted with this device's key, so they can be restored only on this device and user
-        account. Moving your data to another device will come with export in a later version.
+        account. To move your data to another computer, use Export below.
       </p>
       <div className="row">
         <button type="button" onClick={() => backup.mutate()} disabled={backup.isPending}>
