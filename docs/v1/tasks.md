@@ -234,11 +234,11 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 14 — Search
 
-- [ ] 14.1 Turn user input into a safe FTS5 query (quoted tokens with prefix stars). [SRCH-3]
-- [ ] 14.2 Search repository: FTS `bm25` + snippet, merged with tag `LIKE` matches, and tests. [SRCH-1, SRCH-2]
-- [ ] 14.3 Filters by type, date range, category and tag. [SRCH-4, CAT-5]
-- [ ] 14.4 `Ctrl/Cmd+K` palette and a `/search` page with grouped, highlighted results that link to records. [SRCH-1, SRCH-2]
-- [ ] 14.5 150 ms debounce. Verify < 300 ms on seeded data. [SRCH-5, NFR-1]
+- [x] 14.1 Turn user input into a safe FTS5 query (quoted tokens with prefix stars). [SRCH-3]
+- [x] 14.2 Search repository: FTS `bm25` + snippet, merged with tag `LIKE` matches, and tests. [SRCH-1, SRCH-2]
+- [x] 14.3 Filters by type, date range, category and tag. [SRCH-4, CAT-5]
+- [x] 14.4 `Ctrl/Cmd+K` palette and a `/search` page with grouped, highlighted results that link to records. [SRCH-1, SRCH-2]
+- [x] 14.5 150 ms debounce. Verify < 300 ms on seeded data. [SRCH-5, NFR-1]
 
 **✅ Done when:** searching "French" returns the goal, the habit and the journal entries, as in the overview example.
 

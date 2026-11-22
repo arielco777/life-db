@@ -37,8 +37,19 @@ describe('performance on a multi-year dataset (NFR-1)', () => {
     );
     const journal = await time(() => repos.journal.list({}, { limit: 50 }));
 
+    // Search (SRCH-5): a common word, a prefix while typing, and a filtered search.
+    const word = await time(() => repos.search.search('walk'));
+    const prefix = await time(() => repos.search.search('wa'));
+    const filtered = await time(() =>
+      repos.search.search('walk', { types: ['journal_entry'], from: '2026-01-01', to: '2026-08-31' }),
+    );
+
     expect(month).toBeLessThan(100);
     expect(day).toBeLessThan(75);
     expect(journal).toBeLessThan(75);
+    // NFR-1 allows 300 ms for results; the data layer keeps well under it.
+    expect(word).toBeLessThan(150);
+    expect(prefix).toBeLessThan(150);
+    expect(filtered).toBeLessThan(150);
   }, 60_000);
 });
