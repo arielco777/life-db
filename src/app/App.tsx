@@ -3,6 +3,7 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { FEATURE_V1_1, SHOW_DEBUG } from './features';
 import { DebugPage } from '@/features/debug/DebugPage';
 import { DayRoute } from '@/features/day/DayPage';
+import { GoalRoutes } from '@/features/goals/GoalPages';
 import { HabitRoutes } from '@/features/habits/HabitPages';
 import { JournalRoutes } from '@/features/journal/JournalPages';
 import { MonthRoute } from '@/features/month/MonthPage';
@@ -82,7 +83,7 @@ function Shell() {
             <Route path="/settings/*" element={<SettingsPage />} />
             {FEATURE_V1_1 && (
               <>
-                <Route path="/goals/*" element={<Placeholder title="Goals" phase="Phase 11" />} />
+                <Route path="/goals/*" element={<GoalRoutes />} />
                 <Route path="/events" element={<Placeholder title="Events" phase="Phase 12" />} />
                 <Route path="/analytics" element={<Placeholder title="Analytics" phase="Phase 13" />} />
                 <Route path="/search" element={<Placeholder title="Search" phase="Phase 14" />} />

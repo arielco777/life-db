@@ -1,13 +1,18 @@
 import type {
   Category,
+  Goal,
+  GoalStatus,
   Habit,
   HabitEntry,
   HabitFrequency,
   HabitTarget,
   HabitType,
   ISODate,
+  ISOMonth,
   JournalEntry,
+  Milestone,
   Priority,
+  ProgressMode,
   RatingScale,
   Settings,
   Tag,
@@ -165,6 +170,78 @@ export interface JournalRepository {
   remove(id: UUID): Promise<void>;
 }
 
+// ───────── Goals ─────────
+
+export interface NewGoal {
+  title: string;
+  description?: string;
+  categoryId?: UUID;
+  priority?: Priority;
+  /** Defaults to `active` (GOAL-2). */
+  status?: GoalStatus;
+  /** Defaults to `milestones` (GOAL-4). */
+  progressMode?: ProgressMode;
+  progressManual?: number;
+  progressCurrent?: number;
+  progressTarget?: number;
+  progressUnit?: string;
+  startDate?: ISODate;
+  targetDate?: ISODate;
+  tagIds?: UUID[];
+  habitIds?: UUID[];
+  months?: ISOMonth[];
+}
+
+/** `null` clears an optional field. */
+export type GoalPatch = {
+  [K in keyof NewGoal]?: NewGoal[K] | null;
+};
+
+export interface GoalFilter {
+  status?: GoalStatus[];
+  /** A category, or null for goals without one. */
+  categoryId?: UUID | null;
+}
+
+export interface NewMilestone {
+  title: string;
+  targetDate?: ISODate;
+}
+export type MilestonePatch = {
+  [K in keyof NewMilestone]?: NewMilestone[K] | null;
+};
+
+export interface GoalRepository {
+  /** In user order, with milestones, linked habits, months and tags. */
+  list(filter?: GoalFilter): Promise<Goal[]>;
+  get(id: UUID): Promise<Goal | null>;
+  /** Goals marked as goals for this month (GOAL-6, MON-7). */
+  forMonth(month: ISOMonth): Promise<Goal[]>;
+  /** Goals linked to this habit (GOAL-5). */
+  forHabit(habitId: UUID): Promise<Goal[]>;
+  create(input: NewGoal): Promise<Goal>;
+  /**
+   * Becoming `completed` records today's logical date in `completedAt`; leaving it clears
+   * the date (GOAL-2). `tagIds`, `habitIds` and `months` replace the whole set when given.
+   */
+  update(id: UUID, patch: GoalPatch): Promise<Goal>;
+  /** Soft-deletes the goal with its milestones, habit links, months and tags (GOAL-7). */
+  remove(id: UUID): Promise<void>;
+  reorder(idsInOrder: UUID[]): Promise<void>;
+
+  addMilestone(goalId: UUID, input: NewMilestone): Promise<Milestone>;
+  updateMilestone(id: UUID, patch: MilestonePatch): Promise<Milestone>;
+  /** Done records today's logical date; not done clears it (GOAL-3). */
+  setMilestoneDone(id: UUID, done: boolean): Promise<Milestone>;
+  reorderMilestones(goalId: UUID, idsInOrder: UUID[]): Promise<void>;
+  removeMilestone(id: UUID): Promise<void>;
+
+  /** Makes the goal's linked habits exactly `habitIds` (GOAL-5). Links use natural IDs (FC-5). */
+  setHabits(goalId: UUID, habitIds: UUID[]): Promise<void>;
+  /** Makes the goal's months exactly `months` (GOAL-6). Rows use natural IDs (FC-5). */
+  setMonths(goalId: UUID, months: ISOMonth[]): Promise<void>;
+}
+
 // ───────── Settings ─────────
 
 export interface SettingsRepository {
@@ -181,5 +258,6 @@ export interface Repositories {
   habits: HabitRepository;
   entries: HabitEntryRepository;
   journal: JournalRepository;
+  goals: GoalRepository;
   settings: SettingsRepository;
 }

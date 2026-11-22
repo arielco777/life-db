@@ -62,6 +62,42 @@ export const newJournalEntrySchema = z.object({
   tagIds: z.array(uuid).optional(),
 });
 
+export const isoMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Expected a month in YYYY-MM form');
+
+const goalFields = {
+  title: z.string().trim().min(1, 'Title is required').max(200),
+  description: optText,
+  categoryId: uuid.optional(),
+  priority: z.enum(['low', 'medium', 'high']).optional(),
+  status: z.enum(['not_started', 'active', 'paused', 'completed', 'abandoned']).optional(),
+  progressMode: z.enum(['milestones', 'manual', 'numeric']).optional(),
+  progressManual: z.number().finite().min(0).max(100).optional(),
+  progressCurrent: z.number().finite().nonnegative().optional(),
+  progressTarget: z.number().finite().positive('Target must be greater than 0').optional(),
+  progressUnit: z.string().trim().max(40).optional(),
+  startDate: isoDate.optional(),
+  targetDate: isoDate.optional(),
+  tagIds: z.array(uuid).optional(),
+  habitIds: z.array(uuid).optional(),
+  months: z.array(isoMonth).optional(),
+};
+
+export const newGoalSchema = z
+  .object(goalFields)
+  .refine((g) => !g.startDate || !g.targetDate || g.targetDate >= g.startDate, {
+    message: 'Target date must not be before start date',
+    path: ['targetDate'],
+  })
+  .refine((g) => g.progressMode !== 'numeric' || g.progressTarget !== undefined, {
+    message: 'A numeric goal needs a target',
+    path: ['progressTarget'],
+  });
+
+export const newMilestoneSchema = z.object({
+  title: z.string().trim().min(1, 'Title is required').max(500),
+  targetDate: isoDate.optional(),
+});
+
 /** Parses with a zod schema and converts failures into a DomainError('validation'). */
 export function parseOrThrow<S extends z.ZodType>(schema: S, input: unknown): z.output<S> {
   const r = schema.safeParse(input);
