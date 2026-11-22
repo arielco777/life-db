@@ -8,3 +8,6 @@ src-tauri/gen/schemas
 *.db-wal
 *.db-shm
 coverage
+
+# Personal Vite env overrides
+.env*.local
