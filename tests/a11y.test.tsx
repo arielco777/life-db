@@ -2,8 +2,10 @@
 import { screen, waitFor } from '@testing-library/react';
 import axe from 'axe-core';
 import { renderWithApp } from './render';
+import { Route, Routes } from 'react-router-dom';
 import { App } from '@/app/App';
 import { DEFAULT_CATEGORY_IDS } from '@/domain/ids';
+import { GoalRoutes } from '@/features/goals/GoalPages';
 import type { UUID } from '@/domain/types';
 
 /**
@@ -91,6 +93,41 @@ describe('Accessibility of every screen (axe)', () => {
     await app.user.click(await screen.findByRole('link', { name: /^Trip/ }, SLOW));
     await screen.findByRole('textbox', { name: 'Entry' });
     expect(entryId).not.toBe('');
+    expect(await violations()).toEqual([]);
+  });
+
+  // V1.1 screens are behind a feature flag in <App />, so they're rendered on their own.
+  it('the goals screens (V1.1)', async () => {
+    const app = await renderWithApp(
+      async ({ repos }) => {
+        const g = await repos.goals.create({
+          title: 'Learn French',
+          categoryId: DEFAULT_CATEGORY_IDS.learning,
+        });
+        const a1 = await repos.goals.addMilestone(g.id, { title: 'Finish A1', targetDate: '2026-09-30' });
+        await repos.goals.addMilestone(g.id, { title: 'Finish A2' });
+        await repos.goals.setMilestoneDone(a1.id, true);
+        await repos.goals.create({ title: 'Books', progressMode: 'numeric', progressTarget: 20 });
+        await repos.goals.create({ title: 'Garden', status: 'completed', progressMode: 'manual' });
+        return (
+          <main>
+            <Routes>
+              <Route path="/goals/*" element={<GoalRoutes />} />
+            </Routes>
+          </main>
+        );
+      },
+      { route: '/goals' },
+    );
+    await screen.findByRole('list', { name: 'Active goals' }, SLOW);
+    expect(await violations()).toEqual([]);
+
+    await app.user.click(screen.getByRole('link', { name: 'Learn French' }));
+    await screen.findByRole('checkbox', { name: 'Finish A1' }, SLOW);
+    expect(await violations()).toEqual([]);
+
+    await app.user.click(screen.getByRole('link', { name: 'Edit' }));
+    await screen.findByLabelText('Title', {}, SLOW);
     expect(await violations()).toEqual([]);
   });
 });

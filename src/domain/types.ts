@@ -105,6 +105,74 @@ export interface JournalEntry {
   updatedAt: Timestamp;
 }
 
+/** Something that happened: a day or a range of days, e.g. a vacation (EVT-1). */
+export interface LifeEvent {
+  id: UUID;
+  name: string;
+  description?: string;
+  startDate: ISODate;
+  /** Last day, inclusive. Absent for a one-day event. */
+  endDate?: ISODate;
+  categoryId?: UUID;
+  tagIds: UUID[];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type GoalStatus = 'not_started' | 'active' | 'paused' | 'completed' | 'abandoned';
+export const GOAL_STATUSES: readonly GoalStatus[] = [
+  'not_started',
+  'active',
+  'paused',
+  'completed',
+  'abandoned',
+];
+
+/** GOAL-4: how a goal's progress is measured. */
+export type ProgressMode = 'milestones' | 'manual' | 'numeric';
+
+export interface Milestone {
+  id: UUID;
+  goalId: UUID;
+  title: string;
+  targetDate?: ISODate;
+  /** Logical date the milestone was ticked off; absent while not done (GOAL-3). */
+  completedAt?: ISODate;
+  sortOrder: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface Goal {
+  id: UUID;
+  title: string;
+  description?: string;
+  categoryId?: UUID;
+  priority: Priority;
+  status: GoalStatus;
+  progressMode: ProgressMode;
+  /** `manual` mode: 0–100. Kept when switching modes, so switching back restores it. */
+  progressManual?: number;
+  /** `numeric` mode: current / target with a unit, e.g. 7 / 20 books. */
+  progressCurrent?: number;
+  progressTarget?: number;
+  progressUnit?: string;
+  startDate?: ISODate;
+  targetDate?: ISODate;
+  /** Logical date the goal was marked completed (GOAL-2). */
+  completedAt?: ISODate;
+  sortOrder: number;
+  /** In user order. */
+  milestones: Milestone[];
+  /** Linked habits (GOAL-5). */
+  habitIds: UUID[];
+  /** Months this is a "monthly goal" for, `YYYY-MM`, ascending (GOAL-6). */
+  months: ISOMonth[];
+  tagIds: UUID[];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export interface Settings {
   'profile.display_name': string;
   week_start: 'mon' | 'sun';

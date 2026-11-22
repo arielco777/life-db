@@ -195,15 +195,15 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 11 — Goals
 
-- [ ] 11.1 Goal repository (+ milestones, goal_habits and goal_months with natural IDs) and tests. [GOAL-1..7, FC-5]
-- [ ] 11.2 `progress.ts`: milestones, manual and numeric modes, with unit tests. [GOAL-4]
-- [ ] 11.3 Goals list grouped by status, with progress bars and a category filter. [GOAL-1, GOAL-2, CAT-5]
-- [ ] 11.4 Goal form and detail page: fields, status (sets `completed_at`), progress mode controls. [GOAL-1, GOAL-2, GOAL-4]
-- [ ] 11.5 Milestones: inline add, toggle, edit, drag reorder, delete. [GOAL-3, GOAL-7]
-- [ ] 11.6 Link/unlink habits, with linked habit month stats on the detail page. [GOAL-5]
-- [ ] 11.7 Month assignment multi-picker, the month goals list below the monthly grid, and "Add monthly goal" from the monthly view. [GOAL-6, MON-7]
-- [ ] 11.8 Daily view goals section (goals with linked habits and their status for the day). [DAY-1, GOAL-5]
-- [ ] 11.9 Tags on goals. Goals appear in the tag view. [TAG-1, TAG-5]
+- [x] 11.1 Goal repository (+ milestones, goal_habits and goal_months with natural IDs) and tests. [GOAL-1..7, FC-5]
+- [x] 11.2 `progress.ts`: milestones, manual and numeric modes, with unit tests. [GOAL-4]
+- [x] 11.3 Goals list grouped by status, with progress bars and a category filter. [GOAL-1, GOAL-2, CAT-5]
+- [x] 11.4 Goal form and detail page: fields, status (sets `completed_at`), progress mode controls. [GOAL-1, GOAL-2, GOAL-4]
+- [x] 11.5 Milestones: inline add, toggle, edit, drag reorder, delete. [GOAL-3, GOAL-7]
+- [x] 11.6 Link/unlink habits, with linked habit month stats on the detail page. [GOAL-5]
+- [x] 11.7 Month assignment multi-picker, the month goals list below the monthly grid, and "Add monthly goal" from the monthly view. [GOAL-6, MON-7]
+- [x] 11.8 Daily view goals section (goals with linked habits and their status for the day). [DAY-1, GOAL-5]
+- [x] 11.9 Tags on goals. Goals appear in the tag view. [TAG-1, TAG-5]
 
 **✅ Done when:** "Learn French" from the overview can be modelled end to end (milestones and linked habits) and shows up in the daily and monthly views.
 
@@ -211,10 +211,10 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 12 — Life events
 
-- [ ] 12.1 LifeEvent repository (`overlapping`) and tests. [EVT-1..3]
-- [ ] 12.2 Events list grouped by year, with a quick-add form, edit and delete. [EVT-1, EVT-3]
-- [ ] 12.3 Validation (end ≥ start), category, tags. Events appear in the tag view. [EVT-1, TAG-1, TAG-5]
-- [ ] 12.4 Daily view events banner across the range, and has-event markers in the monthly grid. [EVT-2, DAY-1, MON-6]
+- [x] 12.1 LifeEvent repository (`overlapping`) and tests. [EVT-1..3]
+- [x] 12.2 Events list grouped by year, with a quick-add form, edit and delete. [EVT-1, EVT-3]
+- [x] 12.3 Validation (end ≥ start), category, tags. Events appear in the tag view. [EVT-1, TAG-1, TAG-5]
+- [x] 12.4 Daily view events banner across the range, and has-event markers in the monthly grid. [EVT-2, DAY-1, MON-6]
 
 **✅ Done when:** a multi-day vacation shows on every covered day and in the month grid.
 
@@ -222,11 +222,11 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 13 — Analytics
 
-- [ ] 13.1 `/analytics` period selector (week, month, year, custom). [ANL-1]
-- [ ] 13.2 Per-habit stat cards with previous-period comparison. [ANL-1, ANL-2]
-- [ ] 13.3 Choose a chart library (design §11 Q4). Per-habit chart, aggregated by week for year ranges. [ANL-3]
-- [ ] 13.4 Habit detail page reuses the stat cards and chart. [ANL-1]
-- [ ] 13.5 Goals summary table with status and category filters. [ANL-4, CAT-5]
+- [x] 13.1 `/analytics` period selector (week, month, year, custom). [ANL-1]
+- [x] 13.2 Per-habit stat cards with previous-period comparison. [ANL-1, ANL-2]
+- [x] 13.3 Choose a chart library (design §11 Q4). Per-habit chart, aggregated by week for year ranges. [ANL-3]
+- [x] 13.4 Habit detail page reuses the stat cards and chart. [ANL-1]
+- [x] 13.5 Goals summary table with status and category filters. [ANL-4, CAT-5]
 
 **✅ Done when:** the overview's examples (Exercise 18/31 58% vs July, Sleep avg/min/max, Reading totals) display correctly from the seeded data.
 
@@ -234,11 +234,11 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 14 — Search
 
-- [ ] 14.1 Turn user input into a safe FTS5 query (quoted tokens with prefix stars). [SRCH-3]
-- [ ] 14.2 Search repository: FTS `bm25` + snippet, merged with tag `LIKE` matches, and tests. [SRCH-1, SRCH-2]
-- [ ] 14.3 Filters by type, date range, category and tag. [SRCH-4, CAT-5]
-- [ ] 14.4 `Ctrl/Cmd+K` palette and a `/search` page with grouped, highlighted results that link to records. [SRCH-1, SRCH-2]
-- [ ] 14.5 150 ms debounce. Verify < 300 ms on seeded data. [SRCH-5, NFR-1]
+- [x] 14.1 Turn user input into a safe FTS5 query (quoted tokens with prefix stars). [SRCH-3]
+- [x] 14.2 Search repository: FTS `bm25` + snippet, merged with tag `LIKE` matches, and tests. [SRCH-1, SRCH-2]
+- [x] 14.3 Filters by type, date range, category and tag. [SRCH-4, CAT-5]
+- [x] 14.4 `Ctrl/Cmd+K` palette and a `/search` page with grouped, highlighted results that link to records. [SRCH-1, SRCH-2]
+- [x] 14.5 150 ms debounce. Verify < 300 ms on seeded data. [SRCH-5, NFR-1]
 
 **✅ Done when:** searching "French" returns the goal, the habit and the journal entries, as in the overview example.
 
@@ -246,8 +246,8 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 15 — V1.1 release
 
-- [ ] 15.1 Remove the V1.1 feature flag. Run the performance pass again for the new views. [NFR-1]
-- [ ] 15.2 Upgrade test: a V1.0 install with real-looking data updates to V1.1 with no data change. [DIST-3]
+- [x] 15.1 Remove the V1.1 feature flag. Run the performance pass again for the new views. [NFR-1] *(`tests/screens.perf.test.tsx` now also times goals, events, analytics and search. The seed fixture gained goals and events.)*
+- [x] 15.2 Upgrade test: a V1.0 install with real-looking data updates to V1.1 with no data change. [DIST-3] *(`tests/upgrade.test.ts`. The real 1.0.0 → 1.1.0 update through the updater is checked by hand after 15.3.)*
 - [ ] 15.3 Tag and publish **V1.1** through the updater.
 
 **✅ Done when:** every V1 requirement ID has been checked off.

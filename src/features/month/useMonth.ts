@@ -4,6 +4,8 @@ import { useRepositories } from '@/app/RepositoryProvider';
 import { addMonths, monthRange } from '@/domain/services/dates';
 import { valuesByHabit, type ValuesByDate } from '@/domain/services/targets';
 import type { Habit, ISOMonth, UUID } from '@/domain/types';
+import { eventKeys } from '@/features/events/hooks';
+import { goalKeys } from '@/features/goals/hooks';
 import { entryKeys, useEntries } from '@/features/habits/entryHooks';
 import { habitKeys, useActiveHabits } from '@/features/habits/hooks';
 
@@ -19,7 +21,8 @@ export interface MonthData {
 /**
  * The monthly grid's data (tasks 6.2): habits active during any part of the month,
  * archived or ended ones included when they were active then (MON-8), and the month's
- * entries. Neighbouring months are prefetched so ‹ › feel instant (MON-2).
+ * entries. Neighbouring months are prefetched, with their goals and events, so ‹ › feel
+ * instant (MON-2).
  */
 export function useMonth(ym: ISOMonth): MonthData {
   const range = monthRange(ym);
@@ -34,6 +37,12 @@ export function useMonth(ym: ISOMonth): MonthData {
       const r = monthRange(m);
       void qc.prefetchQuery({ queryKey: habitKeys.activeOn(r), queryFn: () => repos.habits.activeOn(r) });
       void qc.prefetchQuery({ queryKey: entryKeys.range(r), queryFn: () => repos.entries.forRange(r) });
+      // The goals list and event markers under and beside the grid (MON-6, MON-7).
+      void qc.prefetchQuery({ queryKey: goalKeys.forMonth(m), queryFn: () => repos.goals.forMonth(m) });
+      void qc.prefetchQuery({
+        queryKey: eventKeys.overlapping(r),
+        queryFn: () => repos.events.overlapping(r),
+      });
     }
   }, [ym, qc, repos]);
 

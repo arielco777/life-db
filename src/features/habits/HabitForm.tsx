@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import { orderedWeekdays, TYPE_LABELS, WEEKDAY_SHORT } from './describe';
 import { parseNumber } from './inputs/NumberInput';
 import type { NewHabit } from '@/domain/repositories';
@@ -7,6 +7,7 @@ import type { Habit, HabitTarget, HabitType, ISODate, Priority, UUID, Weekday } 
 import { CategorySelect } from '@/features/categories/CategorySelect';
 import { useSettings } from '@/features/settings/hooks';
 import { TagInput } from '@/features/tags/TagInput';
+import { Field } from '@/ui/Field';
 
 export interface HabitDraft {
   name: string;
@@ -456,30 +457,5 @@ export function HabitForm({ initial, locked, submitLabel, busy, onSubmit, onCanc
         </button>
       </div>
     </form>
-  );
-}
-
-function Field({
-  label,
-  id,
-  hint,
-  error,
-  children,
-}: {
-  label: string;
-  id: string;
-  hint?: string;
-  error?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="field">
-      <label htmlFor={id}>
-        {label}
-        {hint && <span className="small muted"> · {hint}</span>}
-      </label>
-      {children}
-      {error && <p className="field-msg error">{error}</p>}
-    </div>
   );
 }

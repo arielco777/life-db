@@ -1,13 +1,17 @@
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from './ErrorBoundary';
-import { FEATURE_V1_1, SHOW_DEBUG } from './features';
+import { SHOW_DEBUG } from './features';
+import { AnalyticsPage } from '@/features/analytics/AnalyticsPage';
 import { DebugPage } from '@/features/debug/DebugPage';
 import { DayRoute } from '@/features/day/DayPage';
+import { EventRoutes } from '@/features/events/EventPages';
+import { GoalRoutes } from '@/features/goals/GoalPages';
 import { HabitRoutes } from '@/features/habits/HabitPages';
 import { JournalRoutes } from '@/features/journal/JournalPages';
 import { MonthRoute } from '@/features/month/MonthPage';
 import { FirstRunGate } from '@/features/onboarding/FirstRun';
-import { Placeholder } from '@/features/Placeholder';
+import { SearchPage } from '@/features/search/SearchPage';
+import { SearchPaletteHost } from '@/features/search/SearchPalette';
 import { useApplyTheme, useSettings } from '@/features/settings/hooks';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { UpdateNotice } from '@/features/updates/UpdateNotice';
@@ -16,7 +20,6 @@ interface NavItem {
   to: string;
   label: string;
   icon: string;
-  v11?: boolean;
 }
 
 const NAV: NavItem[] = [
@@ -24,14 +27,12 @@ const NAV: NavItem[] = [
   { to: '/month', label: 'Month', icon: '▦' },
   { to: '/habits', label: 'Habits', icon: '✓' },
   { to: '/journal', label: 'Journal', icon: '✎' },
-  { to: '/goals', label: 'Goals', icon: '◎', v11: true },
-  { to: '/events', label: 'Events', icon: '✦', v11: true },
-  { to: '/analytics', label: 'Analytics', icon: '∿', v11: true },
-  { to: '/search', label: 'Search', icon: '⌕', v11: true },
+  { to: '/goals', label: 'Goals', icon: '◎' },
+  { to: '/events', label: 'Events', icon: '✦' },
+  { to: '/analytics', label: 'Analytics', icon: '∿' },
+  { to: '/search', label: 'Search', icon: '⌕' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
 ];
-
-const visibleNav = NAV.filter((n) => FEATURE_V1_1 || !n.v11);
 
 export function App() {
   useApplyTheme();
@@ -53,7 +54,7 @@ function Shell() {
           Life DB
           {name && <span className="nav-name">{name}</span>}
         </div>
-        {visibleNav.map((n) => (
+        {NAV.map((n) => (
           <NavLink key={n.to} to={n.to} className="nav-link">
             <span className="nav-icon" aria-hidden>
               {n.icon}
@@ -80,19 +81,16 @@ function Shell() {
             <Route path="/habits/*" element={<HabitRoutes />} />
             <Route path="/journal/*" element={<JournalRoutes />} />
             <Route path="/settings/*" element={<SettingsPage />} />
-            {FEATURE_V1_1 && (
-              <>
-                <Route path="/goals/*" element={<Placeholder title="Goals" phase="Phase 11" />} />
-                <Route path="/events" element={<Placeholder title="Events" phase="Phase 12" />} />
-                <Route path="/analytics" element={<Placeholder title="Analytics" phase="Phase 13" />} />
-                <Route path="/search" element={<Placeholder title="Search" phase="Phase 14" />} />
-              </>
-            )}
+            <Route path="/goals/*" element={<GoalRoutes />} />
+            <Route path="/events/*" element={<EventRoutes />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/search" element={<SearchPage />} />
             {SHOW_DEBUG && <Route path="/debug" element={<DebugPage />} />}
             <Route path="*" element={<Navigate to="/day" replace />} />
           </Routes>
         </ErrorBoundary>
       </main>
+      <SearchPaletteHost />
     </div>
   );
 }
