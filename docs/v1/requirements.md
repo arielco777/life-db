@@ -33,11 +33,11 @@ The V1.0 database schema already contains every V1.1 table, so V1.1 is a plain a
 | Item | Planned for |
 | --- | --- |
 | Data export (JSON / CSV / Markdown) and import | V1.5 |
-| Accounts / authentication | V1.5 |
-| Cloud sync, Supabase, multi-device | V1.5 |
+| Accounts / authentication | V5 (cloud, last) |
+| Cloud sync, Supabase, multi-device | V5 (cloud, last) |
 | App lock (PIN / password / biometrics on open) | V1.5 |
 | Data-loss recovery: recovery key, password-protected backups, restoring on another device | Later (not yet planned) |
-| Payments / premium tier | V1.5+ |
+| Payments / premium tier | V5 (cloud, last) |
 | Trends, correlations, life timeline | V2 |
 | Money / budgeting module | V3 |
 | AI companion, semantic search | V4 |
@@ -55,7 +55,7 @@ The V1.0 database schema already contains every V1.1 table, so V1.1 is a plain a
   - a habit entry's ID is derived from (habit ID, date)
   - link records (goal↔habit, tag↔record, goal↔month) derive their ID from the pair they link
   - the 8 default categories have fixed, built-in IDs
-  - tags with the same normalized name are merged on sync (rule recorded for V1.5)
+  - tags with the same normalized name are merged on sync (rule recorded for cloud sync, V5)
 
 ## 3. Glossary
 

@@ -526,7 +526,7 @@ Repository / Domain layer
 SQLite
 ```
 
-This abstraction is important because V1.5 will introduce synchronization.
+This abstraction is important because a later version (V5) will introduce synchronization.
 
 ---
 
@@ -572,9 +572,13 @@ The exact schema should be finalized separately through a dedicated backend/sche
 
 ---
 
-# 17. V1.5 — Cloud Sync
+# 17. V5 — Cloud Sync (last)
 
-Once the local product is proven, add cloud synchronization.
+Cloud comes **last**. Running servers, accounts and paid storage only makes sense once there are enough users to need them and pay for them, so everything that depends on a backend waits until after V4. Until then Life DB stays fully local, and moving data between devices goes through export/import (V1.5).
+
+V1 already keeps the cheap groundwork, so sync can be added without reshaping the data: UUIDs, `updated_at` on every write, soft deletes, natural IDs for records two devices could create independently, and the repository layer where change tracking can slot in.
+
+Once the local product is proven and has the users to justify it, add cloud synchronization.
 
 The local SQLite database remains the primary local data source.
 
@@ -615,7 +619,9 @@ SQLite remains useful locally.
 
 # 18. Free vs Premium Concept
 
-The initial business model can be:
+Premium is the cloud, so it arrives with V5. Until then every feature is free and local.
+
+The business model, once the cloud exists, can be:
 
 ### Free
 
@@ -663,14 +669,11 @@ Local Life DB
         │
         ▼
 V1.5
-Cloud Sync
+Local extras (no server)
 │
-├── Authentication
-├── Supabase
-├── PostgreSQL
-├── Sync Engine
-├── Multi-device
-└── Cloud Backup
+├── Export: JSON / CSV / Markdown
+├── Import (moves data between devices)
+└── App lock (PIN / password / biometrics)
         │
         ▼
 V2
@@ -697,6 +700,18 @@ Money
         ▼
 V4
 AI Companion
+        │
+        ▼
+V5 (last, once there are enough users)
+Cloud
+│
+├── Authentication
+├── Supabase
+├── PostgreSQL
+├── Sync Engine
+├── Multi-device
+├── Cloud Backup
+└── Premium tier
 ```
 
 The budgeting application is already largely developed separately and can be integrated as a future Life DB module rather than blocking V1.
@@ -787,7 +802,7 @@ The core product should work without an internet connection.
 
 Start simple.
 
-Add advanced analytics, cloud sync, money and AI only when the core Life DB is useful.
+Add advanced analytics, money and AI only when the core Life DB is useful, and cloud sync only once there are enough users to justify running a backend.
 
 ### AI is not the product
 
@@ -811,4 +826,4 @@ The first technical milestone is therefore:
 
 Then build the V1 functionality on top of it.
 
-The cloud, synchronization, budgeting integration and AI should come later.
+Budgeting integration and AI should come later. The cloud and synchronization come last.
