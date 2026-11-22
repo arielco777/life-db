@@ -6,6 +6,7 @@ import { createHabitEntryRepository } from './repositories/entries';
 import { createHabitRepository } from './repositories/habits';
 import { createJournalRepository } from './repositories/journal';
 import { createLifeEventRepository } from './repositories/lifeEvents';
+import { createSearchRepository } from './repositories/search';
 import { createSettingsRepository } from './repositories/settings';
 import { createTagRepository } from './repositories/tags';
 import type { Repositories } from '@/domain/repositories';
@@ -25,6 +26,7 @@ export function createRepositories(driver: SqlDriver, clock: Clock = systemClock
     journal: createJournalRepository(ctx),
     goals: createGoalRepository(ctx),
     events: createLifeEventRepository(ctx),
+    search: createSearchRepository(ctx),
     settings: createSettingsRepository(ctx),
   };
 }

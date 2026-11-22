@@ -270,6 +270,62 @@ export interface LifeEventRepository {
   remove(id: UUID): Promise<void>;
 }
 
+// ───────── Search ─────────
+
+/** The kinds of record search finds (SRCH-1). Milestone matches come back as their goal. */
+export type SearchType = 'journal_entry' | 'habit' | 'goal' | 'life_event' | 'tag';
+
+export interface SearchFilters {
+  /** Only these kinds; all when empty or absent. */
+  types?: SearchType[];
+  /**
+   * Records from this date range: journal entries by date, events, habits and goals
+   * overlapping it. Tags aren't dated, so a date filter leaves them out.
+   */
+  from?: ISODate;
+  to?: ISODate;
+  /** A category, or null for records without one. Leaves tags out. */
+  categoryId?: UUID | null;
+  /** Records carrying this tag. Leaves tags out. */
+  tagId?: UUID;
+}
+
+export interface SearchHit {
+  type: Exclude<SearchType, 'tag'>;
+  id: UUID;
+  /** Name or title; absent for an untitled journal entry. */
+  title?: string;
+  /** Text around the match, with matches between MARK_START and MARK_END (searchQuery.ts). */
+  snippet: string;
+  /** A goal found through one of its milestones: that milestone's title. */
+  milestone?: string;
+  /** Journal entry date, or an event's first day. */
+  date?: ISODate;
+  endDate?: ISODate;
+  categoryId?: UUID;
+  /** Habit archived, or goal status, to show next to the result. */
+  archived?: boolean;
+  status?: GoalStatus;
+}
+
+export interface TagHit {
+  id: UUID;
+  name: string;
+  /** Live records carrying the tag. */
+  count: number;
+}
+
+export interface SearchResults {
+  /** By relevance, then newest first (SRCH-3). */
+  hits: SearchHit[];
+  tags: TagHit[];
+}
+
+export interface SearchRepository {
+  /** Full-text search over every record type plus tag names (SRCH-1…4). */
+  search(query: string, filters?: SearchFilters, limit?: number): Promise<SearchResults>;
+}
+
 // ───────── Settings ─────────
 
 export interface SettingsRepository {
@@ -288,5 +344,6 @@ export interface Repositories {
   journal: JournalRepository;
   goals: GoalRepository;
   events: LifeEventRepository;
+  search: SearchRepository;
   settings: SettingsRepository;
 }

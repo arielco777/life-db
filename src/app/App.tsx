@@ -10,7 +10,8 @@ import { HabitRoutes } from '@/features/habits/HabitPages';
 import { JournalRoutes } from '@/features/journal/JournalPages';
 import { MonthRoute } from '@/features/month/MonthPage';
 import { FirstRunGate } from '@/features/onboarding/FirstRun';
-import { Placeholder } from '@/features/Placeholder';
+import { SearchPage } from '@/features/search/SearchPage';
+import { SearchPaletteHost } from '@/features/search/SearchPalette';
 import { useApplyTheme, useSettings } from '@/features/settings/hooks';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { UpdateNotice } from '@/features/updates/UpdateNotice';
@@ -88,7 +89,7 @@ function Shell() {
                 <Route path="/goals/*" element={<GoalRoutes />} />
                 <Route path="/events/*" element={<EventRoutes />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
-                <Route path="/search" element={<Placeholder title="Search" phase="Phase 14" />} />
+                <Route path="/search" element={<SearchPage />} />
               </>
             )}
             {SHOW_DEBUG && <Route path="/debug" element={<DebugPage />} />}
@@ -96,6 +97,7 @@ function Shell() {
           </Routes>
         </ErrorBoundary>
       </main>
+      {FEATURE_V1_1 && <SearchPaletteHost />}
     </div>
   );
 }
