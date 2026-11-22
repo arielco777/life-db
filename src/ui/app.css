@@ -946,7 +946,8 @@ fieldset:disabled .type-option {
   margin: 0;
   font-size: 24px;
 }
-a.icon-btn {
+a.icon-btn,
+button.icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1605,4 +1606,116 @@ a.icon-btn {
   color: var(--accent);
   font-size: 11px;
   cursor: default;
+}
+
+/* ───────── analytics ───────── */
+.period-picker {
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+.period-label {
+  min-width: 10ch;
+  text-align: center;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: var(--space-4);
+}
+.habit-stats-title {
+  margin: 0;
+  font-size: 16px;
+}
+.stats-table,
+.goal-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+.stats-table th,
+.stats-table td,
+.goal-table th,
+.goal-table td {
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.stats-table thead th,
+.goal-table thead th {
+  font-size: 12px;
+  color: var(--ink-muted);
+  border-bottom: 1px solid var(--border);
+}
+.stats-table tbody th {
+  color: var(--ink-muted);
+}
+.stats-table td:first-of-type {
+  font-weight: 600;
+}
+.goal-table tbody tr + tr {
+  border-top: 1px solid var(--border);
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.chart-frame {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius);
+}
+.chart-frame:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.chart-frame svg {
+  display: block;
+  overflow: visible;
+}
+.chart-bar {
+  fill: var(--chart-series);
+}
+.chart-bar.active {
+  opacity: 0.75;
+}
+.chart-grid,
+.chart-axis {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.chart-tick {
+  fill: var(--ink-muted);
+  font: 11px/1 var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+.chart-tooltip {
+  position: absolute;
+  top: -8px;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
+.chart-table summary {
+  cursor: pointer;
+  color: var(--ink-muted);
+}
+.chart-table table {
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.chart-table th,
+.chart-table td {
+  padding: 2px var(--space-2);
+  text-align: left;
+  font-weight: 400;
 }

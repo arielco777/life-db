@@ -222,11 +222,11 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 13 — Analytics
 
-- [ ] 13.1 `/analytics` period selector (week, month, year, custom). [ANL-1]
-- [ ] 13.2 Per-habit stat cards with previous-period comparison. [ANL-1, ANL-2]
-- [ ] 13.3 Choose a chart library (design §11 Q4). Per-habit chart, aggregated by week for year ranges. [ANL-3]
-- [ ] 13.4 Habit detail page reuses the stat cards and chart. [ANL-1]
-- [ ] 13.5 Goals summary table with status and category filters. [ANL-4, CAT-5]
+- [x] 13.1 `/analytics` period selector (week, month, year, custom). [ANL-1]
+- [x] 13.2 Per-habit stat cards with previous-period comparison. [ANL-1, ANL-2]
+- [x] 13.3 Choose a chart library (design §11 Q4). Per-habit chart, aggregated by week for year ranges. [ANL-3]
+- [x] 13.4 Habit detail page reuses the stat cards and chart. [ANL-1]
+- [x] 13.5 Goals summary table with status and category filters. [ANL-4, CAT-5]
 
 **✅ Done when:** the overview's examples (Exercise 18/31 58% vs July, Sleep avg/min/max, Reading totals) display correctly from the seeded data.
 
