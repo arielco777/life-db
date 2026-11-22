@@ -1,4 +1,3 @@
-import { FEATURE_V1_1 } from '@/app/features';
 import { useMemo } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { MONTH_NAMES, monthTitle } from './labels';
@@ -25,7 +24,7 @@ function MonthPage({ ym }: { ym: ISOMonth }) {
   const today = useToday();
   const thisMonth = monthOf(today);
   const month = useMonth(ym);
-  const { data: events } = useEventsOverlapping(monthRange(ym), FEATURE_V1_1);
+  const { data: events } = useEventsOverlapping(monthRange(ym));
   const eventDays = useMemo(() => eventsByDay(events ?? [], monthRange(ym)), [events, ym]);
   // Wait for categories too, so cells don't flash the fallback tint before their colour arrives.
   const categoriesPending = useCategories().isPending;
@@ -109,7 +108,7 @@ function MonthPage({ ym }: { ym: ISOMonth }) {
         />
       )}
 
-      {FEATURE_V1_1 && <MonthGoals ym={ym} />}
+      <MonthGoals ym={ym} />
     </section>
   );
 }

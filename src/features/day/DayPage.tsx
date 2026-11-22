@@ -3,7 +3,6 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { groupByCategory } from './grouping';
 import { rowStatus } from './rowStatus';
 import { useDay } from './useDay';
-import { FEATURE_V1_1 } from '@/app/features';
 import { markInteractive } from '@/app/startup';
 import { isISODate } from '@/domain/services/clock';
 import { addDays, diffDays } from '@/domain/services/dates';
@@ -116,13 +115,11 @@ function DayPage({ date }: { date: ISODate }) {
         </div>
       </header>
 
-      {FEATURE_V1_1 && <DayEvents date={date} />}
+      <DayEvents date={date} />
 
       <HabitsSection date={date} day={day} />
 
-      {FEATURE_V1_1 && !day.isPending && (
-        <DayGoals date={date} habits={day.habits} valuesByHabit={day.valuesByHabit} />
-      )}
+      {!day.isPending && <DayGoals date={date} habits={day.habits} valuesByHabit={day.valuesByHabit} />}
 
       <section className="day-section" aria-labelledby="day-journal">
         <h2 id="day-journal" className="section-title">

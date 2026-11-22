@@ -13,9 +13,6 @@ import { monthTitle } from '@/features/month/labels';
 import { MonthRoute } from '@/features/month/MonthPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 
-// The daily and monthly views show goals only in V1.1 builds.
-vi.mock('@/app/features', () => ({ FEATURE_V1_1: true, SHOW_DEBUG: false }));
-
 type Repos = Awaited<ReturnType<typeof setup>>['repos'];
 
 const today = logicalToday(4);
@@ -147,12 +144,13 @@ describe('Month goals (tasks 11.7, GOAL-6, MON-7)', () => {
     await within(list).findByRole('link', { name: 'Learn a recipe' });
 
     // Only unfinished goals not already in the month are offered.
-    const existing = screen.getByLabelText(`Add an existing goal to ${name}`);
+    await app.user.click(screen.getByRole('button', { name: 'Add an existing goal…' }));
+    const existing = await screen.findByLabelText(`Add an existing goal to ${name}`);
     expect(
       within(existing)
         .getAllByRole('option')
         .map((o) => o.textContent),
-    ).toEqual(['Add an existing goal…', 'Learn French']);
+    ).toEqual(['Choose a goal…', 'Learn French']);
     await app.user.selectOptions(existing, 'Learn French');
     await within(list).findByRole('link', { name: 'Learn French' });
 
@@ -262,7 +260,7 @@ describe('Accessibility with goals shown (axe, NFR-7)', () => {
   it('monthly view', async () => {
     await open(`/month/${thisMonth}`, seed);
     await screen.findByRole('link', { name: 'Learn French' }, { timeout: 5000 });
-    await screen.findByLabelText(/^Add an existing goal/);
+    await screen.findByRole('button', { name: 'Add an existing goal…' });
     expect(await violations()).toEqual([]);
   });
 
