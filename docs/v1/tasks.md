@@ -195,11 +195,11 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 11 — Goals
 
-- [ ] 11.1 Goal repository (+ milestones, goal_habits and goal_months with natural IDs) and tests. [GOAL-1..7, FC-5]
-- [ ] 11.2 `progress.ts`: milestones, manual and numeric modes, with unit tests. [GOAL-4]
-- [ ] 11.3 Goals list grouped by status, with progress bars and a category filter. [GOAL-1, GOAL-2, CAT-5]
-- [ ] 11.4 Goal form and detail page: fields, status (sets `completed_at`), progress mode controls. [GOAL-1, GOAL-2, GOAL-4]
-- [ ] 11.5 Milestones: inline add, toggle, edit, drag reorder, delete. [GOAL-3, GOAL-7]
+- [x] 11.1 Goal repository (+ milestones, goal_habits and goal_months with natural IDs) and tests. [GOAL-1..7, FC-5]
+- [x] 11.2 `progress.ts`: milestones, manual and numeric modes, with unit tests. [GOAL-4]
+- [x] 11.3 Goals list grouped by status, with progress bars and a category filter. [GOAL-1, GOAL-2, CAT-5]
+- [x] 11.4 Goal form and detail page: fields, status (sets `completed_at`), progress mode controls. [GOAL-1, GOAL-2, GOAL-4]
+- [x] 11.5 Milestones: inline add, toggle, edit, drag reorder, delete. [GOAL-3, GOAL-7]
 - [ ] 11.6 Link/unlink habits, with linked habit month stats on the detail page. [GOAL-5]
 - [ ] 11.7 Month assignment multi-picker, the month goals list below the monthly grid, and "Add monthly goal" from the monthly view. [GOAL-6, MON-7]
 - [ ] 11.8 Daily view goals section (goals with linked habits and their status for the day). [DAY-1, GOAL-5]

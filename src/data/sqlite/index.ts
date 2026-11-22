@@ -1,6 +1,7 @@
 import type { SqlDriver } from '../driver';
 import { createContext } from './context';
 import { createCategoryRepository } from './repositories/categories';
+import { createGoalRepository } from './repositories/goals';
 import { createHabitEntryRepository } from './repositories/entries';
 import { createHabitRepository } from './repositories/habits';
 import { createJournalRepository } from './repositories/journal';
@@ -21,6 +22,7 @@ export function createRepositories(driver: SqlDriver, clock: Clock = systemClock
     habits,
     entries: createHabitEntryRepository(ctx, habits),
     journal: createJournalRepository(ctx),
+    goals: createGoalRepository(ctx),
     settings: createSettingsRepository(ctx),
   };
 }
