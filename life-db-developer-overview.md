@@ -640,8 +640,9 @@ The business model, once the cloud exists, can be:
 - Cloud sync
 - Automatic backup
 - Multi-device access
+- AI features, on every device
 
-AI is not a premium feature: it runs on the user's own computer (V4), so it costs nothing to provide.
+AI becomes a premium feature once the cloud exists. Not every phone can run a local model, so AI on mobile needs a hosted model, and that has a running cost. Until then, V4's AI runs locally on desktop through Ollama.
 
 This avoids artificially restricting the core Life DB.
 
@@ -717,6 +718,7 @@ Cloud
 ├── Sync Engine
 ├── Multi-device
 ├── Cloud Backup
+├── Hosted AI (phones and devices without a local model)
 └── Premium tier
 ```
 
@@ -782,7 +784,7 @@ and identify meaningful relationships.
 
 ### How V4 works: local AI via Ollama
 
-The AI companion runs **locally**, through [Ollama](https://ollama.com) on the user's own computer. Journal entries and habit data never leave the device, there is no server or account, and it costs nothing to run. This keeps V4 independent of the cloud (V5).
+The AI companion runs **locally**, through [Ollama](https://ollama.com) on the user's own computer. Journal entries and habit data never leave the device, there is no server or account, and it costs nothing to run. This keeps V4 independent of the cloud (V5). Later, with the cloud, AI becomes a premium feature backed by a hosted model, so it also works on phones that can't run one locally (see §18).
 
 **Setup.** Ollama is a separate install, and models (2–5 GB) are too large to bundle with Life DB. The app detects Ollama at `localhost:11434`, shows in Settings → AI whether a model is available, and guides the user through installing one. AI is optional: every other feature works without it.
 
@@ -802,7 +804,7 @@ This makes V2 a prerequisite: its analytics are the engine the AI relies on.
 **Limits.**
 
 - Needs roughly 8 GB of RAM; answers take a few seconds on machines without a good GPU.
-- Desktop only: Ollama does not run on phones.
+- Desktop only: Ollama does not run on phones, and not every phone can run a model. AI on mobile waits for the hosted, premium AI in V5.
 - Calls go through the Rust side of the app, not the webview, like the database.
 
 ---

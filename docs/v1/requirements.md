@@ -40,7 +40,7 @@ The V1.0 database schema already contains every V1.1 table, so V1.1 is a plain a
 | Payments / premium tier | V5 (cloud, last) |
 | Trends, correlations, life timeline | V2 |
 | Money / budgeting module | V3 |
-| AI companion, semantic search | V4 (local, via Ollama) |
+| AI companion, semantic search | V4 (local on desktop, via Ollama); hosted premium AI for mobile in V5 |
 | Mobile builds (iOS/Android) | Post-V1 (V1 must not block it) |
 | Images / file attachments in journal | Post-V1 |
 | Reminders / notifications | Post-V1 |
