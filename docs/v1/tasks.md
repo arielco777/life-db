@@ -211,10 +211,10 @@ V1 ships in two releases (see requirements §2, "Release split"). The **full sch
 
 ## Phase 12 — Life events
 
-- [ ] 12.1 LifeEvent repository (`overlapping`) and tests. [EVT-1..3]
-- [ ] 12.2 Events list grouped by year, with a quick-add form, edit and delete. [EVT-1, EVT-3]
-- [ ] 12.3 Validation (end ≥ start), category, tags. Events appear in the tag view. [EVT-1, TAG-1, TAG-5]
-- [ ] 12.4 Daily view events banner across the range, and has-event markers in the monthly grid. [EVT-2, DAY-1, MON-6]
+- [x] 12.1 LifeEvent repository (`overlapping`) and tests. [EVT-1..3]
+- [x] 12.2 Events list grouped by year, with a quick-add form, edit and delete. [EVT-1, EVT-3]
+- [x] 12.3 Validation (end ≥ start), category, tags. Events appear in the tag view. [EVT-1, TAG-1, TAG-5]
+- [x] 12.4 Daily view events banner across the range, and has-event markers in the monthly grid. [EVT-2, DAY-1, MON-6]
 
 **✅ Done when:** a multi-day vacation shows on every covered day and in the month grid.
 

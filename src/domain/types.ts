@@ -105,6 +105,20 @@ export interface JournalEntry {
   updatedAt: Timestamp;
 }
 
+/** Something that happened: a day or a range of days, e.g. a vacation (EVT-1). */
+export interface LifeEvent {
+  id: UUID;
+  name: string;
+  description?: string;
+  startDate: ISODate;
+  /** Last day, inclusive. Absent for a one-day event. */
+  endDate?: ISODate;
+  categoryId?: UUID;
+  tagIds: UUID[];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export type GoalStatus = 'not_started' | 'active' | 'paused' | 'completed' | 'abandoned';
 export const GOAL_STATUSES: readonly GoalStatus[] = [
   'not_started',

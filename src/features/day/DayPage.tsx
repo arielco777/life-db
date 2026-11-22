@@ -10,6 +10,7 @@ import { addDays, diffDays } from '@/domain/services/dates';
 import type { ValuesByDate } from '@/domain/services/targets';
 import type { Habit, ISODate } from '@/domain/types';
 import { useCategories } from '@/features/categories/hooks';
+import { DayEvents } from '@/features/events/DayEvents';
 import { DayGoals } from '@/features/goals/DayGoals';
 import { HabitEntryField } from '@/features/habits/HabitEntryField';
 import { useHabits } from '@/features/habits/hooks';
@@ -115,7 +116,7 @@ function DayPage({ date }: { date: ISODate }) {
         </div>
       </header>
 
-      {/* V1.1: life events covering the date (DAY-1 §2) render here. */}
+      {FEATURE_V1_1 && <DayEvents date={date} />}
 
       <HabitsSection date={date} day={day} />
 

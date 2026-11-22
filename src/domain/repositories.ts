@@ -10,6 +10,7 @@ import type {
   ISODate,
   ISOMonth,
   JournalEntry,
+  LifeEvent,
   Milestone,
   Priority,
   ProgressMode,
@@ -242,6 +243,33 @@ export interface GoalRepository {
   setMonths(goalId: UUID, months: ISOMonth[]): Promise<void>;
 }
 
+// ───────── Life events ─────────
+
+export interface NewLifeEvent {
+  name: string;
+  description?: string;
+  startDate: ISODate;
+  /** Last day of a range, inclusive; absent for a one-day event (EVT-1). */
+  endDate?: ISODate;
+  categoryId?: UUID;
+  tagIds?: UUID[];
+}
+export type LifeEventPatch = {
+  [K in keyof NewLifeEvent]?: NewLifeEvent[K] | null;
+};
+
+export interface LifeEventRepository {
+  /** Newest first (EVT-3). */
+  list(): Promise<LifeEvent[]>;
+  /** Events covering any day of the range, oldest first (EVT-2, DAY-1, MON-6). */
+  overlapping(range: DateRange): Promise<LifeEvent[]>;
+  get(id: UUID): Promise<LifeEvent | null>;
+  create(input: NewLifeEvent): Promise<LifeEvent>;
+  update(id: UUID, patch: LifeEventPatch): Promise<LifeEvent>;
+  /** Soft-deletes the event and its tags (EVT-3). */
+  remove(id: UUID): Promise<void>;
+}
+
 // ───────── Settings ─────────
 
 export interface SettingsRepository {
@@ -259,5 +287,6 @@ export interface Repositories {
   entries: HabitEntryRepository;
   journal: JournalRepository;
   goals: GoalRepository;
+  events: LifeEventRepository;
   settings: SettingsRepository;
 }
