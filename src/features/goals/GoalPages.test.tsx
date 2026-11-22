@@ -120,13 +120,43 @@ describe('Goal form (tasks 11.4)', () => {
     expect(await app.repos.goals.list()).toEqual([]);
   });
 
-  it('flags a target date before the start date', async () => {
+  it('sets a target date only when "On a date" is chosen, like a habit end date', async () => {
     const app = await open('/goals/new');
     await app.user.type(await screen.findByLabelText('Title'), 'G');
+    expect(screen.getByRole('radio', { name: 'None' })).toBeChecked();
+    expect(screen.queryByLabelText('Target date')).toBeNull();
+
+    await app.user.click(screen.getByRole('radio', { name: 'On a date' }));
+    await app.user.click(screen.getByRole('button', { name: 'Create goal' }));
+    expect(screen.getByText('Pick a target date, or choose None')).toBeInTheDocument();
+    // Focus moves to the field that needs fixing.
+    await waitFor(() => expect(screen.getByLabelText('Target date')).toHaveFocus());
+
     await app.user.type(screen.getByLabelText(/^Start date/), '2026-09-10');
-    await app.user.type(screen.getByLabelText(/^Target date/), '2026-09-01');
+    await app.user.type(screen.getByLabelText('Target date'), '2026-09-01');
     await app.user.click(screen.getByRole('button', { name: 'Create goal' }));
     expect(screen.getByText('The target date is before the start date')).toBeInTheDocument();
+
+    // Choosing None again drops the date instead of saving it.
+    await app.user.click(screen.getByRole('radio', { name: 'None' }));
+    await app.user.click(screen.getByRole('button', { name: 'Create goal' }));
+    await waitFor(() => expect(path()).toMatch(/^\/goals\/[\w-]+$/));
+    const [goal] = await app.repos.goals.list();
+    expect(goal!.targetDate).toBeUndefined();
+  });
+
+  it('switching an existing target date to None clears it', async () => {
+    let id = '';
+    const app = await open('/goals', async (repos) => {
+      id = (await repos.goals.create({ title: 'Garden', targetDate: '2026-10-01' })).id;
+    });
+    await app.user.click(await screen.findByRole('link', { name: 'Garden' }));
+    await app.user.click(await screen.findByRole('link', { name: 'Edit' }));
+    expect(await screen.findByLabelText('Target date')).toHaveValue('2026-10-01');
+    await app.user.click(screen.getByRole('radio', { name: 'None' }));
+    await app.user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(path()).toBe(`/goals/${id}`));
+    expect((await app.repos.goals.get(id))!.targetDate).toBeUndefined();
   });
 
   it('edits a goal, clearing emptied fields', async () => {

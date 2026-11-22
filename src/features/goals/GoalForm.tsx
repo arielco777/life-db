@@ -19,6 +19,8 @@ export interface GoalDraft {
   target: string;
   unit: string;
   startDate: string;
+  /** "No target date" vs "On a date": explicit, like a habit's end date. */
+  hasTargetDate: boolean;
   targetDate: string;
   tagIds: UUID[];
 }
@@ -38,6 +40,7 @@ export function draftFrom(g?: Goal): GoalDraft {
     target: num(g?.progressTarget),
     unit: g?.progressUnit ?? '',
     startDate: g?.startDate ?? '',
+    hasTargetDate: !!g?.targetDate,
     targetDate: g?.targetDate ?? '',
     tagIds: g?.tagIds ?? [],
   };
@@ -54,7 +57,8 @@ export function toInput(
 ): { input: NewGoal; errors?: undefined } | { input?: undefined; errors: Errors } {
   const errors: Errors = {};
   if (!d.title.trim()) errors.title = 'Give the goal a title';
-  if (d.startDate && d.targetDate && d.targetDate < d.startDate)
+  if (d.hasTargetDate && !d.targetDate) errors.targetDate = 'Pick a target date, or choose None';
+  else if (d.hasTargetDate && d.startDate && d.targetDate < d.startDate)
     errors.targetDate = 'The target date is before the start date';
 
   // Only the chosen mode's fields are checked. The others keep their value if it's valid.
@@ -84,7 +88,7 @@ export function toInput(
       progressTarget: badTarget ? undefined : target,
       progressUnit: d.unit.trim() || undefined,
       startDate: d.startDate || undefined,
-      targetDate: d.targetDate || undefined,
+      targetDate: d.hasTargetDate ? d.targetDate : undefined,
       tagIds: d.tagIds,
     },
   };
@@ -248,16 +252,40 @@ export function GoalForm({ initial, submitLabel, busy, onSubmit, onCancel }: Goa
             onChange={(e) => set('startDate', e.target.value)}
           />
         </Field>
-        <Field label="Target date" id={`${ids}-target-date`} hint="Optional" error={errors.targetDate}>
-          <input
-            id={`${ids}-target-date`}
-            type="date"
-            value={d.targetDate}
-            min={d.startDate || undefined}
-            aria-invalid={!!errors.targetDate}
-            onChange={(e) => set('targetDate', e.target.value)}
-          />
-        </Field>
+        <fieldset className="field">
+          <legend>Target date</legend>
+          <div className="end-options">
+            <label className="check-row row">
+              <input
+                type="radio"
+                name={`${ids}-target-date`}
+                checked={!d.hasTargetDate}
+                onChange={() => set('hasTargetDate', false)}
+              />
+              <span>None</span>
+            </label>
+            <label className="check-row row">
+              <input
+                type="radio"
+                name={`${ids}-target-date`}
+                checked={d.hasTargetDate}
+                onChange={() => set('hasTargetDate', true)}
+              />
+              <span>On a date</span>
+            </label>
+            {d.hasTargetDate && (
+              <input
+                type="date"
+                aria-label="Target date"
+                value={d.targetDate}
+                min={d.startDate || undefined}
+                aria-invalid={!!errors.targetDate}
+                onChange={(e) => set('targetDate', e.target.value)}
+              />
+            )}
+          </div>
+          {errors.targetDate && <p className="field-msg error">{errors.targetDate}</p>}
+        </fieldset>
       </div>
 
       <Field label="Tags" id={`${ids}-tags`}>
