@@ -41,7 +41,7 @@ Platform-specific features (file dialogs, revealing a folder, file writes) sit b
 | Dates | date-fns | Local-date helpers; no time zone conversion for `YYYY-MM-DD` |
 | IDs | UUID v7 (`uuidv7` package) for new records; UUID v5 (`uuid` package) for natural IDs | Time-ordered, sync-friendly (FC-1). Natural IDs per FC-5 (§4.1) |
 | Styling | CSS Modules + CSS custom properties (design tokens) | Light/dark themes, notebook style |
-| Charts | Lightweight lib (e.g. uPlot or Recharts) | ANL-3 only |
+| Charts | Hand-written SVG bar chart, no library (see §11 Q4) | ANL-3 only |
 | DB (prod) | Rust `rusqlite` with `bundled-sqlcipher-vendored-openssl` feature | Bundles SQLCipher (SQLite + AES-256) with FTS5. See §3. |
 | Key storage | Rust `keyring` crate | OS credential store for the device key (SEC-2) |
 | DB (tests) | `better-sqlite3` | Same SQL, unencrypted, run under Vitest in Node. Encryption is tested in Rust (§9). |
@@ -697,5 +697,5 @@ The Rust `db_*` commands get `cargo test` cases for: transaction rollback, backu
 1. Should a boolean habit show an explicit "not done" (✗) by default, or keep it hidden behind the context menu (current design)?
 2. Should rating scales other than 1–10 (e.g. 1–5) be offered in V1, or should 1–10 be fixed? (The design supports both.)
 3. Should the journal get a WYSIWYG Markdown editor later, or stay a plain textarea?
-4. Which chart library? Pick at Phase 13 based on bundle size.
+4. ~~Which chart library?~~ **Decided (Phase 13):** none. Each habit has one small single-series bar chart, which a ~150-line SVG component (`src/features/analytics/BarChart.tsx`) draws with no added bundle weight. It has thin bars with 4px rounded tops and a 2px gap, a hover and arrow-key readout, and a "Show as table" view. Bars use `--chart-series`, checked with the dataviz palette validator against both themes' surfaces.
 5. ~~Where do feedback and issue reports go?~~ **Decided:** GitHub Issues on `arielco777/life-db` (DIST-4).

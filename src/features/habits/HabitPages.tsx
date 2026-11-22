@@ -9,6 +9,7 @@ import type { HabitPatch, NewHabit } from '@/domain/repositories';
 import { addDays } from '@/domain/services/dates';
 import type { Habit } from '@/domain/types';
 import { FEATURE_V1_1 } from '@/app/features';
+import { HabitStatsSection } from '@/features/analytics/HabitStatsSection';
 import { useCategories } from '@/features/categories/hooks';
 import { useHabitGoals } from '@/features/goals/hooks';
 import { useSettings, useToday } from '@/features/settings/hooks';
@@ -217,6 +218,8 @@ function HabitDetail({ habit }: { habit: Habit }) {
           </ul>
         </div>
       )}
+
+      {FEATURE_V1_1 && <HabitStatsSection habit={habit} />}
 
       <div className="row danger-zone">
         <button

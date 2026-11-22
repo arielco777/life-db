@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from './ErrorBoundary';
 import { FEATURE_V1_1, SHOW_DEBUG } from './features';
+import { AnalyticsPage } from '@/features/analytics/AnalyticsPage';
 import { DebugPage } from '@/features/debug/DebugPage';
 import { DayRoute } from '@/features/day/DayPage';
 import { EventRoutes } from '@/features/events/EventPages';
@@ -86,7 +87,7 @@ function Shell() {
               <>
                 <Route path="/goals/*" element={<GoalRoutes />} />
                 <Route path="/events/*" element={<EventRoutes />} />
-                <Route path="/analytics" element={<Placeholder title="Analytics" phase="Phase 13" />} />
+                <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/search" element={<Placeholder title="Search" phase="Phase 14" />} />
               </>
             )}

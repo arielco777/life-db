@@ -33,7 +33,7 @@ const contrast = (a: string, b: string) => {
 };
 
 const TEXT = ['ink', 'ink-muted', 'margin', 'accent', 'error', 'warning'];
-const EDGES = ['control-border', 'focus'];
+const EDGES = ['control-border', 'focus', 'chart-series'];
 const BACKGROUNDS = ['paper', 'paper-raised'];
 
 describe.each([
