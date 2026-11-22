@@ -20,6 +20,7 @@ import type {
   TaggableType,
   UUID,
 } from './types';
+import type { ExportFile } from './transfer';
 
 export interface DateRange {
   from: ISODate;
@@ -336,6 +337,13 @@ export interface SettingsRepository {
 
 // ───────── Aggregate ─────────
 
+// ───────── Export & import (V1.5) ─────────
+
+export interface TransferRepository {
+  /** All data as a Life DB export file (EXP-1). `appVersion` is recorded in the file. */
+  exportAll(opts: { appVersion: string }): Promise<ExportFile>;
+}
+
 export interface Repositories {
   categories: CategoryRepository;
   tags: TagRepository;
@@ -346,4 +354,5 @@ export interface Repositories {
   events: LifeEventRepository;
   search: SearchRepository;
   settings: SettingsRepository;
+  transfer: TransferRepository;
 }

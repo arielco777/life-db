@@ -43,6 +43,19 @@ export interface SaveFileOptions extends FileDialogOptions {
   defaultName: string;
 }
 
+/** What reading an export file found (IMP-1). */
+export type ExportReadOutcome =
+  | { state: 'ok'; text: string }
+  | { state: 'needs_password' }
+  | { state: 'wrong_password' }
+  | { state: 'not_life_db' };
+
+/** One file of a folder export (EXP-3). `name` is a single, portable file name. */
+export interface ExportFolderFile {
+  name: string;
+  text: string;
+}
+
 /**
  * Everything the UI needs from the device beyond the database's rows (FC-4): native file
  * dialogs, the file manager, and copying or replacing the database file. Desktop uses the
@@ -53,6 +66,20 @@ export interface PlatformService {
   pickSavePath(options: SaveFileOptions): Promise<string | null>;
   /** Asks the user to choose one file. Resolves to its path, or null if cancelled. */
   pickOpenPath(options: FileDialogOptions): Promise<string | null>;
+  /** Asks the user to choose a folder. Resolves to its path, or null if cancelled. */
+  pickFolder(title: string): Promise<string | null>;
+  /**
+   * Writes an export file, replacing `path` only once the whole file is written. With a
+   * password, the file is encrypted (EXP-8); the password is never stored or logged.
+   */
+  writeExport(path: string, text: string, password?: string): Promise<void>;
+  /** Reads an export file, decrypting it with `password` if it is protected (IMP-1). */
+  readExport(path: string, password?: string): Promise<ExportReadOutcome>;
+  /**
+   * Creates a new folder `name` inside `parent` (`name (2)`… if taken) and writes the
+   * files into it, never overwriting anything (EXP-3). Resolves to the folder's path.
+   */
+  writeFolder(parent: string, name: string, files: ExportFolderFile[]): Promise<string>;
   /** Opens the system file manager with this file selected. */
   revealInFolder(path: string): Promise<void>;
   /** Writes a consistent, encrypted copy of the database to `path` (EXP-4). */

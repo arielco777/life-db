@@ -5,7 +5,13 @@ import * as logger from '@tauri-apps/plugin-log';
 import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { check } from '@tauri-apps/plugin-updater';
-import type { AppInfo, AvailableUpdate, DataInfo, PlatformService } from './PlatformService';
+import type {
+  AppInfo,
+  AvailableUpdate,
+  DataInfo,
+  ExportReadOutcome,
+  PlatformService,
+} from './PlatformService';
 import { LATEST_SCHEMA_VERSION } from '@/data/sqlite';
 
 /** Tauri rejects with the Rust error's message as a plain string; keep it as an Error's message. */
@@ -19,6 +25,11 @@ function call<T>(promise: Promise<T>): Promise<T> {
 export const tauriPlatform: PlatformService = {
   pickSavePath: ({ title, defaultName, filters }) => call(save({ title, defaultPath: defaultName, filters })),
   pickOpenPath: ({ title, filters }) => call(open({ title, filters, multiple: false, directory: false })),
+  pickFolder: (title) =>
+    call(open({ title, multiple: false, directory: true })).then((p) => (typeof p === 'string' ? p : null)),
+  writeExport: (path, text, password) => call(invoke<void>('export_write', { path, text, password })),
+  readExport: (path, password) => call(invoke<ExportReadOutcome>('export_read', { path, password })),
+  writeFolder: (parent, name, files) => call(invoke<string>('export_write_folder', { parent, name, files })),
   revealInFolder: (path) => call(revealItemInDir(path)),
   backupTo: (destPath) => call(invoke<void>('db_backup', { destPath })),
   autoBackup: (today, keepCount) => call(invoke<string | null>('db_auto_backup', { today, keepCount })),
