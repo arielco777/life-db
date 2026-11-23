@@ -82,6 +82,11 @@ export interface PlatformService {
   writeFolder(parent: string, name: string, files: ExportFolderFile[]): Promise<string>;
   /** Opens the system file manager with this file selected. */
   revealInFolder(path: string): Promise<void>;
+  /**
+   * Saves a copy of the database in the backups folder as `<label>-<time>.lifedb`, never
+   * pruned (e.g. `pre-import`, IMP-5). Resolves to its path, for undoing with `restoreFrom`.
+   */
+  safetyBackup(label: string): Promise<string>;
   /** Writes a consistent, encrypted copy of the database to `path` (EXP-4). */
   backupTo(path: string): Promise<void>;
   /**

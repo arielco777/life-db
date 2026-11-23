@@ -54,6 +54,9 @@ export function fakePlatform(info: Partial<DataInfo> = {}) {
     backupTo: vi.fn(async (path: string): Promise<void> => {
       state.backups.push(path);
     }),
+    safetyBackup: vi.fn(
+      async (label: string): Promise<string> => `/home/me/.local/share/life-db/backups/${label}-1.lifedb`,
+    ),
     autoBackup: vi.fn(async (_today: string, _keepCount: number): Promise<string | null> => null),
     restoreFrom: vi.fn(
       async (_path: string): Promise<string> => '/home/me/.local/share/life-db/backups/pre-restore-1.lifedb',
