@@ -18,6 +18,10 @@ const validators: { [K in keyof Settings]: (v: unknown) => boolean } = {
   'day.group_by_category': (v) => typeof v === 'boolean',
 };
 
+/** Whether `value` is allowed for setting `key` (also used by import, IMP-3). */
+export const isValidSetting = (key: string, value: unknown): boolean =>
+  key in validators && validators[key as keyof Settings](value);
+
 /** Key/value settings stored as JSON; missing or invalid keys fall back to DEFAULT_SETTINGS. */
 export function createSettingsRepository(ctx: RepoContext): SettingsRepository {
   const { db } = ctx;
