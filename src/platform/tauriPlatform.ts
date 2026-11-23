@@ -32,6 +32,7 @@ export const tauriPlatform: PlatformService = {
   writeFolder: (parent, name, files) => call(invoke<string>('export_write_folder', { parent, name, files })),
   revealInFolder: (path) => call(revealItemInDir(path)),
   backupTo: (destPath) => call(invoke<void>('db_backup', { destPath })),
+  safetyBackup: (label) => call(invoke<string>('db_backup_internal', { label })),
   autoBackup: (today, keepCount) => call(invoke<string | null>('db_auto_backup', { today, keepCount })),
   // Backups from a newer app (a higher schema version) are refused.
   restoreFrom: (srcPath) =>

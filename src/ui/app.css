@@ -523,6 +523,29 @@ button.danger {
 .dialog-body p {
   margin: var(--space-3) 0 0;
 }
+/* Multi-step dialogs with more to read (import, IMP-6). */
+.dialog-wide {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 2 * var(--space-4));
+  overflow-y: auto;
+}
+.dialog h2:focus {
+  outline: none;
+}
+.import-option {
+  align-items: flex-start;
+  margin-top: var(--space-2);
+}
+.import-option input {
+  margin-top: 3px;
+}
+.import-summary {
+  margin: 0;
+  padding-left: var(--space-4);
+}
+.import-summary li + li {
+  margin-top: var(--space-1);
+}
 .dialog-actions {
   display: flex;
   justify-content: flex-end;

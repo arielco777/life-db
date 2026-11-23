@@ -55,7 +55,7 @@ V1.5 ships as **app version 1.5.0** through the updater. It has no data migratio
   - a failure partway leaves the DB unchanged;
   - search finds imported records.
   [IMP-2..5, NFR-14]
-- [ ] 17.7 Import dialog in Settings → Data: file → password → Replace or Merge → preview → `pre-import` backup and apply → result with *Undo import* (restores the backup) → reload. Focus moves to each step's heading. Component tests and axe. [IMP-3..7]
+- [x] 17.7 Import dialog in Settings → Data: file → password → Replace or Merge → preview → `pre-import` backup and apply → result with *Undo import* (restores the backup) → reload. Focus moves to each step's heading. Component tests and axe. [IMP-3..7]
 - [x] 17.8 Perf test: validate and preview under 5 s, replace and merge each under 10 s on the seeded dataset. [NFR-13]
 
 **✅ Done when:** an export from one computer, imported with replace on a fresh install of another, shows the same data; merging two diverged copies gives the newest version of each record with no duplicate tags or categories; *Undo import* brings back the previous data.
