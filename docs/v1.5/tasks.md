@@ -21,15 +21,15 @@ V1.5 ships as **app version 1.5.0** through the updater. It has no data migratio
 
 ### 16A. Format & Rust
 
-- [ ] 16.1 `ExportFile` Zod schema in `src/domain/transfer.ts`: header, preference allowlist, one row schema per table (camelCase columns, booleans), and tombstone schemas with reference columns. Reuse the domain enums and date schemas. [EXP-1]
-- [ ] 16.2 `TransferRepository.exportAll()` in `src/data/sqlite/transfer/export.ts`: one query per table including deleted rows, rows sorted by ID, tombstones stripped to their reference columns. Add it to `createRepositories`. [EXP-1]
-- [ ] 16.3 `life_db_core::envelope`: Argon2id + AES-256-GCM with the header as associated data, `Zeroizing` secrets. `cargo test`: round trip, wrong password, tampered header and ciphertext. Adds `argon2`, `aes-gcm`, `zeroize`, `base64`. [EXP-8, NFR-16]
-- [ ] 16.4 Commands `export_write` (atomic: tmp + fsync + rename), `export_read` (plain or protected, typed errors), `export_write_folder` (safe names, never overwrites). Matching `PlatformService` methods plus `pickFolder()`, with fakes for tests. [EXP-1..3, EXP-8, FC-4]
+- [x] 16.1 `ExportFile` Zod schema in `src/domain/transfer.ts`: header, preference allowlist, one row schema per table (camelCase columns, booleans), and tombstone schemas with reference columns. Reuse the domain enums and date schemas. [EXP-1]
+- [x] 16.2 `TransferRepository.exportAll()` in `src/data/sqlite/transfer/export.ts`: one query per table including deleted rows, rows sorted by ID, tombstones stripped to their reference columns. Add it to `createRepositories`. [EXP-1]
+- [x] 16.3 `life_db_core::envelope`: Argon2id + AES-256-GCM with the header as associated data, `Zeroizing` secrets. `cargo test`: round trip, wrong password, tampered header and ciphertext. Adds `argon2`, `aes-gcm`, `zeroize`, `base64`. [EXP-8, NFR-16]
+- [x] 16.4 Commands `export_write` (atomic: tmp + fsync + rename), `export_read` (plain or protected, typed errors), `export_write_folder` (safe names, never overwrites). Matching `PlatformService` methods plus `pickFolder()`, with fakes for tests. [EXP-1..3, EXP-8, FC-4]
 
 ### 16B. CSV & Markdown
 
-- [ ] 16.5 `csvExport.ts`: long and wide layouts, RFC 4180 quoting, BOM, CSV-injection guard on text cells only, values in each habit's unit, duplicate habit names disambiguated. Unit tests. [EXP-2]
-- [ ] 16.6 `markdownExport.ts`: one file per entry, portable file names with clash suffixes, JSON-quoted YAML front matter (date, title, tags, category). Unit tests. [EXP-3]
+- [x] 16.5 `csvExport.ts`: long and wide layouts, RFC 4180 quoting, BOM, CSV-injection guard on text cells only, values in each habit's unit, duplicate habit names disambiguated. Unit tests. [EXP-2]
+- [x] 16.6 `markdownExport.ts`: one file per entry, portable file names with clash suffixes, JSON-quoted YAML front matter (date, title, tags, category). Unit tests. [EXP-3]
 
 ### 16C. UI
 

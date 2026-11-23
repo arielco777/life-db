@@ -64,6 +64,9 @@ pub fn run() {
             commands::db_restore,
             commands::db_info,
             commands::app_log_file,
+            commands::export_write,
+            commands::export_read,
+            commands::export_write_folder,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Life DB");

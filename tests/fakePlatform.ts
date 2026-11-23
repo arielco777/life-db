@@ -2,6 +2,8 @@ import { vi } from 'vitest';
 import type {
   AvailableUpdate,
   DataInfo,
+  ExportFolderFile,
+  ExportReadOutcome,
   LogLevel,
   FileDialogOptions,
   PlatformService,
@@ -20,10 +22,34 @@ export function fakePlatform(info: Partial<DataInfo> = {}) {
     /** What the next update check finds. */
     nextUpdate: null as AvailableUpdate | null,
     backups: [] as string[],
+    /** What the next folder dialog "returns" (null = cancelled). */
+    nextFolder: null as string | null,
+    /** Export files written, by path; `password` is set for protected ones. */
+    exports: new Map<string, { text: string; password?: string }>(),
+    /** Folder exports written: the folder's path and its files. */
+    folders: [] as { path: string; files: ExportFolderFile[] }[],
   };
   const service = {
     pickSavePath: vi.fn(async (_options: SaveFileOptions): Promise<string | null> => state.nextSavePath),
     pickOpenPath: vi.fn(async (_options: FileDialogOptions): Promise<string | null> => state.nextOpenPath),
+    pickFolder: vi.fn(async (_title: string): Promise<string | null> => state.nextFolder),
+    writeExport: vi.fn(async (path: string, text: string, password?: string): Promise<void> => {
+      state.exports.set(path, { text, password });
+    }),
+    readExport: vi.fn(async (path: string, password?: string): Promise<ExportReadOutcome> => {
+      const f = state.exports.get(path);
+      if (!f) return { state: 'not_life_db' };
+      if (f.password === undefined) return { state: 'ok', text: f.text };
+      if (password === undefined) return { state: 'needs_password' };
+      return password === f.password ? { state: 'ok', text: f.text } : { state: 'wrong_password' };
+    }),
+    writeFolder: vi.fn(async (parent: string, name: string, files: ExportFolderFile[]): Promise<string> => {
+      const taken = (p: string) => state.folders.some((f) => f.path === p);
+      let path = `${parent}/${name}`;
+      for (let i = 2; taken(path); i++) path = `${parent}/${name} (${i})`;
+      state.folders.push({ path, files });
+      return path;
+    }),
     revealInFolder: vi.fn(async (_path: string): Promise<void> => {}),
     backupTo: vi.fn(async (path: string): Promise<void> => {
       state.backups.push(path);

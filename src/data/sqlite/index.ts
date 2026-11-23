@@ -9,6 +9,7 @@ import { createLifeEventRepository } from './repositories/lifeEvents';
 import { createSearchRepository } from './repositories/search';
 import { createSettingsRepository } from './repositories/settings';
 import { createTagRepository } from './repositories/tags';
+import { exportAll } from './transfer/export';
 import type { Repositories } from '@/domain/repositories';
 import { systemClock, type Clock } from '@/domain/services/clock';
 
@@ -18,6 +19,7 @@ export { migrate, MIGRATIONS, LATEST_SCHEMA_VERSION, DatabaseTooNewError } from 
 export function createRepositories(driver: SqlDriver, clock: Clock = systemClock): Repositories {
   const ctx = createContext(driver, clock);
   const habits = createHabitRepository(ctx);
+  const settings = createSettingsRepository(ctx);
   return {
     categories: createCategoryRepository(ctx),
     tags: createTagRepository(ctx),
@@ -27,6 +29,7 @@ export function createRepositories(driver: SqlDriver, clock: Clock = systemClock
     goals: createGoalRepository(ctx),
     events: createLifeEventRepository(ctx),
     search: createSearchRepository(ctx),
-    settings: createSettingsRepository(ctx),
+    settings,
+    transfer: { exportAll: ({ appVersion }) => exportAll(ctx, settings, appVersion) },
   };
 }

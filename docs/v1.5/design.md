@@ -56,7 +56,7 @@ The file mirrors the **tables**, one array per table, with columns in camelCase.
 ```
 
 - **Columns:** every column of the table as of schema version 3, renamed to camelCase (`frequency_rest` → `frequencyRest`). `0/1` columns become booleans.
-- **Tombstones:** a row with `deleted_at` set is written as `{ "id", "createdAt", "updatedAt", "deletedAt" }` plus its **reference columns**: foreign keys (`habitId`, `goalId`, `categoryId`, `tagId`, `entityType`/`entityId`) and the parts of a natural ID (`date`, `month`). These contain no user text, and they let a replace insert the tombstone without breaking a foreign key. Names, text, values and notes are never written.
+- **Tombstones:** a row with `deleted_at` set is written as `{ "id", "createdAt", "updatedAt", "deletedAt" }` plus its **reference columns**: required foreign keys (`habitId`, `goalId`, `tagId`, `entityType`/`entityId`) and the parts of a natural ID (`date`, `month`). Optional ones like `categoryId` aren't needed to insert a tombstone, so they're left out. These contain no user text, and they let a replace insert the tombstone without breaking a foreign key. Names, text, values and notes are never written.
 - **Settings:** an allowlist of preferences: `profile.display_name`, `week_start`, `day_start_hour`, `theme`, `date_format`, `day.group_by_category`. Device settings (`backup.*`, `updates.*`, `onboarding.completed`) are left out.
 - **Order:** rows sorted by `id` within each table, so two exports of the same data are byte-identical and diff cleanly.
 - **Versioning:** `format` changes only when the file's shape changes. A future migration that adds a column bumps it to 2, and the importer upgrades a format-1 file in memory first (a chain of `upgradeFormat1To2`… functions, like migrations).
@@ -64,7 +64,7 @@ The file mirrors the **tables**, one array per table, with columns in camelCase.
 
 ### 2.2 Building it
 
-`TransferRepository.exportAll()` (in `src/data/sqlite/transfer/export.ts`) runs one `SELECT *` per table, including deleted rows, maps rows to the format, and returns the object. The UI stringifies it (`JSON.stringify(file, null, 1)`: readable and still compact) and passes it to Rust.
+`TransferRepository.exportAll({ appVersion })` (in `src/data/sqlite/transfer/export.ts`) runs one `SELECT *` per table, including deleted rows, maps rows to the format, and returns the object. The UI stringifies it (`JSON.stringify(file, null, 1)`: readable and still compact) and passes it to Rust.
 
 `ExportFile` is defined once as a Zod schema in `src/domain/transfer.ts`. Export output is type-checked against it, and import parses with it, so both sides can't drift apart.
 

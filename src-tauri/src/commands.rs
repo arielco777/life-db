@@ -2,6 +2,7 @@
 
 use life_db_core::backups::{self, BACKUPS_DIR};
 use life_db_core::db::{Database, Statement};
+use life_db_core::export::{self, ExportFile, ReadOutcome};
 use life_db_core::keystore::DeviceKey;
 use life_db_core::{DbStatus, Error, KEY_FILE, Opened, Result};
 use serde::Serialize;
@@ -184,4 +185,34 @@ pub fn app_log_file(app: AppHandle) -> Result<String> {
         .join(format!("{}.log", crate::LOG_FILE_STEM))
         .display()
         .to_string())
+}
+
+// ───────── exports (V1.5 design §2.4) ─────────
+// Passwords and export text are never logged (SEC-3, NFR-16).
+
+/// Writes an export file, encrypted when a password is given (EXP-1..3, EXP-8).
+#[tauri::command(async)]
+pub fn export_write(path: String, text: String, password: Option<String>) -> Result<()> {
+    let password = password.map(zeroize::Zeroizing::new);
+    export::write_export(
+        &PathBuf::from(path),
+        &text,
+        password.as_ref().map(|p| p.as_str()),
+    )
+    .inspect_err(|e| log::warn!("export failed: {e}"))
+}
+
+/// Reads an export, decrypting it if protected (IMP-1).
+#[tauri::command(async)]
+pub fn export_read(path: String, password: Option<String>) -> Result<ReadOutcome> {
+    let password = password.map(zeroize::Zeroizing::new);
+    export::read_export(&PathBuf::from(path), password.as_ref().map(|p| p.as_str()))
+}
+
+/// Writes a new folder of files inside `parent` (EXP-3). Returns the folder's path.
+#[tauri::command(async)]
+pub fn export_write_folder(parent: String, name: String, files: Vec<ExportFile>) -> Result<String> {
+    export::write_folder(&PathBuf::from(parent), &name, &files)
+        .map(|p| p.display().to_string())
+        .inspect_err(|e| log::warn!("folder export failed: {e}"))
 }

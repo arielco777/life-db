@@ -3,7 +3,9 @@
 
 pub mod backups;
 pub mod db;
+pub mod envelope;
 pub mod error;
+pub mod export;
 pub mod keystore;
 
 use db::Database;
