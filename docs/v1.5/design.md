@@ -145,7 +145,7 @@ All steps up to *apply* only read. Cancelling at any point changes nothing.
 ### 4.2 Validation (IMP-2)
 
 - **Shape:** `ExportFile.safeParse`. Each row reuses the domain's rules (enums, ISO dates, `end ≥ start`, rating bounds, the habit target triple). Errors are summarised for people: "Habit entry 2026-08-14 has an invalid value", plus the count of other problems, never a raw Zod dump.
-- **References:** every `habitId`, `goalId`, `categoryId`, `tagId` and `entityTags.entityId` must be in the file, or (for a merge) in the app. A live row may not point to a tombstone. A tombstone whose parent is missing is dropped with a note, not rejected: there's nothing left for it to delete.
+- **References:** every `habitId`, `goalId`, `categoryId`, `tagId` and `entityTags.entityId` must be in the file, or (for a merge) in the app. It may point to a deleted record: the app itself keeps, for example, the entries of a deleted habit. A tombstone whose parent is missing is dropped with a note, not rejected: there's nothing left for it to delete.
 - **Natural IDs:** for `habitEntries`, `goalHabits`, `goalMonths`, `entityTags`, the `id` must equal `naturalId(…)` of its fields (V1 §4.1). A mismatch means the file was edited by hand and would break merging later, so it is rejected.
 - **Format:** `format > 1` → "made by a newer version of Life DB". `app ≠ "life-db"` → "not a Life DB export".
 

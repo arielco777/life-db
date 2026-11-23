@@ -10,6 +10,7 @@ import { createSearchRepository } from './repositories/search';
 import { createSettingsRepository } from './repositories/settings';
 import { createTagRepository } from './repositories/tags';
 import { exportAll } from './transfer/export';
+import { applyImport, planImport } from './transfer/import';
 import type { Repositories } from '@/domain/repositories';
 import { systemClock, type Clock } from '@/domain/services/clock';
 
@@ -30,6 +31,10 @@ export function createRepositories(driver: SqlDriver, clock: Clock = systemClock
     events: createLifeEventRepository(ctx),
     search: createSearchRepository(ctx),
     settings,
-    transfer: { exportAll: ({ appVersion }) => exportAll(ctx, settings, appVersion) },
+    transfer: {
+      exportAll: ({ appVersion }) => exportAll(ctx, settings, appVersion),
+      plan: (file, mode) => planImport(ctx, file, mode),
+      apply: (plan) => applyImport(ctx, plan),
+    },
   };
 }

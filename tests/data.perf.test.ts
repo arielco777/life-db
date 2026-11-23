@@ -2,6 +2,7 @@ import { seedLargeDataset } from './fixtures/seed';
 import { setup } from './helpers';
 import { dayWindow } from '@/features/day/rowStatus';
 import { buildHabitCsv, buildJournalFiles, buildJsonExport } from '@/features/transfer/build';
+import { parseExport } from '@/domain/importFile';
 
 /**
  * Data-layer share of the NFR-1 budgets on 5y × 30 habits + 3k journal entries.
@@ -81,4 +82,38 @@ describe('performance on a multi-year dataset (NFR-1)', () => {
     expect(files).toHaveLength(3000);
     for (const ms of [json, csv, wide, md]) expect(ms).toBeLessThan(5000);
   }, 60_000);
+
+  // NFR-13 (V1.5): reading and previewing an export of the dataset in under 5 s; replacing
+  // with it, or merging it into a different multi-year dataset, in under 10 s each.
+  it('imports the whole dataset within NFR-13', async () => {
+    const a = await setup('2026-08-31T12:00:00');
+    await seedLargeDataset(a.driver);
+    const text = await buildJsonExport(a.repos, '1.5.0');
+    const timed = async <T>(fn: () => Promise<T> | T) => {
+      const t0 = performance.now();
+      const out = await fn();
+      return [performance.now() - t0, out] as const;
+    };
+
+    const b = await setup('2026-08-31T12:00:00');
+    const [preview, plan] = await timed(() => b.repos.transfer.plan(parseExport(text), 'replace'));
+    const [replace] = await timed(() => b.repos.transfer.apply(plan));
+    expect((await b.repos.search.search('walk')).hits.length).toBeGreaterThan(0);
+
+    // A second, different dataset (other IDs, same tag and category names) to merge into.
+    const c = await setup('2026-08-31T12:00:00');
+    await seedLargeDataset(c.driver, { seed: 7 });
+    const [mergePreview, mergePlan] = await timed(() => c.repos.transfer.plan(parseExport(text), 'merge'));
+    const [merge] = await timed(() => c.repos.transfer.apply(mergePlan));
+    console.info(
+      `import: preview ${preview.toFixed(0)} ms, replace ${replace.toFixed(0)} ms, ` +
+        `merge preview ${mergePreview.toFixed(0)} ms, merge ${merge.toFixed(0)} ms ` +
+        `(${mergePlan.counts.habitEntries.add} entries added, ${mergePlan.combined.tags} tags combined)`,
+    );
+    expect(mergePlan.counts.habitEntries.add).toBeGreaterThan(30_000);
+    expect(preview).toBeLessThan(5000);
+    expect(mergePreview).toBeLessThan(5000);
+    expect(replace).toBeLessThan(10_000);
+    expect(merge).toBeLessThan(10_000);
+  }, 120_000);
 });

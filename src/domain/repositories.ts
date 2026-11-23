@@ -20,6 +20,7 @@ import type {
   TaggableType,
   UUID,
 } from './types';
+import type { ImportMode, ImportPlan } from './importFile';
 import type { ExportFile } from './transfer';
 
 export interface DateRange {
@@ -342,6 +343,14 @@ export interface SettingsRepository {
 export interface TransferRepository {
   /** All data as a Life DB export file (EXP-1). `appVersion` is recorded in the file. */
   exportAll(opts: { appVersion: string }): Promise<ExportFile>;
+  /**
+   * Checks a parsed export against the app's data and works out what importing it would
+   * do (IMP-2, IMP-6). Reads only. Throws DomainError('validation') for a file that
+   * can't be imported, e.g. a record pointing to one that is nowhere.
+   */
+  plan(file: ExportFile, mode: ImportMode): Promise<ImportPlan>;
+  /** Imports a planned file in one transaction (IMP-3, IMP-4, IMP-5). */
+  apply(plan: ImportPlan): Promise<void>;
 }
 
 export interface Repositories {

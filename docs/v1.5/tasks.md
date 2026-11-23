@@ -43,12 +43,12 @@ V1.5 ships as **app version 1.5.0** through the updater. It has no data migratio
 
 ## Phase 17 — Import
 
-- [ ] 17.1 Parse and validate: `export_read` with a password prompt, `ExportFile` parsing, format check, reference check (dropping orphaned tombstones), natural-ID check. Errors summarised for people. [IMP-1, IMP-2]
-- [ ] 17.2 `Database::transaction` uses `prepare_cached`; measure 60k inserts in one call. Batch into multi-row inserts only if needed. [NFR-13]
-- [ ] 17.3 `TransferRepository.plan(file, mode)`: compares with the app's `id, updated_at, deleted_at` per table and counts add, update, delete and unchanged. For a merge, remaps same-name tags and custom categories first and recomputes affected natural IDs. [IMP-4, IMP-6]
-- [ ] 17.4 `TransferRepository.apply(plan)` for **replace**: hard-deletes children first, inserts parents first with tombstone placeholders, writes preferences. All in one transaction. [IMP-3, IMP-5]
-- [ ] 17.5 `apply` for **merge**: upserts with `WHERE excluded.updated_at > t.updated_at`, applies tombstones only when newer, keeps the app's settings. All in one transaction. [IMP-4, IMP-5]
-- [ ] 17.6 Repository tests:
+- [x] 17.1 Parse and validate: `export_read` with a password prompt, `ExportFile` parsing, format check, reference check (dropping orphaned tombstones), natural-ID check. Errors summarised for people. [IMP-1, IMP-2]
+- [x] 17.2 `Database::transaction` uses `prepare_cached`; measure 60k inserts in one call. Batch into multi-row inserts only if needed. [NFR-13]
+- [x] 17.3 `TransferRepository.plan(file, mode)`: compares with the app's `id, updated_at, deleted_at` per table and counts add, update, delete and unchanged. For a merge, remaps same-name tags and custom categories first and recomputes affected natural IDs. [IMP-4, IMP-6]
+- [x] 17.4 `TransferRepository.apply(plan)` for **replace**: hard-deletes children first, inserts parents first with tombstone placeholders, writes preferences. All in one transaction. [IMP-3, IMP-5]
+- [x] 17.5 `apply` for **merge**: upserts with `WHERE excluded.updated_at > t.updated_at`, applies tombstones only when newer, keeps the app's settings. All in one transaction. [IMP-4, IMP-5]
+- [x] 17.6 Repository tests:
   - the NFR-14 round trip (export → replace into an empty DB → export is byte-identical);
   - each merge rule: add, newer wins, a tie keeps the app's row, tombstone newer and older, same-name tag and category merge;
   - merging a second time changes nothing;
@@ -56,7 +56,7 @@ V1.5 ships as **app version 1.5.0** through the updater. It has no data migratio
   - search finds imported records.
   [IMP-2..5, NFR-14]
 - [ ] 17.7 Import dialog in Settings → Data: file → password → Replace or Merge → preview → `pre-import` backup and apply → result with *Undo import* (restores the backup) → reload. Focus moves to each step's heading. Component tests and axe. [IMP-3..7]
-- [ ] 17.8 Perf test: validate and preview under 5 s, replace and merge each under 10 s on the seeded dataset. [NFR-13]
+- [x] 17.8 Perf test: validate and preview under 5 s, replace and merge each under 10 s on the seeded dataset. [NFR-13]
 
 **✅ Done when:** an export from one computer, imported with replace on a fresh install of another, shows the same data; merging two diverged copies gives the newest version of each record with no duplicate tags or categories; *Undo import* brings back the previous data.
 

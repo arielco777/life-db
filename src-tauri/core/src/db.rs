@@ -49,6 +49,9 @@ impl Database {
              PRAGMA busy_timeout = 5000;
              PRAGMA temp_store = MEMORY;",
         )?;
+        // An import writes each table with a few statement shapes, over and over (V1.5
+        // design §4.5): keep every shape prepared rather than re-parsing each statement.
+        conn.set_prepared_statement_cache_capacity(64);
         Ok(Self {
             conn: Mutex::new(conn),
             path,
@@ -91,7 +94,8 @@ impl Database {
         let mut conn = self.lock();
         let tx = conn.transaction()?;
         for s in statements {
-            tx.execute(&s.sql, params_from_iter(to_sql_values(&s.params)?))?;
+            tx.prepare_cached(&s.sql)?
+                .execute(params_from_iter(to_sql_values(&s.params)?))?;
         }
         tx.commit()?;
         Ok(())
